@@ -1,0 +1,5 @@
+玛薇卡 w(0.5),dash,wait(0.2),e
+茜特菈莉 e,q
+希诺宁 e,attack(0.8),q
+芙宁娜 e
+玛薇卡 e,q,charge(3)

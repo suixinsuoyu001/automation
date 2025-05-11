@@ -1,0 +1,20 @@
+{
+  "info": {
+    "name": "未命名路径",
+    "type": "collect",
+    "author": "g",
+    "version": "1.0",
+    "description": "",
+    "bgiVersion": "0.35.1"
+  },
+  "positions": [
+    {
+      "id": 1,
+      "action": "",
+      "move_mode": "walk",
+      "type": "teleport",
+      "x": 2292.4921509686046,
+      "y": -826.7341056178802
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+珊瑚宫心海 dash(0.2),e,wait(0.5),e(hold)
+申鹤 w(0.5),e(hold)
+枫原万叶 e,attack(0.1)
+神里绫华 dash(0.2),wait(0.2),charge,attack(0.2),e,q
+珊瑚宫心海 q,e,attack(2)
+申鹤 e(hold),q
+枫原万叶 e,attack(0.1)

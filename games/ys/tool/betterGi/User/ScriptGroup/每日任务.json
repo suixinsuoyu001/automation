@@ -1,0 +1,68 @@
+{
+  "index": 1,
+  "name": "每日任务",
+  "config": {
+    "pathingConfig": {
+      "enabled": true,
+      "autoPickEnabled": true,
+      "partyName": "常用",
+      "isVisitStatueBeforeSwitchParty": false,
+      "mainAvatarIndex": "",
+      "guardianAvatarIndex": "",
+      "guardianElementalSkillSecondInterval": "",
+      "guardianElementalSkillLongPress": false,
+      "onlyInTeleportRecover": false,
+      "jsScriptUseEnabled": false,
+      "soloTaskUseFightEnabled": false,
+      "skipDuring": "",
+      "useGadgetIntervalMs": 0,
+      "autoSkipEnabled": false,
+      "autoRunEnabled": true,
+      "autoFightEnabled": false,
+      "autoFightConfig": {
+        "strategyName": "",
+        "teamNames": "",
+        "fightFinishDetectEnabled": true,
+        "actionSchedulerByCd": "",
+        "finishDetectConfig": {
+          "battleEndProgressBarColor": "",
+          "battleEndProgressBarColorTolerance": "",
+          "fastCheckEnabled": false,
+          "fastCheckParams": "",
+          "checkEndDelay": "",
+          "beforeDetectDelay": ""
+        },
+        "pickDropsAfterFightEnabled": true,
+        "pickDropsConfig": {
+          "forwardTimes": 6,
+          "calibrationTimes": 15,
+          "decayFactor": 0.7,
+          "forwardSeconds": 2
+        },
+        "kazuhaPickupEnabled": true,
+        "timeout": 120
+      }
+    },
+    "shellConfig": {
+      "disable": false,
+      "timeout": 60,
+      "noWindow": true,
+      "output": true
+    },
+    "enableShellConfig": false
+  },
+  "projects": [
+    {
+      "name": "枫丹传送.json",
+      "folderName": ".",
+      "jsScriptSettingsObject": null,
+      "index": 1,
+      "type": "Pathing",
+      "status": "Enabled",
+      "schedule": "Daily",
+      "runNum": 1,
+      "nextFlag": false,
+      "allowJsNotification": true
+    }
+  ]
+}

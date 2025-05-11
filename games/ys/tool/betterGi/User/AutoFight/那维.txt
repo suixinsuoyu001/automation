@@ -1,0 +1,5 @@
+心海 w(0.5),e
+那维莱特 e
+希诺宁 e,attack(0.5),q
+闲云 e,attack(0.2),q,wait(0.3),e,attack(0.2)
+那维莱特 e,charge(3),q,charge(3),charge(3)

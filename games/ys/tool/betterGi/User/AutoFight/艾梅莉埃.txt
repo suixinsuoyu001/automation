@@ -1,0 +1,10 @@
+艾梅莉埃 e
+班尼特 dash(0.2),e(hold)
+白术 dash(0.2),e,q
+班尼特 e,q
+香菱 e
+艾梅莉埃 q
+班尼特 dash(0.2),e(hold)
+白术 dash(0.2),e,q
+班尼特 dash(0.2),q,e
+香菱 e,q

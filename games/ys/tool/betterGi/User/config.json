@@ -1,0 +1,467 @@
+{
+  "maskWindowConfig": {
+    "uidCoverRect": {
+      "x": 1690,
+      "y": 1052,
+      "width": 173,
+      "height": 22
+    },
+    "uidCoverRightBottomRect": {
+      "x": 230,
+      "y": 28,
+      "width": 173,
+      "height": 22
+    },
+    "eastPoint": {
+      "x": 274,
+      "y": 109
+    },
+    "southPoint": {
+      "x": 150,
+      "y": 233
+    },
+    "westPoint": {
+      "x": 32,
+      "y": 109
+    },
+    "northPoint": {
+      "x": 150,
+      "y": -9
+    },
+    "controlLocked": true,
+    "directionsEnabled": false,
+    "displayRecognitionResultsOnMask": true,
+    "logBoxLocation": {
+      "x": 0,
+      "y": 0,
+      "width": 0,
+      "height": 0
+    },
+    "maskEnabled": true,
+    "showLogBox": true,
+    "showStatus": true,
+    "uidCoverEnabled": false,
+    "showFps": false,
+    "useSubform": false
+  },
+  "commonConfig": {
+    "screenshotEnabled": false,
+    "screenshotUidCoverEnabled": false,
+    "exitToTray": false,
+    "currentBackdropType": 2,
+    "isFirstRun": false,
+    "runForVersion": "0.44.4",
+    "onceHadRunDeviceIdList": [
+      "V7N5KBB2RRA7E97DTXNE6JGR1KCS80DA9RVTW01120H9PVDG78WG"
+    ]
+  },
+  "genshinStartConfig": {
+    "autoEnterGameEnabled": true,
+    "genshinStartArgs": "",
+    "installPath": "D:\\Genshin Impact\\Genshin Impact Game\\YuanShen.exe",
+    "linkedStartEnabled": true,
+    "recordGameTimeEnabled": false
+  },
+  "autoPickConfig": {
+    "enabled": true,
+    "itemIconLeftOffset": 60,
+    "itemTextLeftOffset": 115,
+    "itemTextRightOffset": 400,
+    "ocrEngine": "Paddle",
+    "fastModeEnabled": false,
+    "pickKey": "F"
+  },
+  "autoSkipConfig": {
+    "enabled": false,
+    "quicklySkipConversationsEnabled": true,
+    "afterChooseOptionSleepDelay": 0,
+    "autoGetDailyRewardsEnabled": false,
+    "autoReExploreEnabled": false,
+    "autoReExploreCharacter": "",
+    "clickChatOption": "优先选择第一个选项",
+    "autoHangoutEventEnabled": false,
+    "autoHangoutEndChoose": "",
+    "autoHangoutChooseOptionSleepDelay": 0,
+    "autoHangoutPressSkipEnabled": true,
+    "runBackgroundEnabled": false,
+    "submitGoodsEnabled": false,
+    "closePopupPagedEnabled": true
+  },
+  "autoFishingConfig": {
+    "enabled": false,
+    "autoThrowRodEnabled": false,
+    "autoThrowRodTimeOut": 10,
+    "wholeProcessTimeoutSeconds": 300,
+    "fishingTimePolicy": 0
+  },
+  "quickTeleportConfig": {
+    "enabled": false,
+    "teleportListClickDelay": 200,
+    "waitTeleportPanelDelay": 50,
+    "hotkeyTpEnabled": false
+  },
+  "autoCookConfig": {
+    "enabled": false
+  },
+  "autoGeniusInvokationConfig": {
+    "defaultCharacterCardRects": [
+      {
+        "x": 667,
+        "y": 632,
+        "width": 165,
+        "height": 282
+      },
+      {
+        "x": 877,
+        "y": 632,
+        "width": 165,
+        "height": 282
+      },
+      {
+        "x": 1088,
+        "y": 632,
+        "width": 165,
+        "height": 282
+      }
+    ],
+    "myDiceCountRect": {
+      "x": 68,
+      "y": 642,
+      "width": 25,
+      "height": 31
+    },
+    "activeCharacterCardSpace": 41,
+    "characterCardExtendHpRect": {
+      "x": -20,
+      "y": 0,
+      "width": 60,
+      "height": 55
+    },
+    "strategyName": "1.莫娜砂糖琴",
+    "sleepDelay": 0
+  },
+  "autoWoodConfig": {
+    "afterZSleepDelay": 0,
+    "woodCountOcrEnabled": false
+  },
+  "autoFightConfig": {
+    "strategyName": "根据队伍自动选择",
+    "teamNames": "",
+    "fightFinishDetectEnabled": true,
+    "actionSchedulerByCd": "",
+    "finishDetectConfig": {
+      "battleEndProgressBarColor": "",
+      "battleEndProgressBarColorTolerance": "",
+      "fastCheckEnabled": false,
+      "fastCheckParams": "",
+      "checkEndDelay": "",
+      "beforeDetectDelay": ""
+    },
+    "pickDropsAfterFightEnabled": true,
+    "pickDropsConfig": {
+      "forwardTimes": 6,
+      "calibrationTimes": 15,
+      "decayFactor": 0.7,
+      "forwardSeconds": 2
+    },
+    "kazuhaPickupEnabled": true,
+    "timeout": 120
+  },
+  "autoMusicGameConfig": {
+    "mustCanorusLevel": false,
+    "musicLevel": "传说"
+  },
+  "autoDomainConfig": {
+    "fightEndDelay": 5,
+    "shortMovement": true,
+    "walkToF": false,
+    "leftRightMoveTimes": 5,
+    "autoEat": false,
+    "partyName": "",
+    "domainName": "",
+    "autoArtifactSalvage": false
+  },
+  "autoArtifactSalvageConfig": {
+    "regularExpression": "(?=[\\S\\s]*攻击力\\+[\\d]*\\n)(?=[\\S\\s]*防御力\\+[\\d]*\\n)",
+    "maxArtifactStar": "4",
+    "maxNumToCheck": 100
+  },
+  "macroConfig": {
+    "enhanceWaitDelay": 0,
+    "fFireInterval": 100,
+    "fPressHoldToContinuationEnabled": false,
+    "runaroundInterval": 10,
+    "runaroundMouseXInterval": 500,
+    "spaceFireInterval": 100,
+    "spacePressHoldToContinuationEnabled": false,
+    "combatMacroEnabled": false,
+    "combatMacroHotkeyMode": "按住时重复",
+    "combatMacroPriority": 1
+  },
+  "recordConfig": {
+    "angle2MouseMoveByX": 1,
+    "angle2DirectInputX": 1,
+    "isRecordCameraOrientation": false
+  },
+  "scriptConfig": {
+    "autoUpdateScriptRepoPeriod": 1,
+    "lastUpdateScriptRepoTime": "2025-05-10T18:42:51.5729612+08:00",
+    "scriptRepoHintDotVisible": false,
+    "subscribedScriptPaths": [
+      "js/AutoCrystalfly"
+    ]
+  },
+  "pathingConditionConfig": {
+    "partyConditions": [],
+    "avatarConditions": [
+      {
+        "subject": "队伍中角色",
+        "predicate": "包含",
+        "object": [
+          "绮良良",
+          "莱依拉",
+          "芭芭拉",
+          "七七"
+        ],
+        "result": "循环短E"
+      },
+      {
+        "subject": "队伍中角色",
+        "predicate": "包含",
+        "object": [
+          "钟离"
+        ],
+        "result": "循环长E"
+      }
+    ],
+    "onlyInTeleportRecover": true,
+    "useGadgetIntervalMs": 0
+  },
+  "hotKeyConfig": {
+    "autoTrackHotkey": "",
+    "autoTrackHotkeyType": "KeyboardMonitor",
+    "autoDomainHotkey": "I",
+    "autoDomainHotkeyType": "KeyboardMonitor",
+    "autoFightHotkey": "Oem6",
+    "autoFightHotkeyType": "KeyboardMonitor",
+    "autoFishingEnabledHotkey": "",
+    "autoFishingEnabledHotkeyType": "KeyboardMonitor",
+    "autoGeniusInvokationHotkey": "",
+    "autoGeniusInvokationHotkeyType": "KeyboardMonitor",
+    "autoPickEnabledHotkey": "",
+    "autoPickEnabledHotkeyType": "KeyboardMonitor",
+    "autoSkipEnabledHotkey": "OemOpenBrackets",
+    "autoSkipEnabledHotkeyType": "KeyboardMonitor",
+    "autoSkipHangoutEnabledHotkey": "",
+    "autoSkipHangoutEnabledHotkeyType": "KeyboardMonitor",
+    "autoWoodHotkey": "",
+    "autoWoodHotkeyType": "KeyboardMonitor",
+    "bgiEnabledHotkey": "F11",
+    "bgiEnabledHotkeyType": "GlobalRegister",
+    "enhanceArtifactHotkey": "",
+    "enhanceArtifactHotkeyType": "KeyboardMonitor",
+    "quickBuyHotkey": "",
+    "quickBuyHotkeyType": "KeyboardMonitor",
+    "quickSereniteaPotHotkey": "",
+    "quickSereniteaPotHotkeyType": "KeyboardMonitor",
+    "quickTeleportEnabledHotkey": "",
+    "quickTeleportEnabledHotkeyType": "KeyboardMonitor",
+    "quickTeleportTickHotkey": "",
+    "quickTeleportTickHotkeyType": "KeyboardMonitor",
+    "takeScreenshotHotkey": "",
+    "takeScreenshotHotkeyType": "KeyboardMonitor",
+    "turnAroundHotkey": "",
+    "turnAroundHotkeyType": "KeyboardMonitor",
+    "clickGenshinConfirmButtonHotkey": "",
+    "clickGenshinConfirmButtonHotkeyType": "KeyboardMonitor",
+    "clickGenshinCancelButtonHotkey": "",
+    "clickGenshinCancelButtonHotkeyType": "KeyboardMonitor",
+    "oneKeyFightHotkey": "",
+    "oneKeyFightHotkeyType": "KeyboardMonitor",
+    "mapPosRecordHotkey": "",
+    "mapPosRecordHotkeyType": "KeyboardMonitor",
+    "autoMusicGameHotkey": "",
+    "autoMusicGameHotkeyType": "KeyboardMonitor",
+    "autoFishingGameHotkey": "",
+    "autoFishingGameHotkeyType": "KeyboardMonitor",
+    "autoTrackPathHotkey": "",
+    "autoTrackPathHotkeyType": "KeyboardMonitor",
+    "test1Hotkey": "",
+    "test1HotkeyType": "KeyboardMonitor",
+    "test2Hotkey": "",
+    "test2HotkeyType": "KeyboardMonitor",
+    "recBigMapPosHotkey": "",
+    "recBigMapPosHotkeyType": "KeyboardMonitor",
+    "pathRecorderHotkey": "",
+    "pathRecorderHotkeyType": "KeyboardMonitor",
+    "addWaypointHotkey": "",
+    "addWaypointHotkeyType": "KeyboardMonitor",
+    "executePathHotkey": "",
+    "executePathHotkeyType": "KeyboardMonitor",
+    "logBoxDisplayHotkey": "",
+    "logBoxDisplayHotkeyType": "KeyboardMonitor",
+    "keyMouseMacroRecordHotkey": "",
+    "keyMouseMacroRecordHotkeyType": "KeyboardMonitor",
+    "suspendHotkey": "",
+    "suspendHotkeyType": "KeyboardMonitor",
+    "cancelTaskHotkey": "P",
+    "cancelTaskHotkeyType": "KeyboardMonitor"
+  },
+  "notificationConfig": {
+    "jsNotificationEnabled": false,
+    "barkAction": "",
+    "barkApiEndpoint": "",
+    "barkAutoCopy": "",
+    "barkBadge": 1,
+    "barkCall": "",
+    "barkCiphertext": "",
+    "barkCopy": "",
+    "barkDeviceKeys": "",
+    "barkGroup": "default",
+    "barkIcon": "",
+    "barkIsArchive": "1",
+    "barkLevel": "active",
+    "barkNotificationEnabled": false,
+    "barkSound": "minuet",
+    "barkSubtitle": "",
+    "barkUrl": "",
+    "barkVolume": 5,
+    "dingDingSecret": "",
+    "dingDingwebhookNotificationEnabled": false,
+    "dingdingWebhookUrl": "",
+    "emailNotificationEnabled": false,
+    "feishuNotificationEnabled": false,
+    "feishuWebhookUrl": "",
+    "feishuAppId": "",
+    "feishuAppSecret": "",
+    "fromEmail": "",
+    "fromName": "",
+    "includeScreenShot": true,
+    "notificationEventSubscribe": "",
+    "smtpPassword": "",
+    "smtpPort": 0,
+    "smtpServer": "",
+    "smtpUsername": "",
+    "telegramApiBaseUrl": "",
+    "telegramBotToken": "",
+    "telegramChatId": "",
+    "telegramNotificationEnabled": false,
+    "toEmail": "",
+    "webhookEnabled": false,
+    "webhookEndpoint": "",
+    "webhookSendTo": "",
+    "webSocketEndpoint": "",
+    "webSocketNotificationEnabled": false,
+    "windowsUwpNotificationEnabled": false,
+    "workweixinNotificationEnabled": false,
+    "workweixinWebhookUrl": "",
+    "xxtuiApiKey": "",
+    "xxtuiChannels": "WX_MP",
+    "xxtuiFrom": "Better原神",
+    "xxtuiNotificationEnabled": false
+  },
+  "keyBindingsConfig": {
+    "globalKeyMappingEnabled": false,
+    "moveForward": 87,
+    "moveBackward": 83,
+    "moveLeft": 65,
+    "moveRight": 68,
+    "switchToWalkOrRun": 162,
+    "normalAttack": 1,
+    "elementalSkill": 69,
+    "elementalBurst": 81,
+    "sprintKeyboard": 160,
+    "sprintMouse": 2,
+    "switchAimingMode": 82,
+    "jump": 32,
+    "drop": 88,
+    "pickUpOrInteract": 70,
+    "quickUseGadget": 90,
+    "interactionInSomeMode": 84,
+    "questNavigation": 86,
+    "abandonChallenge": 80,
+    "switchMember1": 49,
+    "switchMember2": 50,
+    "switchMember3": 51,
+    "switchMember4": 52,
+    "switchMember5": 53,
+    "shortcutWheel": 9,
+    "openInventory": 66,
+    "openCharacterScreen": 67,
+    "openMap": 77,
+    "openPaimonMenu": 27,
+    "openAdventurerHandbook": 112,
+    "openCoOpScreen": 113,
+    "openWishScreen": 114,
+    "openBattlePassScreen": 115,
+    "openTheEventsMenu": 116,
+    "openTheSettingsMenu": 117,
+    "openTheFurnishingScreen": 118,
+    "openStellarReunion": 119,
+    "openQuestMenu": 74,
+    "openNotificationDetails": 89,
+    "openChatScreen": 13,
+    "openSpecialEnvironmentInformation": 85,
+    "checkTutorialDetails": 71,
+    "elementalSight": 4,
+    "showCursor": 164,
+    "openPartySetupScreen": 76,
+    "openFriendsScreen": 79,
+    "hideUI": 191
+  },
+  "otherConfig": {
+    "restoreFocusOnLostEnabled": false,
+    "gameCultureInfoName": "zh-Hans",
+    "uiCultureInfoName": "zh-Hans"
+  },
+  "tpConfig": {
+    "mapZoomEnabled": true,
+    "mapZoomOutDistance": 1000,
+    "mapZoomInDistance": 400,
+    "stepIntervalMilliseconds": 20,
+    "maxZoomLevel": 5,
+    "minZoomLevel": 2,
+    "reviveStatueOfTheSevenPointX": 2294.5009765625,
+    "reviveStatueOfTheSevenPointY": -826.339111328125,
+    "reviveStatueOfTheSevenArea": "道成林",
+    "reviveStatueOfTheSevenCountry": "须弥",
+    "isReviveInNearestStatueOfTheSeven": false,
+    "reviveStatueOfTheSeven": {
+      "id": "471",
+      "name": "七天神像-草",
+      "type": "Goddess",
+      "country": "须弥",
+      "area": "道成林",
+      "tranPosition": [
+        -823.91796875,
+        202.31915283203125,
+        2297.883056640625
+      ],
+      "tranX": 2297.883056640625,
+      "tranY": -823.91796875,
+      "description": null,
+      "position": [
+        -826.339111328125,
+        201.75619506835938,
+        2294.5009765625
+      ],
+      "x": 2294.5009765625,
+      "y": -826.339111328125
+    },
+    "shouldMove": false,
+    "hpRestoreDuration": 5,
+    "tolerance": 200,
+    "maxIterations": 30,
+    "maxMouseMove": 300,
+    "mapScaleFactor": 2.661,
+    "hasErrors": false
+  },
+  "captureMode": "BitBlt",
+  "detailedErrorLogs": false,
+  "notShowNewVersionNoticeEndVersion": "0.45.1",
+  "triggerInterval": 50,
+  "autoFixWin11BitBlt": true,
+  "inferenceDevice": "CPU",
+  "nextScheduledTask": [],
+  "selectedOneDragonFlowConfigName": "默认配置"
+}

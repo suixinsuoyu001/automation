@@ -1,0 +1,6 @@
+托马 w(1.5),e
+班尼特 e,q
+迪希亚 e
+托马 q
+班尼特 wait(1),e
+基尼奇 e,attack(1),wait(0.2),e,attack(1),,wait(0.2),e,attack(1),,wait(0.2),e,attack(1),,wait(0.2),e

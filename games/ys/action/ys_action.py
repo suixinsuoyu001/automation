@@ -10,11 +10,20 @@ pyautogui.FAILSAFE = False  # 禁用 fail-safe
 
 image_path = 'games/ys/image/'
 json_path = 'games/ys/data/img_loc.json'
+setting = read_json('setting.json')
 
 c = check('原神',image_path,json_path)
 m = match(image_path,0.9)
 
 num = 0.9
+
+resolution = setting['resolution']
+
+def get_position(position):
+    x = int(position[0]/2560*resolution[0])
+    y = int(position[1]/1440*resolution[1])
+    print(x,y)
+    return x,y
 
 def click(name, num=num):
     if c.processed_screen is None:
@@ -25,7 +34,7 @@ def click(name, num=num):
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
         if focus and '原神' in focus and position:
-            pyautogui.click(position[0])
+            pyautogui.click(get_position(position[0]))
             time.sleep(0.4)
             break
         time.sleep(0.02)
@@ -40,7 +49,7 @@ def move(name, num=num):
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
         if focus and '原神' in focus and position:
-            pyautogui.moveTo(position[1])
+            pyautogui.moveTo(get_position(position[1]))
             time.sleep(0.4)
             break
         time.sleep(0.02)
@@ -56,7 +65,7 @@ def click_limit(name,t,num = 0.9):
         control.activate()
         position = c.check_one_pic(name, num, c.processed_screen)
         if position is not None:
-            pyautogui.click(position[0])
+            pyautogui.click(get_position(position[0]))
             time.sleep(0.4)
             print(f'click_limit:{name} 已捕获并点击')
             break
@@ -94,9 +103,8 @@ def scroll_click(name1,name2,num = num):
     print(match)
     print(matches)
     for i in matches:
-
         if match[1][1]<i['y']+100:
-            pyautogui.click([i['x'],i['y']])
+            pyautogui.click(get_position([i['x'],i['y']]))
             break
 
     print(f'scroll_click:已识别{name2}并点击')
@@ -113,7 +121,7 @@ def 登录(zh):
     wait_start = waits(['菜单','退出登录'])
     if wait_start == '菜单':
         pyautogui.press('esc')
-        time.sleep(0.8)
+        time.sleep(1.5)
         click('退出2')
         click('退出至登录界面')
     click('退出登录')
@@ -130,18 +138,18 @@ def 登录(zh):
     if waits(['菜单','空月祝福']) == '空月祝福':
         click('空月祝福')
         time.sleep(0.5)
-        pyautogui.press(' ')
+        click('空白位置')
 
 def 移动枫丹():
     waits(['菜单'])
     pyautogui.press('m')
     waits(['关闭'])
     for i in range(5):
-        pyautogui.click(62, 591)
-    pyautogui.click(63, 846)
+        pyautogui.click(get_position([62, 591]))
+    pyautogui.click(get_position([63, 846]))
     click('地图标识')
     click(waits(['枫丹地图标识1','枫丹地图标识2']))
-    pyautogui.click(1287, 716)
+    pyautogui.click(get_position([1287, 716]))
     time.sleep(0.5)
     click_limit('传送点',1)
     time.sleep(0.5)
@@ -419,7 +427,7 @@ zh  = [
 if __name__ == '__main__':
     res = c.t_match.save_pic_loc('须弥地图标识1',json_path)
     # print(res)
-    # m.click('原神图标')wd
+    # m.click('原神图标')
     # # m.wait('退出登录')
     # c.check_start()
     #m

@@ -20,6 +20,9 @@ class t_match():
             image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         height, width = template.shape[:2]
+        # print(template)
+        if image is None or image.size == 0:
+            return None
         result = self.get_match_result(image,template)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配
@@ -35,6 +38,7 @@ class t_match():
         if image is None:
             image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
+
         result = self.get_match_result(image,template)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配
@@ -50,10 +54,13 @@ class t_match():
     def save_pic_loc(self,name,json_path,num = 0.85):
         image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
+        output_file = "screenshot.png"
+        cv2.imwrite(output_file, template)
         result = self.get_match_result(image, template)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
+        print(max_val)
         if max_val >= threshold:
             # 计算模板匹配的区域坐标
             top_left = list(max_loc)

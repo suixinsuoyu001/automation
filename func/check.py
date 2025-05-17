@@ -228,6 +228,7 @@ def show_real_time_match():
 
 
 if __name__ == '__main__':
-    c = check('原神','image/','data\img_loc.json')
-    c.check_pic(['剧情标识'])
+    c = check('原神','games/ys/image/','games/ys/data/img_loc.json')
+    c.check_start()
+    c.show_pic()
 

@@ -1,0 +1,7 @@
+pip install opencv-python==4.10.0.84
+pip install pywin32==308
+pip install pyautogui==0.9.54
+pip install pynput==1.7.7
+
+调节分辨率
+开启无边框

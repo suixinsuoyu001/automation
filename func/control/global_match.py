@@ -16,7 +16,7 @@ class match():
         pil_img = Image.open(path).convert('RGB')
         return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
-    def find_image_on_screen(self,name, threshold=0.9):
+    def find_image_on_screen(self,name, threshold=0.8):
         template_path =  f"{self.path}{name}.png"
         if not os.path.exists(template_path):
             raise FileNotFoundError(f"文件不存在: {os.path.abspath(template_path)}")
@@ -27,7 +27,7 @@ class match():
         h, w = template.shape[:2]
         screenshot = pyautogui.screenshot()
         screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
-        # screenshot_cv = cv2.resize(screenshot_cv, (2560, 1440), interpolation=cv2.INTER_AREA)
+        screenshot_cv = cv2.resize(screenshot_cv, (2560, 1440), interpolation=cv2.INTER_AREA)
         result = cv2.matchTemplate(screenshot_cv, template, cv2.TM_CCOEFF_NORMED)
         yloc, xloc = np.where(result >= threshold)
         rectangles = []
@@ -43,14 +43,14 @@ class match():
         return centers
 
     def click(self,name,num = None):
+        print(f'click:{name} 开始捕获')
         if num is None:
             num = self.num
         while True:
             matches = self.find_image_on_screen(name,num)
-            print(matches)
             if matches:
-
                 pyautogui.click(matches[0])
+                print(f'click:{name} 已捕获并点击')
                 break
 
     def wait(self,name,num = None):

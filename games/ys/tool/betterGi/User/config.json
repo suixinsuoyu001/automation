@@ -52,7 +52,8 @@
     "isFirstRun": false,
     "runForVersion": "0.44.4",
     "onceHadRunDeviceIdList": [
-      "V7N5KBB2RRA7E97DTXNE6JGR1KCS80DA9RVTW01120H9PVDG78WG"
+      "V7N5KBB2RRA7E97DTXNE6JGR1KCS80DA9RVTW01120H9PVDG78WG",
+      "E2QJX4SN2PYN8ZG0FNHVAD5AQRQVG5Z0YHB5QBPZ06RGYS54ESY0"
     ]
   },
   "genshinStartConfig": {
@@ -205,8 +206,8 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-05-10T18:42:51.5729612+08:00",
-    "scriptRepoHintDotVisible": false,
+    "lastUpdateScriptRepoTime": "2025-05-18T12:08:56.033722+08:00",
+    "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"
     ]

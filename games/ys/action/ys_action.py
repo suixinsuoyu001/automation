@@ -123,7 +123,7 @@ def 登录(zh):
         pyautogui.press('esc')
         time.sleep(1.5)
         click('退出2')
-        click('退出至登录界面')
+        click('退出登录标识')
     click('退出登录')
     click('退出')
     click('登录其他账号')
@@ -425,15 +425,14 @@ zh  = [
        ]
 
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('须弥地图标识1',json_path)
+    res = c.t_match.save_pic_loc('退出登录标识',json_path)
     # print(res)
     # m.click('原神图标')
     # # m.wait('退出登录')
-    # c.check_start()
-    #m
-    # # 登录(zh[2])
-    # 每日(1)
-    # # 圣遗物分解()
-    # c.check_stop()
+    c.check_start()
+    # 登录(zh[6])
+    每日(1)
+    # 圣遗物分解()
+    c.check_stop()
 
 

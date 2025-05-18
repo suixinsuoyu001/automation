@@ -206,9 +206,9 @@ def 探索派遣():
     pyautogui.press(' ')
     time.sleep(1)
     click('探索派遣')
-    if waits(['全部领取','召回']) == '全部领取':
-        click('全部领取')
-        click('再次派遣')
+    if waits(['全部领取标识','召回']) == '全部领取标识':
+        click('全部领取标识')
+        click('再次派遣标识')
     click('关闭')
 
 def 历练点():
@@ -448,13 +448,12 @@ zh  = [
        ]
 
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('全部领取',json_path)
+    res = c.t_match.save_pic_loc('再次派遣标识',json_path)
     # log(res)
     # m.click('原神图标')
     # # m.wait('退出登录')
-    # c.check_start()
-    # 登录(zh[6])
-    # 圣遗物分解()
-    # c.check_stop()
+    c.check_start()
+    click('再次派遣标识')
+    c.check_stop()
 
 

@@ -34,6 +34,7 @@ def click(name, num=num):
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
         if focus and '原神' in focus and position:
+            log(position)
             pyautogui.click(get_position(position[0]))
             time.sleep(0.4)
             break
@@ -49,7 +50,7 @@ def move(name, num=num):
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
         if focus and '原神' in focus and position:
-            pyautogui.moveTo(get_position(position[1]))
+            pyautogui.moveTo(get_position(position[0]))
             time.sleep(0.4)
             break
         time.sleep(0.02)
@@ -102,7 +103,7 @@ def scroll_click(name1,name2,num = num):
     log(match)
     log(matches)
     for i in matches:
-        if match[1][1]<i['y']+100:
+        if match[0][1]<i['y']+100:
             pyautogui.click(get_position([i['x'],i['y']]))
             break
 
@@ -143,8 +144,20 @@ def 登录(zh):
     click('点击进入')
     if waits(['菜单','空月祝福']) == '空月祝福':
         click('空月祝福')
-        time.sleep(0.5)
+        time.sleep(1)
         click('空白位置')
+    邮件领取()
+
+def 邮件领取():
+    waits(['菜单'])
+    time.sleep(0.5)
+    pyautogui.press('esc')
+    if waits(['邮件待领取','邮件'],0.95) == '邮件待领取':
+        click('邮件待领取')
+        click('全部领取')
+        click('空白位置')
+        click('关闭')
+    pyautogui.press('esc')
 
 def 移动枫丹():
     waits(['菜单'])
@@ -405,17 +418,17 @@ def 切换常用队伍():
     click(waits(['关闭']))
 
 def 每日(zh_num,n):
-    # 登录(zh[zh_num])
-    # 移动枫丹()
-    # 枫丹合成台()
-    # res = 合成()
-    # # if res:
-    # 切换副本队伍()
-    # 晶蝶()
-    # 须弥回血传送()
-    秘境_圣遗物(n)
-    圣遗物分解()
-    切换常用队伍()
+    登录(zh[zh_num])
+    移动枫丹()
+    枫丹合成台()
+    res = 合成()
+    if res:
+        切换副本队伍()
+        晶蝶()
+        须弥回血传送()
+        秘境_圣遗物(n)
+        圣遗物分解()
+        切换常用队伍()
     移动枫丹()
     枫丹凯瑟琳()
     历练点()
@@ -435,7 +448,7 @@ zh  = [
        ]
 
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('再次派遣',json_path)
+    res = c.t_match.save_pic_loc('全部领取',json_path)
     # log(res)
     # m.click('原神图标')
     # # m.wait('退出登录')

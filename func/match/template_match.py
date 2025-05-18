@@ -28,7 +28,7 @@ class t_match():
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
         if max_val >= threshold:
-            return round(max_val,2),[max_loc[0]+width//2,max_loc[1]+height//2]
+            return [max_loc[0]+width//2,max_loc[1]+height//2],round(max_val,2)
         else:
             pass
             # log('未匹配到')

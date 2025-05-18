@@ -15,12 +15,12 @@ class t_match():
         result = cv2.matchTemplate(gray_image, gray_template, cv2.TM_CCOEFF_NORMED)
         return result
 
-    def match_pic(self,name,num = 0.9,image = None):
+    def match_pic(self,name,num = 0.85,image = None):
         if image is None:
             image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         height, width = template.shape[:2]
-        # print(template)
+        # log(template)
         if image is None or image.size == 0:
             return None
         result = self.get_match_result(image,template)
@@ -31,10 +31,10 @@ class t_match():
             return round(max_val,2),[max_loc[0]+width//2,max_loc[1]+height//2]
         else:
             pass
-            # print('未匹配到')
+            # log('未匹配到')
 
 
-    def match_pics(self,name,num = 0.9,image = None):
+    def match_pics(self,name,num = 0.85,image = None):
         if image is None:
             image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
@@ -47,11 +47,14 @@ class t_match():
         res = []
         # 打印匹配结果
         for pt in zip(*locations[::-1]):  # locations 返回的是行列坐标，zip 反转成 (x, y) 格式
-            # print(f"匹配位置: {pt}, 匹配值: {result[pt[1], pt[0]]}")
+            # log(f"匹配位置: {pt}, 匹配值: {result[pt[1], pt[0]]}")
             res.append({'x':int(pt[0]),'y':int(pt[1])})
         return res
 
     def save_pic_loc(self,name,json_path,num = 0.85):
+        if not get_hwnd(self.wt):
+            log(f'{self.wt}未启动')
+            return None
         image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         output_file = "screenshot.png"
@@ -60,7 +63,7 @@ class t_match():
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
-        print(max_val)
+        log(max_val)
         if max_val >= threshold:
             # 计算模板匹配的区域坐标
             top_left = list(max_loc)
@@ -71,9 +74,9 @@ class t_match():
             if [top_left, bottom_right] not in locs[name]:
                 locs[name].append([top_left, bottom_right])
             save_json(json_path, locs)
-            print(max_val, [top_left, bottom_right],[(top_left[0]+bottom_right[0])//2,(top_left[1]+bottom_right[1])//2])
+            log(max_val, [top_left, bottom_right],[(top_left[0]+bottom_right[0])//2,(top_left[1]+bottom_right[1])//2])
         else:
-            print("匹配失败")
+            log("匹配失败")
 
 
     def get_pic_loc(self,name):
@@ -90,9 +93,9 @@ class t_match():
                 top_left = list(max_loc)
                 h, w, channels = template.shape  # 模板的高度和宽度
                 bottom_right = [top_left[0] + w, top_left[1] + h]
-                print(max_val, [top_left, bottom_right])
+                log(max_val, [top_left, bottom_right])
             else:
-                print("No match found.")
+                log("No match found.")
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 

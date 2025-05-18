@@ -23,23 +23,28 @@ class check():
                 pic = get_pic(self.wt)
             except:
                 pic = None
-                print('图片获取失败')
+                log('图片获取失败')
             if pic is not None:
                 self.processed_screen = get_pic(self.wt)
 
     def check_start(self,time_limit = 0.02):
         self.time_limit = time_limit
         self.stop_event = threading.Event()
+        flag = 1
+        while not get_hwnd(self.wt):
+            if flag:
+                log(f'等待{self.wt}启动')
+                flag = 0
         self.thread = threading.Thread(target=self.get_pic_loop)
         self.thread.start()
         time.sleep(1)
         control.activate()
-        print("获取图片进程已开始")
+        log("获取图片进程已开始")
 
     def check_stop(self):
         self.stop_event.set()  # 触发停止事件
         self.thread.join()  # 等待线程结束
-        print("获取图片进程已停止")
+        log("获取图片进程已停止")
 
     def match_one_pic(self,name,num = 0.9):
         return self.t_match.match_pic(name,num,self.processed_screen)
@@ -48,19 +53,19 @@ class check():
         return self.t_match.match_pics(name,num,self.processed_screen)
 
     def wait(self,name,num = 0.9):
-        print(f'wait:{name} 开始捕获')
+        log(f'wait:{name} 开始捕获')
         while True:
             position = self.check_one_pic(name,num,self.processed_screen)
             if position:
-                print(f'wait: {name} 已找到')
+                log(f'wait: {name} 已找到')
                 time.sleep(0.5)
                 return True
 
     def wait_click(self,name,num = 0.9):
         if self.processed_screen is None:
-            print('check_start未运行')
+            log('check_start未运行')
             return
-        print(f'wait_click:{name} 开始捕获')
+        log(f'wait_click:{name} 开始捕获')
         flag = 0
         while True:
             control.activate()
@@ -72,13 +77,13 @@ class check():
             if flag and not position:
                 break
             time.sleep(0.02)
-        print(f'wait_click:{name} 已捕获并点击')
+        log(f'wait_click:{name} 已捕获并点击')
 
     def wait_click_limit(self,name,t,num = 0.9):
         if self.processed_screen is None:
-            print('check_start未运行')
+            log('check_start未运行')
             return
-        print(f'wait_click_limit:{name} 开始捕获')
+        log(f'wait_click_limit:{name} 开始捕获')
         flag = 0
         start_time = time.time()
         while True:
@@ -89,16 +94,16 @@ class check():
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
-                print(f'wait_click_limit:{name} 已捕获并点击')
+                log(f'wait_click_limit:{name} 已捕获并点击')
                 break
             time.sleep(0.02)
             if time.time() - start_time > t:
-                print(f'wait_click_limit:{name} 未捕获，超时取消')
+                log(f'wait_click_limit:{name} 未捕获，超时取消')
                 break
 
 
     def wait_press(self,name,key,num = 0.9):
-        print(f'wait_press:{name} 开始捕获')
+        log(f'wait_press:{name} 开始捕获')
         flag = 0
         while True:
             control.activate()
@@ -110,53 +115,53 @@ class check():
             if flag and not position:
                 break
             time.sleep(0.02)
-        print(f'wait_press:{name} 捕获 {key}已按下')
+        log(f'wait_press:{name} 捕获 {key}已按下')
 
     def waits(self,names,num = 0.9):
-        print(f'waits:{names} 开始捕获')
+        log(f'waits:{names} 开始捕获')
         if self.processed_screen is None:
-            print('check_start未运行')
+            log('check_start未运行')
             return
         while True:
             for name in names:
                 position = self.check_one_pic(name,num,self.processed_screen)
                 if position:
-                    print(f'wait: {name} 已找到')
+                    log(f'wait: {name} 已找到')
                     time.sleep(0.5)
                     return name
 
     def click_loop_until(self,names,item_names,num = 0.9):
-        print(f'click_loop_until: 开始循环遍历 {names}')
+        log(f'click_loop_until: 开始循环遍历 {names}')
         while True:
             for name in item_names + names:
                 position = self.check_one_pic(name,num,self.processed_screen)
                 if position:
                     if name in names:
                         control.click(position[0])
-                        print(f'click_loop_until: 点击 {name}')
+                        log(f'click_loop_until: 点击 {name}')
                         time.sleep(0.5)
                     else:
-                        print(f'click_loop_until: {name} 已捕获 结束循环')
+                        log(f'click_loop_until: {name} 已捕获 结束循环')
                         return name
 
     def click_point_until(self,point,key,num = 0.9):
-        print(f'click_point_until:开始获取 {key}')
+        log(f'click_point_until:开始获取 {key}')
         while not self.check_one_pic(key, num, self.processed_screen):
             control.click(point)
-        print(f'click_point_until:已捕获 {key}')
+        log(f'click_point_until:已捕获 {key}')
 
     def run_until(self,name,key,num = 0.9):
-        print(f'run_until:开始朝{name}移动')
+        log(f'run_until:开始朝{name}移动')
         while not self.check_one_pic(name, num, self.processed_screen):
             control.send_key(key, 0.5)
-        print(f'run_until:已移动到{name}位置')
+        log(f'run_until:已移动到{name}位置')
 
     def scroll_click(self,name1,name2,num = 0.9):
         while self.match_one_pic(name1,num) is None:
             if not self.match_one_pic(name2, num):
-                print('name2', self.match_one_pic(name1, num))
+                log('name2', self.match_one_pic(name1, num))
                 continue
-            print('name2',self.match_one_pic(name1, num))
+            log('name2',self.match_one_pic(name1, num))
             point = self.match_one_pic(name2,num)[1]
             control.scroll(-1, point)
             time.sleep(1)
@@ -169,7 +174,7 @@ class check():
                 if item_point[1][1]<i['y']:
                     control.click([i['x'],i['y']])
                     break
-        print(f'scroll_click:已查找到{name1}')
+        log(f'scroll_click:已查找到{name1}')
     def check_one_pic(self,name,num,screen):
         if screen is None:
             return
@@ -205,7 +210,7 @@ class check():
             # 退出条件
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
-            print(f'总用时 {time.time() - t0}')
+            log(f'总用时 {time.time() - t0}')
 
         cv2.destroyAllWindows()
 

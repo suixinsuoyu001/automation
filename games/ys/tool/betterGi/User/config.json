@@ -57,7 +57,7 @@
     ]
   },
   "genshinStartConfig": {
-    "autoEnterGameEnabled": true,
+    "autoEnterGameEnabled": false,
     "genshinStartArgs": "",
     "installPath": "D:\\Genshin Impact\\Genshin Impact Game\\YuanShen.exe",
     "linkedStartEnabled": true,

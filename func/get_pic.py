@@ -1,20 +1,20 @@
 import time,win32gui,win32ui,cv2
 from ctypes import windll
 import numpy as np
+from func.common import get_hwnd
 
 
-
-def get_hwnd(target_title: str) -> str:
-    result = ""
-    def callback(hwnd, extra):
-        nonlocal result  # 让回调函数可以修改外部变量
-        if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
-            title = win32gui.GetWindowText(hwnd)
-            if title and target_title == title:  # 模糊匹配
-                result = hwnd
-
-    win32gui.EnumWindows(callback, None)
-    return result if result else None
+# def get_hwnd(target_title: str) -> str:
+#     result = ""
+#     def callback(hwnd, extra):
+#         nonlocal result  # 让回调函数可以修改外部变量
+#         if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
+#             title = win32gui.GetWindowText(hwnd)
+#             if title and target_title == title:  # 模糊匹配
+#                 result = hwnd
+#
+#     win32gui.EnumWindows(callback, None)
+#     return result if result else None
 
 
 

@@ -1,6 +1,7 @@
 import json,cv2,os,win32gui
+import sys
 import time
-
+import traceback
 import numpy as np
 import pygetwindow as gw
 import ctypes
@@ -46,7 +47,8 @@ def get_hwnd(target_title: str) -> str:
         nonlocal result  # 让回调函数可以修改外部变量
         if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
             title = win32gui.GetWindowText(hwnd)
-            if title and target_title in title:  # 模糊匹配
+            # if title and target_title in title:  # 模糊匹配
+            if title and target_title == title:  # 绝对匹配
                 result = hwnd
 
     win32gui.EnumWindows(callback, None)
@@ -79,6 +81,18 @@ def get_item_hwnd(right, bot):
     return result if result else None
 
 
+def log(*args, sep=' ', end='\n', file=None, flush=False):
+    if file is None:
+        file = sys.stdout
+    # 获取当前调用栈的最后一帧（调用者）
+    stack = traceback.extract_stack()[-2]  # 当前函数外部一层
+    path = stack.filename
+    line = stack.lineno
+    path_link = f'\033[34mFile "{path}", line {line}\033[0m' # 蓝色
+    content = sep.join(str(arg) for arg in args)
+
+    print(f'{path_link} {content}', end=end, file=file, flush=flush)
+
 
 if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'
@@ -94,3 +108,6 @@ if __name__ == '__main__':
     # # 获取当前活动窗口句柄
     # hwnd = user32.GetForegroundWindow()
     # print(hwnd)
+
+
+

@@ -5,6 +5,7 @@ from func.check import *
 from func.control.global_match import *
 import pyautogui
 import keyboard
+import subprocess
 
 pyautogui.FAILSAFE = False  # 禁用 fail-safe
 
@@ -22,14 +23,13 @@ resolution = setting['resolution']
 def get_position(position):
     x = int(position[0]/2560*resolution[0])
     y = int(position[1]/1440*resolution[1])
-    print(x,y)
     return x,y
 
 def click(name, num=num):
     if c.processed_screen is None:
-        print('check_start未运行')
+        log('check_start未运行')
         return
-    print(f'click:{name} 开始捕获')
+    log(f'click:{name} 开始捕获')
     while True:
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
@@ -38,13 +38,13 @@ def click(name, num=num):
             time.sleep(0.4)
             break
         time.sleep(0.02)
-    print(f'click:{name} 已捕获并点击')
+    log(f'click:{name} 已捕获并点击')
 
 def move(name, num=num):
     if c.processed_screen is None:
-        print('check_start未运行')
+        log('check_start未运行')
         return
-    print(f'click:{name} 开始捕获')
+    log(f'click:{name} 开始捕获')
     while True:
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
@@ -53,13 +53,13 @@ def move(name, num=num):
             time.sleep(0.4)
             break
         time.sleep(0.02)
-    print(f'click:{name} 已捕获并点击')
+    log(f'click:{name} 已捕获并点击')
 
 def click_limit(name,t,num = 0.9):
     if c.processed_screen is None:
-        print('check_start未运行')
+        log('check_start未运行')
         return
-    print(f'click_limit:{name} 开始捕获')
+    log(f'click_limit:{name} 开始捕获')
     start_time = time.time()
     while True:
         control.activate()
@@ -67,18 +67,17 @@ def click_limit(name,t,num = 0.9):
         if position is not None:
             pyautogui.click(get_position(position[0]))
             time.sleep(0.4)
-            print(f'click_limit:{name} 已捕获并点击')
+            log(f'click_limit:{name} 已捕获并点击')
             break
         time.sleep(0.02)
         if time.time() - start_time > t:
-            print(f'click_limit:{name} 未捕获，超时取消')
+            log(f'click_limit:{name} 未捕获，超时取消')
             break
 
 def waits(names,num = num):
-    print(f'waits:{names} 开始捕获')
-    if c.processed_screen is None:
-        print('check_start未运行')
-        return
+    log(f'waits:{names} 开始捕获')
+    while c.processed_screen is None:
+        log('check_start未运行')
     while True:
         focus = get_focus_window()
         if not (focus and '原神' in focus):
@@ -86,7 +85,7 @@ def waits(names,num = num):
         for name in names:
             position = c.check_one_pic(name,num,c.processed_screen)
             if position:
-                print(f'wait: {name} 已找到')
+                log(f'wait: {name} 已找到')
                 time.sleep(0.2)
                 return name
 
@@ -94,20 +93,20 @@ def scroll_click(name1,name2,num = num):
     while 1:
         match = c.match_one_pic(name1, num)
         if match:
-            print(f'scroll_click:已识别{name1}')
+            log(f'scroll_click:已识别{name1}')
             break
         for i in range(8):
             pyautogui.scroll(-5)
         time.sleep(0.5)
     matches = c.match_pics(name2,num)
-    print(match)
-    print(matches)
+    log(match)
+    log(matches)
     for i in matches:
         if match[1][1]<i['y']+100:
             pyautogui.click(get_position([i['x'],i['y']]))
             break
 
-    print(f'scroll_click:已识别{name2}并点击')
+    log(f'scroll_click:已识别{name2}并点击')
 
 def 打开betterGi():
     m.click('betterGi')
@@ -116,6 +115,13 @@ def 打开betterGi():
     else:
         m.click('原神图标')
 
+def 打开betterGi2():
+    exe_path = r"games\ys\tool\betterGi\BetterGI.exe"
+    subprocess.Popen(exe_path)
+    if m.waits(['脚本_启动2','脚本_停止2']) == '脚本_启动2':
+        m.click('脚本_启动2')
+    else:
+        m.click('原神图标2')
 
 def 登录(zh):
     wait_start = waits(['菜单','退出登录'])
@@ -166,7 +172,7 @@ def 枫丹合成台():
     pyautogui.keyUp('d')
     time.sleep(1)
     pyautogui.keyUp('w')
-    print('移动到枫丹合成台')
+    log('移动到枫丹合成台')
 
 def 枫丹凯瑟琳():
     waits(['菜单'])
@@ -178,7 +184,7 @@ def 枫丹凯瑟琳():
     pyautogui.keyUp('a')
     time.sleep(0.7)
     pyautogui.keyUp('w')
-    print('移动到枫丹凯瑟琳')
+    log('移动到枫丹凯瑟琳')
 
 def 探索派遣():
     waits(['F'])
@@ -264,8 +270,10 @@ def 秘境_圣遗物(num):
     if num == 1:
         name = '圣遗物_虹灵的净土'
     elif num == 2:
-        name = '圣遗物_罪祸的终末'
+        name = '圣遗物_褪色的剧场'
     elif num == 3:
+        name = '圣遗物_罪祸的终末'
+    elif num == 4:
         name = '圣遗物_岩中幽谷'
     else:
         name = None
@@ -278,7 +286,7 @@ def 秘境_圣遗物(num):
     scroll_click(name, '圣遗物传送')
     click_limit('传送',2)
     waits(['菜单'])
-    time.sleep(0.5)
+    time.sleep(1)
     pyautogui.keyDown('w')
     time.sleep(0.4)
     pyautogui.rightClick()
@@ -296,10 +304,10 @@ def 晶蝶传送(name):
     pyautogui.press('m')
     waits(['关闭'])
     for i in range(5):
-        pyautogui.click(62, 591)
-    pyautogui.click(63, 846)
+        pyautogui.click(get_position([62, 591]))
+    pyautogui.click(get_position([63, 846]))
     if name == '晶蝶传送点3':
-        pyautogui.click(63, 846)
+        pyautogui.click(get_position([63, 846]))
     click('地图标识')
     click(waits(['枫丹地图标识1','枫丹地图标识2']))
     click(name)
@@ -359,9 +367,9 @@ def 须弥回血传送():
     pyautogui.press('m')
     waits(['关闭'])
     for i in range(5):
-        pyautogui.click(62, 591)
-    pyautogui.click(63, 846)
-    pyautogui.click(63, 846)
+        pyautogui.click(get_position([62, 591]))
+    pyautogui.click(get_position([63, 846]))
+    pyautogui.click(get_position([63, 846]))
     click('地图标识')
     click(waits(['须弥地图标识1','须弥地图标识2']))
     click('须弥传送点1')
@@ -396,16 +404,18 @@ def 切换常用队伍():
         pyautogui.press('esc')
     click(waits(['关闭']))
 
-def 每日(n):
-    移动枫丹()
-    枫丹合成台()
-    res = 合成()
-    if res:
-        切换副本队伍()
-        晶蝶()
-        须弥回血传送()
-        秘境_圣遗物(n)
-        切换常用队伍()
+def 每日(zh_num,n):
+    # 登录(zh[zh_num])
+    # 移动枫丹()
+    # 枫丹合成台()
+    # res = 合成()
+    # # if res:
+    # 切换副本队伍()
+    # 晶蝶()
+    # 须弥回血传送()
+    秘境_圣遗物(n)
+    圣遗物分解()
+    切换常用队伍()
     移动枫丹()
     枫丹凯瑟琳()
     历练点()
@@ -425,14 +435,13 @@ zh  = [
        ]
 
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('退出登录标识',json_path)
-    # print(res)
+    res = c.t_match.save_pic_loc('再次派遣',json_path)
+    # log(res)
     # m.click('原神图标')
     # # m.wait('退出登录')
-    c.check_start()
+    # c.check_start()
     # 登录(zh[6])
-    每日(1)
     # 圣遗物分解()
-    c.check_stop()
+    # c.check_stop()
 
 

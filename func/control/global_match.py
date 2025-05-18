@@ -27,7 +27,7 @@ class match():
         h, w = template.shape[:2]
         screenshot = pyautogui.screenshot()
         screenshot_cv = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
-        screenshot_cv = cv2.resize(screenshot_cv, (2560, 1440), interpolation=cv2.INTER_AREA)
+        # screenshot_cv = cv2.resize(screenshot_cv, (2560, 1440), interpolation=cv2.INTER_AREA)
         result = cv2.matchTemplate(screenshot_cv, template, cv2.TM_CCOEFF_NORMED)
         yloc, xloc = np.where(result >= threshold)
         rectangles = []
@@ -62,6 +62,7 @@ class match():
                 break
 
     def waits(self,names, num=None):
+        print(f'waits:{names} 开始捕获')
         if num is None:
             num = self.num
         while True:
@@ -69,6 +70,7 @@ class match():
                 matches = self.find_image_on_screen(name,num)
                 if matches:
                     time.sleep(0.2)
+                    print(f'wait: {name} 已找到')
                     return name
 
     def click_num(self,name,n):

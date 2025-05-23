@@ -104,7 +104,7 @@ def mnyz():
         time.sleep(0.2)
 
 def auto():
-    click_names = ['活动1','活动3','活动4','活动5','hd6','hd7','hd8']
+    click_names = ['活动1','活动3','活动4','活动5','hd6','hd7','hd8','hd9']
     esc_names = []
     names = []
     while True:
@@ -118,7 +118,7 @@ def auto():
         time.sleep(0.2)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('活动2',json_path,0.8)
+    c.t_match.save_pic_loc('hd9',json_path,0.8)
     # print(res)
     # talk()
     # mnyz()

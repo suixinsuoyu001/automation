@@ -64,7 +64,7 @@
     "recordGameTimeEnabled": false
   },
   "autoPickConfig": {
-    "enabled": true,
+    "enabled": false,
     "itemIconLeftOffset": 60,
     "itemTextLeftOffset": 115,
     "itemTextRightOffset": 400,
@@ -206,7 +206,7 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-05-18T12:08:56.033722+08:00",
+    "lastUpdateScriptRepoTime": "2025-05-22T23:12:35.2457154+08:00",
     "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"

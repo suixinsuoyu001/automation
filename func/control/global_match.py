@@ -5,7 +5,7 @@ import pyautogui
 import numpy as np
 from PIL import Image
 import cv2
-
+from func.common import *
 
 class match():
     def __init__(self,path,num):
@@ -43,14 +43,14 @@ class match():
         return centers
 
     def click(self,name,num = None):
-        print(f'click:{name} 开始捕获')
+        log(f'click:{name} 开始捕获')
         if num is None:
             num = self.num
         while True:
             matches = self.find_image_on_screen(name,num)
             if matches:
                 pyautogui.click(matches[0])
-                print(f'click:{name} 已捕获并点击')
+                log(f'click:{name} 已捕获并点击')
                 break
 
     def wait(self,name,num = None):
@@ -62,7 +62,7 @@ class match():
                 break
 
     def waits(self,names, num=None):
-        print(f'waits:{names} 开始捕获')
+        log(f'waits:{names} 开始捕获')
         if num is None:
             num = self.num
         while True:
@@ -70,8 +70,24 @@ class match():
                 matches = self.find_image_on_screen(name,num)
                 if matches:
                     time.sleep(0.2)
-                    print(f'wait: {name} 已找到')
+                    log(f'wait: {name} 已找到')
                     return name
+
+    def waits_limit(self,names,t = 3, num=None):
+        log(f'waits:{names} 开始捕获')
+        if num is None:
+            num = self.num
+        start_time = time.time()
+        while True:
+            for name in names:
+                matches = self.find_image_on_screen(name,num)
+                if matches:
+                    time.sleep(0.2)
+                    log(f'wait: {name} 已找到')
+                    return name
+                if time.time() - start_time > t:
+                    log(f'waits_limit:{name} 未捕获，超时取消')
+                    return None
 
     def click_num(self,name,n):
         while True:

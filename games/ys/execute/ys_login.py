@@ -1,22 +1,8 @@
 import time
 
-import keyboard
-
 from games.ys.action.ys_action import *
 
-def run(n = None):
-    m.click('原神图标')
-    c.check_start()
-    if n is None:
-        for i in zh:
-            登录(i)
-            log('等待0')
-            keyboard.wait('0')
-    else:
-        登录(n)
-    c.check_stop()
-
-zh  = [
+zh = [
         'kechengzhuang524@126.com',     #0
         'kemeihao694350@126.com',       #1
         'kenc40sklx6093@126.com',       #2
@@ -27,5 +13,25 @@ zh  = [
         '13280859317'                   #7
        ]
 
+def run():
+    m.click('原神图标2')
+    # 登录(zh[0])
+    # 登录(zh[1])
+    登录(zh[2])
+    登录(zh[3])
+    登录(zh[4])
+    登录(zh[5])
+    登录(zh[6])
+    登录(zh[7])
+
+    c.check_stop()
+
 if __name__ == '__main__':
+    # c.check_start()
+    # # 登录(zh[0])
+    # 邮件领取()
+    # # 每日(0,1)
+    # #
+    # # # 圣遗物分解()
+    # c.check_stop()
     run()

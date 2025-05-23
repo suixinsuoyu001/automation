@@ -5,6 +5,16 @@ import pyautogui
 import ctypes
 import time
 
+
+setting = read_json('setting.json')
+resolution = setting['resolution']
+
+def get_position(position):
+    x = int(position[0]/2560*resolution[0])
+    y = int(position[1]/1440*resolution[1])
+    return x,y
+
+
 # 定义结构体（Windows API 需要）
 class MOUSEINPUT(ctypes.Structure):
     _fields_ = [("dx", ctypes.c_long),
@@ -54,7 +64,7 @@ c = check('崩坏：星穹铁道',image_path,json_path)
 def pic_click(names,matches):
     for i in names:
         if i in matches:
-            pyautogui.click(matches[i][0])
+            pyautogui.click(get_position(matches[i][0]))
             return
 
 def pic_press(names,matches,s):

@@ -119,7 +119,7 @@ def 打开betterGi():
 def 打开betterGi2():
     exe_path = r"games\ys\tool\betterGi\BetterGI.exe"
     subprocess.Popen(exe_path)
-    if m.waits(['脚本_启动2','脚本_停止2']) == '脚本_启动2':
+    if m.waits_limit(['脚本_启动2','脚本_停止2']) == '脚本_启动2':
         m.click('脚本_启动2')
     else:
         m.click('原神图标2')
@@ -144,6 +144,8 @@ def 登录(zh):
     click('点击进入')
     if waits(['菜单','空月祝福']) == '空月祝福':
         click('空月祝福')
+        time.sleep(1)
+        click('空白位置')
         time.sleep(1)
         click('空白位置')
     邮件领取()
@@ -298,8 +300,9 @@ def 秘境_圣遗物(num):
     move('圣遗物传送标识')
     scroll_click(name, '圣遗物传送')
     click_limit('传送',2)
+    time.sleep(2)
     waits(['菜单'])
-    time.sleep(1)
+    time.sleep(0.5)
     pyautogui.keyDown('w')
     time.sleep(0.4)
     pyautogui.rightClick()
@@ -423,12 +426,12 @@ def 每日(zh_num,n):
     枫丹合成台()
     res = 合成()
     if res:
-        切换副本队伍()
-        晶蝶()
+        # 切换副本队伍()
+        # 晶蝶()
         须弥回血传送()
         秘境_圣遗物(n)
         圣遗物分解()
-        切换常用队伍()
+        # 切换常用队伍()
     移动枫丹()
     枫丹凯瑟琳()
     历练点()
@@ -436,7 +439,7 @@ def 每日(zh_num,n):
     每日委托()
     纪行()
 
-zh  = [
+zh = [
         'kechengzhuang524@126.com',     #0
         'kemeihao694350@126.com',       #1
         'kenc40sklx6093@126.com',       #2
@@ -446,14 +449,14 @@ zh  = [
         'k6597975255692@sohu.com',      #6
         '13280859317'                   #7
        ]
-
 if __name__ == '__main__':
     res = c.t_match.save_pic_loc('再次派遣标识',json_path)
+
     # log(res)
     # m.click('原神图标')
     # # m.wait('退出登录')
-    c.check_start()
-    click('再次派遣标识')
-    c.check_stop()
+    # c.check_start()
+    # click('再次派遣标识')
+    # c.check_stop()
 
 

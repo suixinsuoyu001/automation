@@ -74,7 +74,6 @@ class t_match():
             if [top_left, bottom_right] not in locs[name]:
                 locs[name].append([top_left, bottom_right])
             save_json(json_path, locs)
-            log(max_val, [top_left, bottom_right],[(top_left[0]+bottom_right[0])//2,(top_left[1]+bottom_right[1])//2])
         else:
             log("匹配失败")
 

@@ -49,7 +49,7 @@ pyautogui.FAILSAFE = False  # 禁用 fail-safe
 image_path = 'games/starRail/image/'
 json_path = 'games/starRail/data/img_loc.json'
 
-c = check('星穹铁道',image_path,json_path)
+c = check('崩坏：星穹铁道',image_path,json_path)
 
 def pic_click(names,matches):
     for i in names:
@@ -104,7 +104,7 @@ def mnyz():
         time.sleep(0.2)
 
 def auto():
-    click_names = ['继续','继续2','空白位置10','准备比赛']
+    click_names = ['活动1','活动3','活动4','活动5','hd6','hd7','hd8']
     esc_names = []
     names = []
     while True:
@@ -114,11 +114,11 @@ def auto():
             print(matches)
             pic_click(click_names, matches)
             pic_press(esc_names, matches, 'esc')
-            # pyautogui.press(' ')
+            pyautogui.press(' ')
         time.sleep(0.2)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('模拟宇宙_金血祝颂',json_path,0.8)
+    c.t_match.save_pic_loc('活动2',json_path,0.8)
     # print(res)
     # talk()
     # mnyz()

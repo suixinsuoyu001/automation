@@ -53,7 +53,7 @@ def loc_jl():
         match = c.match_one_pic('领取奖励',0.8)
         if not match:
             break
-        point = match[1]
+        point = match[0]
         dis_x = point[0]-item_point[0]
         dis_y = point[1]-item_point[1]
         if dis_x > 700 or abs(dis_y) > 200:
@@ -226,5 +226,5 @@ def 剧情():
         time.sleep(0.2)
 
 if __name__ == '__main__':
-    # c.t_match.save_pic_loc('跳过剧情', json_path, 0.8)
-    剧情()
+    c.t_match.save_pic_loc('聊天标识', json_path, 0.8)
+    # 剧情()

@@ -162,7 +162,7 @@ class check():
                 log('name2', self.match_one_pic(name1, num))
                 continue
             log('name2',self.match_one_pic(name1, num))
-            point = self.match_one_pic(name2,num)[1]
+            point = self.match_one_pic(name2,num)[0]
             control.scroll(-1, point)
             time.sleep(1)
         while 1:
@@ -171,7 +171,7 @@ class check():
                 break
 
             for i in self.match_pics(name2,num):
-                if item_point[1][1]<i['y']:
+                if item_point[0][1]<i['y']+100:
                     control.click([i['x'],i['y']])
                     break
         log(f'scroll_click:已查找到{name1}')

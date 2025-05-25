@@ -114,7 +114,7 @@ class check():
         cropped_img = image[y:y+h, x:x+w]
 
         output_file = "item.png"
-        cv2.imwrite(output_file, cropped_img)
+        # cv2.imwrite(output_file, cropped_img)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
         log(max_val)
@@ -204,7 +204,7 @@ class check():
 if __name__ == '__main__':
     # game_start(windows_title)
     c = check(windows_title)
-    c.save_pic_loc('test')
+    c.save_pic_loc('test',0.8)
     #
     c.check_start()
     # c.waits(['test'])

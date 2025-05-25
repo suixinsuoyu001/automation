@@ -180,6 +180,17 @@ def get_position(position):
     y = int(position[1]/1440*resolution[1])
     return x,y
 
+def game_start(windows_title):
+    if get_hwnd(windows_title):
+        win32gui.ShowWindow(get_hwnd(windows_title), win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
+        win32gui.SetForegroundWindow(get_hwnd(windows_title))  # 激活窗口
+    else:
+        os.startfile(get_game_path(windows_title))
+        while True:
+            focus = get_focus_window()
+            if focus and windows_title in focus:
+                break
+
 if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'
     # 16384554

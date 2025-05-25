@@ -1,42 +1,7 @@
 {
   "maskWindowConfig": {
-    "uidCoverRect": {
-      "x": 1690,
-      "y": 1052,
-      "width": 173,
-      "height": 22
-    },
-    "uidCoverRightBottomRect": {
-      "x": 230,
-      "y": 28,
-      "width": 173,
-      "height": 22
-    },
-    "eastPoint": {
-      "x": 274,
-      "y": 109
-    },
-    "southPoint": {
-      "x": 150,
-      "y": 233
-    },
-    "westPoint": {
-      "x": 32,
-      "y": 109
-    },
-    "northPoint": {
-      "x": 150,
-      "y": -9
-    },
-    "controlLocked": true,
     "directionsEnabled": false,
     "displayRecognitionResultsOnMask": true,
-    "logBoxLocation": {
-      "x": 0,
-      "y": 0,
-      "width": 0,
-      "height": 0
-    },
     "maskEnabled": true,
     "showLogBox": true,
     "showStatus": true,
@@ -50,7 +15,7 @@
     "exitToTray": false,
     "currentBackdropType": 2,
     "isFirstRun": false,
-    "runForVersion": "0.44.4",
+    "runForVersion": "0.45.1",
     "onceHadRunDeviceIdList": [
       "V7N5KBB2RRA7E97DTXNE6JGR1KCS80DA9RVTW01120H9PVDG78WG",
       "E2QJX4SN2PYN8ZG0FNHVAD5AQRQVG5Z0YHB5QBPZ06RGYS54ESY0"
@@ -159,12 +124,7 @@
       "beforeDetectDelay": ""
     },
     "pickDropsAfterFightEnabled": true,
-    "pickDropsConfig": {
-      "forwardTimes": 6,
-      "calibrationTimes": 15,
-      "decayFactor": 0.7,
-      "forwardSeconds": 2
-    },
+    "pickDropsAfterFightSeconds": 15,
     "kazuhaPickupEnabled": true,
     "timeout": 120
   },
@@ -206,7 +166,7 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-05-25T19:12:48.4134715+08:00",
+    "lastUpdateScriptRepoTime": "2025-05-25T19:56:02.2181851+08:00",
     "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"
@@ -306,7 +266,9 @@
     "suspendHotkey": "",
     "suspendHotkeyType": "KeyboardMonitor",
     "cancelTaskHotkey": "P",
-    "cancelTaskHotkeyType": "KeyboardMonitor"
+    "cancelTaskHotkeyType": "KeyboardMonitor",
+    "onedragonHotkey": "",
+    "onedragonHotkeyType": "KeyboardMonitor"
   },
   "notificationConfig": {
     "jsNotificationEnabled": false,
@@ -331,10 +293,6 @@
     "dingDingwebhookNotificationEnabled": false,
     "dingdingWebhookUrl": "",
     "emailNotificationEnabled": false,
-    "feishuNotificationEnabled": false,
-    "feishuWebhookUrl": "",
-    "feishuAppId": "",
-    "feishuAppSecret": "",
     "fromEmail": "",
     "fromName": "",
     "includeScreenShot": true,
@@ -343,6 +301,15 @@
     "smtpPort": 0,
     "smtpServer": "",
     "smtpUsername": "",
+    "feishuNotificationEnabled": false,
+    "feishuWebhookUrl": "",
+    "feishuAppId": "",
+    "feishuAppSecret": "",
+    "oneBotNotificationEnabled": false,
+    "oneBotEndpoint": "",
+    "oneBotUserId": "",
+    "oneBotGroupId": "",
+    "oneBotToken": "",
     "telegramApiBaseUrl": "",
     "telegramBotToken": "",
     "telegramChatId": "",
@@ -412,6 +379,7 @@
   },
   "otherConfig": {
     "restoreFocusOnLostEnabled": false,
+    "autoFetchDispatchAdventurersGuildCountry": "无",
     "gameCultureInfoName": "zh-Hans",
     "uiCultureInfoName": "zh-Hans"
   },
@@ -456,6 +424,9 @@
     "maxMouseMove": 300,
     "mapScaleFactor": 2.661,
     "hasErrors": false
+  },
+  "devConfig": {
+    "recordMapName": "Teyvat"
   },
   "captureMode": "BitBlt",
   "detailedErrorLogs": false,

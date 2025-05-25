@@ -12,7 +12,9 @@ pyautogui.FAILSAFE = False  # 禁用 fail-safe
 image_path = 'games/ys/image/'
 json_path = 'games/ys/data/img_loc.json'
 
-c = check('原神',image_path,json_path)
+windows_title = '原神'
+
+c = check(windows_title,image_path,json_path)
 m = match(image_path,0.9)
 
 num = 0.9
@@ -306,7 +308,11 @@ def 秘境_圣遗物(num):
     pyautogui.keyUp('w')
     pyautogui.press('i')
     waits(['单人挑战'])
-    waits(['菜单'])
+    while True:
+        if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
+            click('任意位置关闭')
+        else:
+            break
     if waits(['须弥复活点','菜单']) == '须弥复活点':
         秘境_圣遗物(num)
 
@@ -446,13 +452,13 @@ zh = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('再次派遣标识',json_path)
-
+    res = c.t_match.save_pic_loc('任意位置关闭',json_path)
+    game_start(windows_title)
     # log(res)
-    # m.click('原神图标')
     # # m.wait('退出登录')
-    # c.check_start()
-    # click('再次派遣标识')
-    # c.check_stop()
+    c.check_start()
+    秘境_圣遗物(1)
+    c.check_stop()
+
 
 

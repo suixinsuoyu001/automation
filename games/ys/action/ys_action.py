@@ -312,7 +312,11 @@ def 秘境_圣遗物(num):
     pyautogui.keyUp('w')
     pyautogui.press('i')
     waits(['单人挑战'])
-    waits(['菜单'])
+    while True:
+        if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
+            click('任意位置关闭')
+        else:
+            break
     if waits(['须弥复活点','菜单']) == '须弥复活点':
         秘境_圣遗物(num)
 
@@ -452,13 +456,12 @@ zh = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('再次派遣标识',json_path)
+    res = c.t_match.save_pic_loc('任意位置关闭',json_path)
     game_start(windows_title)
     # log(res)
     # # m.wait('退出登录')
     c.check_start()
-    切换副本队伍()
-    切换常用队伍()
+    秘境_圣遗物(1)
     c.check_stop()
 
 

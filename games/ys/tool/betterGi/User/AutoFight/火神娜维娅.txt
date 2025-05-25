@@ -1,4 +1,10 @@
-茜特菈莉 w(0.5),dash,e,q
-夜兰 e,wait(0.4),e,e,q
+玛薇卡 w(0.5),dash,wait(0.2),e
+班尼特 dash,wait(0.2)e
+希诺宁 e,attack(0.8),q
+娜维娅 e
 班尼特 e,q
-流浪者 e,wait(0.2),charge,attack(5),e
+玛薇卡 e,q,charge(3)
+娜维娅 e,q
+希诺宁 e,attack(0.8),q
+班尼特 e,q
+玛薇卡 e(hold),charge(3)

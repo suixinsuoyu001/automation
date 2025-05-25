@@ -1,7 +1,7 @@
 import threading
-
+import pyautogui
 import win32con
-
+from PIL import Image
 from func.common import *
 from func.get_pic import get_pic
 from func.match.template_match import t_match
@@ -109,13 +109,18 @@ class check():
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         result = self.t_match.get_match_result(image, template)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+        h, w, channels = template.shape  # 模板的高度和宽度
+        x,y = max_loc
+        cropped_img = image[y:y+h, x:x+w]
+
+        output_file = "item.png"
+        cv2.imwrite(output_file, cropped_img)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
         log(max_val)
         if max_val >= threshold:
             # 计算模板匹配的区域坐标
             top_left = list(max_loc)
-            h, w, channels = template.shape  # 模板的高度和宽度
             bottom_right = [top_left[0] + w, top_left[1] + h]
             locs = read_json(self.json_path)
             locs[name] = locs.get(name, [])

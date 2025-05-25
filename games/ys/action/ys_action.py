@@ -11,19 +11,15 @@ pyautogui.FAILSAFE = False  # 禁用 fail-safe
 
 image_path = 'games/ys/image/'
 json_path = 'games/ys/data/img_loc.json'
-setting = read_json('setting.json')
 
 c = check('原神',image_path,json_path)
 m = match(image_path,0.9)
 
 num = 0.9
 
-resolution = setting['resolution']
 
-def get_position(position):
-    x = int(position[0]/2560*resolution[0])
-    y = int(position[1]/1440*resolution[1])
-    return x,y
+
+
 
 def click(name, num=num):
     if c.processed_screen is None:

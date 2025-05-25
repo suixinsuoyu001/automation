@@ -65,7 +65,7 @@ class check():
         while True:
             t0 = time.time()
             processed_screen = self.processed_screen
-            processed_screen = reset_pic(processed_screen, 1600, 900)
+            processed_screen = reset_pic(processed_screen, 900, 600)
             cv2.imshow(window_name, processed_screen)
             # set_window_topmost(window_name)  # 设置窗口置顶
             # 退出条件

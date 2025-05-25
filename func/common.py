@@ -99,53 +99,56 @@ def log(*args, sep=' ', end='\n', file=None, flush=False):
 def get_installed_games_with_path():
     uninstall_keys = [
         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
-        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+        # r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall",
+        r"Software\Microsoft\Windows\CurrentVersion\Uninstall"
     ]
+
+    roots = [winreg.HKEY_LOCAL_MACHINE, winreg.HKEY_CURRENT_USER]
+
     res = []
 
-    for key_path in uninstall_keys:
-        try:
-            reg_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path)
-            for i in range(winreg.QueryInfoKey(reg_key)[0]):
-                subkey_name = winreg.EnumKey(reg_key, i)
-                subkey = winreg.OpenKey(reg_key, subkey_name)
-                try:
-                    display_name = winreg.QueryValueEx(subkey, "DisplayName")[0]
-                    if display_name == '崩坏：星穹铁道':
-                        pass
+    for root in roots:
+        for key_path in uninstall_keys:
+            try:
+                reg_key = winreg.OpenKey(root, key_path)
+                for i in range(winreg.QueryInfoKey(reg_key)[0]):
                     try:
-                        install_location = winreg.QueryValueEx(subkey, "InstallLocation")[0]
-                    except:
-                        install_location = ""
-                    try:
-                        display_icon = winreg.QueryValueEx(subkey, "DisplayIcon")[0]
-                    except:
-                        display_icon = ""
+                        subkey_name = winreg.EnumKey(reg_key, i)
+                        subkey = winreg.OpenKey(reg_key, subkey_name)
 
-                    try:
-                        uninstall_string = winreg.QueryValueEx(subkey, "UninstallString")[0]
-                    except:
-                        uninstall_string = ""
+                        display_name = winreg.QueryValueEx(subkey, "DisplayName")[0]
 
-                    # 综合判断 exe 的可能位置
-                    exe_guess = ""
-                    if display_icon and display_icon.lower().endswith(".exe"):
-                        exe_guess = display_icon
-                    elif uninstall_string and uninstall_string.lower().endswith(".exe"):
-                        exe_guess = uninstall_string
-                    elif install_location:
-                        # 在安装目录下猜测主程序名
-                        for file in os.listdir(install_location):
-                            if file.lower().endswith(".exe"):
-                                exe_guess = os.path.join(install_location, file)
-                                break
+                        install_location = winreg.QueryValueEx(subkey, "InstallLocation")[0] if "InstallLocation" in [
+                            winreg.EnumValue(subkey, j)[0] for j in range(winreg.QueryInfoKey(subkey)[1])] else ""
+                        display_icon = winreg.QueryValueEx(subkey, "DisplayIcon")[0] if "DisplayIcon" in [
+                            winreg.EnumValue(subkey, j)[0] for j in range(winreg.QueryInfoKey(subkey)[1])] else ""
+                        uninstall_string = winreg.QueryValueEx(subkey, "UninstallString")[0] if "UninstallString" in [
+                            winreg.EnumValue(subkey, j)[0] for j in range(winreg.QueryInfoKey(subkey)[1])] else ""
 
-                    res.append((display_name, exe_guess))
+                        # 综合判断 exe 的可能位置
+                        exe_guess = ""
+                        if display_icon and display_icon.lower().endswith(".exe"):
+                            exe_guess = display_icon
+                        elif uninstall_string and uninstall_string.lower().endswith(".exe"):
+                            exe_guess = uninstall_string
+                        elif install_location and os.path.isdir(install_location):
+                            for file in os.listdir(install_location):
+                                if file.lower().endswith(".exe") and "uninstall" not in file.lower():
+                                    exe_guess = os.path.join(install_location, file)
+                                    break
 
-                except FileNotFoundError:
-                    continue
-        except:
-            continue
+                        res.append((display_name, exe_guess))
+
+                    except FileNotFoundError:
+                        continue
+                    except Exception as e:
+                        # 调试用，可移除
+                        print(f"[!] 子项读取失败: {e}")
+                        continue
+            except Exception as e:
+                # 调试用，可移除
+                print(f"[!] 无法访问注册表路径: {key_path}, 错误: {e}")
+                continue
 
     return res
 
@@ -155,7 +158,7 @@ def find_game_name(game_name):
         if game_name in name:
             print(f"{name}")
 
-def open_game(game_name):
+def get_game_path(game_name):
     games = get_installed_games_with_path()
     for name, path in games:
         if name != game_name:
@@ -180,6 +183,3 @@ if __name__ == '__main__':
     # # 获取当前活动窗口句柄
     # hwnd = user32.GetForegroundWindow()
     # print(hwnd)
-
-
-

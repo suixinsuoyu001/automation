@@ -19,7 +19,7 @@ def game_start(windows_title):
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
         win32gui.SetForegroundWindow(hwnd)  # 激活窗口
     else:
-        os.startfile(open_game(windows_title))
+        os.startfile(get_game_path(windows_title))
         while True:
             focus = get_focus_window()
             if focus and windows_title in focus:
@@ -197,25 +197,24 @@ class check():
 
 
 if __name__ == '__main__':
-    # game_start(windows_title)
-
-    c = check(windows_title)
-    # c.save_pic_loc('分解')
-
-    c.check_start()
-    while True:
-        c.wait_click('再来一次')
-        time.sleep(5)
-
-    # c.send_key('esc')
-    # time.sleep(0.5)
-    # c.send_key('esc')
-
-
-    # c.waits(['Enter'])
-    # c.send_key('b')
-    # c.click_until(c.waits(['遗器1', '遗器2']), '分解')
-    # c.wait_click('分解')
-
-
-    c.check_stop()
+    game_start(windows_title)
+    # c = check(windows_title)
+    # # c.save_pic_loc('分解')
+    #
+    # c.check_start()
+    # while True:
+    #     c.wait_click('再来一次')
+    #     time.sleep(5)
+    #
+    # # c.send_key('esc')
+    # # time.sleep(0.5)
+    # # c.send_key('esc')
+    #
+    #
+    # # c.waits(['Enter'])
+    # # c.send_key('b')
+    # # c.click_until(c.waits(['遗器1', '遗器2']), '分解')
+    # # c.wait_click('分解')
+    #
+    #
+    # c.check_stop()

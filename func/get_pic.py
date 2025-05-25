@@ -63,7 +63,7 @@ def get_pic(window_title):
     saveDC.DeleteDC()
     mfcDC.DeleteDC()
     win32gui.ReleaseDC(hwnd, hwndDC)
-    # im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
+    im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
     output_file = "screenshot.png"
     # cv2.imwrite(output_file, im)
 

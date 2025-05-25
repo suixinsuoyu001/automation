@@ -17,7 +17,7 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 
 
 class check():
-    def __init__(self,windows_title,num = 0.9,time_limit = 0):
+    def __init__(self,windows_title,num = 0.8,time_limit = 0):
         self.wt = windows_title
         self.time_limit = time_limit
         self.num = num
@@ -146,7 +146,7 @@ class check():
         while True:
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click,position[0])
+                self.post(control.click,get_position(position[0]))
                 flag = 1
                 time.sleep(1)
             if flag and not position:
@@ -189,9 +189,9 @@ class check():
                 log(f'click_until:{item_position} 已识别结束循环')
                 break
             if position is not None:
-                self.post(control.click,position[0])
+                self.post(control.click,get_position(position[0]))
                 log(f'click_until:{name} 已捕获并点击')
-                time.sleep(0.5)
+                time.sleep(1)
             time.sleep(0.02)
 
     def send_key(self,key):
@@ -261,8 +261,9 @@ class check():
 if __name__ == '__main__':
     # game_start(windows_title)
     c = check(windows_title)
-
-
+    c.save_pic_loc('test',0.8)
+    #
+    c.check_start()
     # c.waits(['test'])
     # while True:
     #     c.wait_click('再来一次')
@@ -279,4 +280,4 @@ if __name__ == '__main__':
     # # c.wait_click('分解')
     #
     #
-    # c.check_stop()
+    c.check_stop()

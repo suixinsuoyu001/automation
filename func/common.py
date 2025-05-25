@@ -9,15 +9,19 @@ import pygetwindow as gw
 import ctypes
 from ctypes import wintypes
 
-import win32con
-
-file_path = os.path.dirname(__file__)
-os.chdir(file_path.replace('func',''))
 
 def read_json(path):
     with open(path, 'r', encoding='utf-8') as file:
         save = json.load(file)
         return save
+
+file_path = os.path.dirname(__file__)
+os.chdir(file_path.replace('func',''))
+setting = read_json('setting.json')
+resolution = setting['resolution']
+
+
+
 
 def save_json(path,data):
     with open(path, 'w', encoding='utf-8') as file:
@@ -170,6 +174,11 @@ def get_game_path(game_name):
 
 def reset_pic(pic,width,height):
     return cv2.resize(pic, (width, height), interpolation=cv2.INTER_AREA)
+
+def get_position(position):
+    x = int(position[0]/2560*resolution[0])
+    y = int(position[1]/1440*resolution[1])
+    return x,y
 
 def game_start(windows_title):
     if get_hwnd(windows_title):

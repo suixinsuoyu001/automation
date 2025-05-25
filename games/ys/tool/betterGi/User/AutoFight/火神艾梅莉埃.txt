@@ -1,0 +1,6 @@
+钟离 s(0.1),e(hold)
+玛薇卡 w(0.5),dash,wait(0.2),e
+班尼特 e
+艾梅莉埃 e,q
+班尼特 q
+玛薇卡 e,q,charge(5)

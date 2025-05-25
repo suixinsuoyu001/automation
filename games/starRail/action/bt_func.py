@@ -197,11 +197,12 @@ class check():
 
 
 if __name__ == '__main__':
-    game_start(windows_title)
-    # c = check(windows_title)
-    # # c.save_pic_loc('分解')
+    # game_start(windows_title)
+    c = check(windows_title)
+    c.save_pic_loc('test')
     #
-    # c.check_start()
+    c.check_start()
+    # c.waits(['test'])
     # while True:
     #     c.wait_click('再来一次')
     #     time.sleep(5)
@@ -217,4 +218,4 @@ if __name__ == '__main__':
     # # c.wait_click('分解')
     #
     #
-    # c.check_stop()
+    c.check_stop()

@@ -34,7 +34,6 @@ def get_pic(window_title):
     sp_h = sp_bot - sp_top
     real_sp_w = int(sp_w)
     real_sp_h = int(sp_h)
-    print(sp_left, sp_top, sp_right, sp_bot)
     hwndDC = win32gui.GetWindowDC(hwnd)  # 获取窗口设备上下文（DC）
     mfcDC = win32ui.CreateDCFromHandle(hwndDC)  # 创建MFC DC从hwndDC
     saveDC = mfcDC.CreateCompatibleDC()  # 创建与mfcDC兼容的DC

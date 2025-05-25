@@ -65,7 +65,7 @@ class check():
         while True:
             t0 = time.time()
             processed_screen = self.processed_screen
-            processed_screen = reset_pic(processed_screen, 900, 600)
+            processed_screen = reset_pic(processed_screen, 800, 450)
             cv2.imshow(window_name, processed_screen)
             # set_window_topmost(window_name)  # 设置窗口置顶
             # 退出条件
@@ -74,81 +74,6 @@ class check():
             # log(f'总用时 {time.time() - t0}')
 
         cv2.destroyAllWindows()
-
-    def match_one_pic(self,name):
-        return self.t_match.match_pic(name,num,self.processed_screen)
-
-    def check_one_pic(self,name,num,screen):
-        if screen is None:
-            return
-        if self.locs.get(name) is None:
-            return self.match_one_pic(name, num)
-        for point in self.locs[name]:
-            p1, p2 = point
-            x, y, w, h = p1[0], p1[1], p2[0]-p1[0], p2[1]-p1[1]
-            new_screen = screen[y:y + h, x:x + w]  # 裁剪图像
-            point = [(p1[0]+p2[0])//2, (p1[1]+p2[1])//2]
-            res = self.t_match.match_pic(name,num,new_screen)
-            if res:
-                max_val, max_loc = res
-                return [point,max_val]
-
-    def save_pic_loc(self,name,num = None):
-        num = self.num if num is None else num
-        image = self.processed_screen
-        template = load_image_with_zh_path(f'{self.path}{name}.png')
-        result = self.t_match.get_match_result(image, template)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
-        # 设置一个阈值来过滤低相关度的匹配
-        threshold = num
-        log(max_val)
-        if max_val >= threshold:
-            # 计算模板匹配的区域坐标
-            top_left = list(max_loc)
-            h, w, channels = template.shape  # 模板的高度和宽度
-            bottom_right = [top_left[0] + w, top_left[1] + h]
-            locs = read_json(self.json_path)
-            locs[name] = locs.get(name, [])
-            if [top_left, bottom_right] not in locs[name]:
-                locs[name].append([top_left, bottom_right])
-            save_json(self.json_path, locs)
-        else:
-            log("匹配失败")
-
-    def wait_click(self,name,num = None):
-        num = self.num if num is None else num
-        if self.processed_screen is None:
-            log('check_start未运行')
-            return
-        log(f'wait_click:{name} 开始捕获')
-        flag = 0
-        while True:
-            position = self.check_one_pic(name, num, self.processed_screen)
-            if position is not None:
-                control.activate()
-                control.click(position[0])
-                control.inactivate()
-                flag = 1
-                time.sleep(0.5)
-            if flag and not position:
-                break
-            time.sleep(0.02)
-        log(f'wait_click:{name} 已捕获并点击')
-
-    def click_until(self,name,item_names,num = None):
-        num = self.num if num is None else num
-        log(f'click_loop_until: 开始循环遍历 {names}')
-        while True:
-            for name in item_names + names:
-                position = self.check_one_pic(name,num,self.processed_screen)
-                if position:
-                    if name in names:
-                        control.click(position[0])
-                        log(f'click_loop_until: 点击 {name}')
-                        time.sleep(0.5)
-                    else:
-                        log(f'click_loop_until: {name} 已捕获 结束循环')
-                        return name
 
 if __name__ == '__main__':
     c = check(windows_title)

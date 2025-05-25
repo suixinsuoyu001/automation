@@ -1,134 +1,52 @@
+from games.starRail.action.bt_func import check,windows_title,control
 from func.common import *
-from func.check import *
-import pyautogui
 
-import ctypes
-import time
+c = check(windows_title)
 
+phone_position = (29, 57)
 
-setting = read_json('setting.json')
-resolution = setting['resolution']
-
-def get_position(position):
-    x = int(position[0]/2560*resolution[0])
-    y = int(position[1]/1440*resolution[1])
-    return x,y
-
-
-# 定义结构体（Windows API 需要）
-class MOUSEINPUT(ctypes.Structure):
-    _fields_ = [("dx", ctypes.c_long),
-                ("dy", ctypes.c_long),
-                ("mouseData", ctypes.c_ulong),
-                ("dwFlags", ctypes.c_ulong),
-                ("time", ctypes.c_ulong),
-                ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong))]
-
-class INPUT(ctypes.Structure):
-    class _INPUT(ctypes.Union):
-        _fields_ = [("mi", MOUSEINPUT)]
-    _anonymous_ = ("_input",)
-    _fields_ = [("type", ctypes.c_ulong), ("_input", _INPUT)]
-
-# 定义鼠标事件常量
-INPUT_MOUSE = 0
-MOUSEEVENTF_LEFTDOWN = 0x0002
-MOUSEEVENTF_LEFTUP = 0x0004
-
-# 加载 user32.dll
-user32 = ctypes.windll.user32
-
-def click():
-    # 创建鼠标按下事件
-    inp_down = INPUT(type=INPUT_MOUSE)
-    inp_down.mi.dwFlags = MOUSEEVENTF_LEFTDOWN
-
-    # 创建鼠标释放事件
-    inp_up = INPUT(type=INPUT_MOUSE)
-    inp_up.mi.dwFlags = MOUSEEVENTF_LEFTUP
-
-    # 发送输入事件
-    user32.SendInput(1, ctypes.byref(inp_down), ctypes.sizeof(inp_down))
-    time.sleep(0.05)  # 模拟按住一段时间
-    user32.SendInput(1, ctypes.byref(inp_up), ctypes.sizeof(inp_up))
-
-
-
-pyautogui.FAILSAFE = False  # 禁用 fail-safe
-
-image_path = 'games/starRail/image/'
-json_path = 'games/starRail/data/img_loc.json'
-
-c = check('崩坏：星穹铁道',image_path,json_path)
-
-def pic_click(names,matches):
-    for i in names:
-        if i in matches:
-            pyautogui.click(get_position(matches[i][0]))
-            return
-
-def pic_press(names,matches,s):
-    for i in names:
-        if i in matches:
-            pyautogui.press(s)
-            return
-
-def talk():
+def 登录(zh):
+    login_wait = c.waits(['Enter','登出','登录其他账号'])
+    if login_wait == 'Enter':
+        while True:
+            if c.waits(['Enter','注销']) == '注销':
+                break
+            c.hold_click(phone_position)
+            time.sleep(1)
+        c.wait_click('注销')
+        c.wait_click('确认')
+        c.click_until('登出', '退出')
+        c.click_until('退出', '登录其他账号')
+    if login_wait == '登出':
+        c.click_until('登出','退出')
+        c.click_until('退出', '登录其他账号')
+    elif login_wait == '登录其他账号':
+        pass
+    c.wait_click('登录其他账号')
+    c.wait_click('账号密码')
+    c.text_input('输入账号', zh)
+    c.text_input('输入密码', 'zxc147123')
+    c.wait_click('同意')
+    c.wait_click_limit('进入游戏')
+    c.wait_click('开始游戏')
+    c.wait_click('点击进入')
     while True:
-        click_names = ['任务标识','对话标识1', '对话标识3', '对话标识2', '消息标识','关闭消息','关闭1','教程翻页','教程翻页2',
-                       '成就领取',  '再来一次', '领取', '传送', '前往', '确认2',
+        if c.waits_limit(['Enter']):
+            break
+        c.send_key('w')
 
-                       ]
-        esc_names = ['空白位置1','阅读','获得物品']
-        names = ['L','M']
-        matches = c.check_pic(click_names+esc_names+names,0.85)
-        focus = get_focus_window()
-        if focus and '星穹铁道' in focus:
-            print(matches)
-            pic_click(click_names, matches)
-            pic_press(esc_names, matches,'esc')
-            if 'L' in matches or 'M' in matches:
-                pyautogui.press(' ')
-                click()
-
-
-
-        time.sleep(0.2)
-
-def mnyz():
-    click_names = ['模拟宇宙_剧情下一步','模拟宇宙_剧情选择',
-                   '确认1', '确认2', '确认3', '丢弃',
-                   '模拟宇宙_选择选项',
-                   '模拟宇宙_推荐祝福','模拟宇宙_未选标识','模拟宇宙_加权奇物','模拟宇宙_金血祝颂',
-                   '模拟宇宙_祝福选择']
-    esc_names = ['空白位置1', '空白位置2','空白位置4',]
-    names = []
-    while True:
-        matches = c.check_pic(click_names+esc_names+names,0.85)
-        focus = get_focus_window()
-        if focus and '星穹铁道' in focus:
-            print(matches)
-            pic_click(click_names, matches)
-            pic_press(esc_names, matches, 'esc')
-            # pyautogui.press(' ')
-        time.sleep(0.2)
-
-def auto():
-    click_names = ['活动1','活动3','活动4','活动5','hd6','hd7','hd8','hd9']
-    esc_names = []
-    names = []
-    while True:
-        matches = c.check_pic(click_names+esc_names+names,0.8)
-        focus = get_focus_window()
-        if focus and '星穹铁道' in focus:
-            print(matches)
-            pic_click(click_names, matches)
-            pic_press(esc_names, matches, 'esc')
-            pyautogui.press(' ')
-        time.sleep(0.2)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('活动1',json_path,0.8)
-    # print(res)
-    # talk()
-    # mnyz()
+    # c.save_pic_loc('test',0.8)
+
+    log('执行开始')
+    c.check_start()
+
+    # time.sleep(0.5)
+
+    # c.send_key('esc')
+    登录('suixin001002@163.com')
+
+
+    c.check_stop()
+

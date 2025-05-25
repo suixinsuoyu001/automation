@@ -14,16 +14,6 @@ control = Control(hwnd)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-def game_start(windows_title):
-    if get_hwnd(windows_title):
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
-        win32gui.SetForegroundWindow(hwnd)  # 激活窗口
-    else:
-        os.startfile(get_game_path(windows_title))
-        while True:
-            focus = get_focus_window()
-            if focus and windows_title in focus:
-                break
 
 
 class check():
@@ -117,7 +107,7 @@ class check():
         # cv2.imwrite(output_file, cropped_img)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num
-        log(max_val)
+        log(max_val,max_loc)
         if max_val >= threshold:
             # 计算模板匹配的区域坐标
             top_left = list(max_loc)
@@ -132,15 +122,16 @@ class check():
 
     def post(self,func, a1=None, a2=None):
         control.activate()
-        time.sleep(0.02)
+        time.sleep(0.01)
         x, y = control.get_mouse_position()
-        if a1:
-            func(a1)
-        elif a2:
+        time.sleep(0.01)
+        if a2:
             func(a1, a2)
+        elif a1:
+            func(a1)
         else:
             func()
-        time.sleep(0.1)
+        time.sleep(0.02)
         control.inactivate()
         time.sleep(0.02)
         control.set_mouse_position(x, y)
@@ -162,6 +153,28 @@ class check():
                 break
             time.sleep(0.02)
         log(f'wait_click:{name} 已捕获并点击')
+
+    def wait_click_limit(self,name,t = 2,num = 0.9):
+        if self.processed_screen is None:
+            log('check_start未运行')
+            return
+        log(f'wait_click_limit:{name} 开始捕获')
+        flag = 0
+        start_time = time.time()
+        while True:
+            control.activate()
+            position = self.check_one_pic(name, num, self.processed_screen)
+            if position is not None:
+                self.post(control.click,position[0])
+                flag = 1
+                time.sleep(1)
+            if flag and not position:
+                log(f'wait_click_limit:{name} 已捕获并点击')
+                break
+            time.sleep(0.02)
+            if time.time() - start_time > t:
+                log(f'wait_click_limit:{name} 未捕获，超时取消')
+                break
 
     def click_until(self,name,item_name,num = None):
         num = self.num if num is None else num
@@ -199,14 +212,57 @@ class check():
                     time.sleep(0.5)
                     return name
 
+    def waits_limit(self,names,t = 2,num = None):
+        num = self.num if num is None else num
+        log(f'waits_limit:{names} 开始捕获')
+        start_time = time.time()
+        if self.processed_screen is None:
+            log('check_start未运行')
+            return
+        while True:
+            for name in names:
+                position = self.check_one_pic(name,num,self.processed_screen)
+                if position:
+                    log(f'waits: {name} 已找到')
+                    time.sleep(0.5)
+                    return name
+                if time.time() - start_time > t:
+                    log(f'waits_limit:{name} 未捕获，超时取消')
+                    return None
+
+    def text_input(self,name,text,num = None):
+        num = self.num if num is None else num
+        log(f'text_input:{name} 开始捕获录入')
+        if self.processed_screen is None:
+            log('check_start未运行')
+            return
+        while True:
+            position = self.check_one_pic(name,num,self.processed_screen)
+            if position:
+                log(f'text_input: {name} 已找到开始点击输入')
+                self.post(control.click_input, position[0],text)
+                return name
+
+    def hold_click(self,point):
+        control.activate()
+        x, y = control.get_mouse_position()
+        time.sleep(0.02)
+        control.send_key_down('alt')
+        time.sleep(0.01)
+        control.click(point)
+        control.send_key_up('alt')
+        time.sleep(0.02)
+        control.inactivate()
+        time.sleep(0.02)
+        control.set_mouse_position(x, y)
+
 
 
 if __name__ == '__main__':
     # game_start(windows_title)
     c = check(windows_title)
-    c.save_pic_loc('test',0.8)
-    #
-    c.check_start()
+
+
     # c.waits(['test'])
     # while True:
     #     c.wait_click('再来一次')
@@ -223,4 +279,4 @@ if __name__ == '__main__':
     # # c.wait_click('分解')
     #
     #
-    c.check_stop()
+    # c.check_stop()

@@ -9,6 +9,8 @@ import pygetwindow as gw
 import ctypes
 from ctypes import wintypes
 
+import win32con
+
 file_path = os.path.dirname(__file__)
 os.chdir(file_path.replace('func',''))
 
@@ -168,6 +170,17 @@ def get_game_path(game_name):
 
 def reset_pic(pic,width,height):
     return cv2.resize(pic, (width, height), interpolation=cv2.INTER_AREA)
+
+def game_start(windows_title):
+    if get_hwnd(windows_title):
+        win32gui.ShowWindow(get_hwnd(windows_title), win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
+        win32gui.SetForegroundWindow(get_hwnd(windows_title))  # 激活窗口
+    else:
+        os.startfile(get_game_path(windows_title))
+        while True:
+            focus = get_focus_window()
+            if focus and windows_title in focus:
+                break
 
 if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'

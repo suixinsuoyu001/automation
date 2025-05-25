@@ -24,6 +24,9 @@ class t_match():
         if image is None or image.size == 0:
             return None
         result = self.get_match_result(image,template)
+        if result is None:
+            log('匹配失败，确认图片是否存在')
+            return None
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配
         threshold = num

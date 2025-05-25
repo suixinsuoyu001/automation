@@ -13,7 +13,9 @@ image_path = 'games/ys/image/'
 json_path = 'games/ys/data/img_loc.json'
 setting = read_json('setting.json')
 
-c = check('原神',image_path,json_path)
+windows_title = '原神'
+
+c = check(windows_title,image_path,json_path)
 m = match(image_path,0.9)
 
 num = 0.9
@@ -451,12 +453,13 @@ zh = [
        ]
 if __name__ == '__main__':
     res = c.t_match.save_pic_loc('再次派遣标识',json_path)
-
+    game_start(windows_title)
     # log(res)
-    # m.click('原神图标')
     # # m.wait('退出登录')
-    # c.check_start()
-    # click('再次派遣标识')
-    # c.check_stop()
+    c.check_start()
+    切换副本队伍()
+    切换常用队伍()
+    c.check_stop()
+
 
 

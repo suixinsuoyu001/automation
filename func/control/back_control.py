@@ -2,7 +2,6 @@ import time,win32gui,win32con
 from func.common import *
 from pynput.mouse import Controller
 
-
 key_code = {
     'esc':win32con.VK_ESCAPE,
     'enter':win32con.VK_RETURN,
@@ -11,7 +10,8 @@ key_code = {
     'f1':win32con.VK_F1,
     'f2':win32con.VK_F2,
     'f3':win32con.VK_F3,
-    'f4':win32con.VK_F4
+    'f4':win32con.VK_F4,
+    'alt': 18
 }
 
 class POINT(ctypes.Structure):
@@ -30,14 +30,16 @@ class Control():
             return key
 
     def send_key_down(self,key):
-        mouse = Controller()
-        last_position = mouse.position  # 记录鼠标初始位置
+        # mouse = Controller()
+        # last_position = mouse.position  # 记录鼠标初始位置
+        # ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_KEYDOWN, self.get_key_code(key), 0)
+        # time.sleep(0.01)
+        # mouse.position = last_position
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_KEYDOWN, self.get_key_code(key), 0)
-        time.sleep(0.01)
-        mouse.position = last_position
 
     def send_key_up(self,key):
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_KEYUP, self.get_key_code(key), 0)
+
 
     def send_key(self,key,t = 0.1):
         self.send_key_down(key)
@@ -108,7 +110,34 @@ class Control():
         # 发送 WM_MOUSEMOVE 消息
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_MOUSEMOVE, 0, lParam)
 
+    def send_left_shift(slef,hwnd):
+        VK_LSHIFT = 0xA0
+        scan_code = ctypes.windll.user32.MapVirtualKeyW(VK_LSHIFT, 0)
 
+        # 构造 lParam
+        lparam_down = 1 | (scan_code << 16)  # 按下
+        lparam_up = (1 << 31) | (1 << 30) | (scan_code << 16)  # 抬起
+
+        # 按下 Shift
+        ctypes.windll.user32.PostMessageW(hwnd, win32con.WM_KEYDOWN, VK_LSHIFT, lparam_down)
+        time.sleep(0.05)
+        # 抬起 Shift
+        ctypes.windll.user32.PostMessageW(hwnd, win32con.WM_KEYUP, VK_LSHIFT, lparam_up)
+
+    def click_input(self,point,text):
+        x, y = point  # 点击的坐标（相对于窗口客户区）
+        ctypes.windll.user32.SetCursorPos(x, y)
+        l_param = (y << 16) | x  # 计算坐标参数
+        ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
+        time.sleep(0.05)
+        ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_LBUTTONUP, 0, l_param)
+        time.sleep(0.02)
+        for char in text:
+            ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_CHAR, ord(char), 0)
+            time.sleep(0.01)
+
+    def test(self,key):
+        ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_KEYUP, key, 0)
 
 
 if __name__ == '__main__':

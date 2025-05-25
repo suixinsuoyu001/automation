@@ -5,4 +5,4 @@
 申鹤 e,q
 枫原万叶 e,attack(0.1),q
 珊瑚宫心海 q,attack(2)
-爱可菲 e,qq
+爱可菲 e,q

@@ -1,4 +1,4 @@
-from games.starRail.action.starRail_task import *
+from games.starRail.action.bt_task import *
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 
@@ -14,7 +14,7 @@ processes = []
 def worker1():
     global terminate_flag
     while not terminate_flag:
-        auto()
+        talk()
 
 
 # 定义启动节点的函数（启动所有进程）
@@ -43,7 +43,7 @@ def stop_nodes():
 def on_press(key):
     global running_flag
     try:
-        if hasattr(key, 'vk') and key.vk == 99:
+        if hasattr(key, 'vk') and key.vk == 97:
             if running_flag:
                 stop_nodes()
             else:

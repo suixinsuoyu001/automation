@@ -227,4 +227,4 @@ def 剧情():
 
 if __name__ == '__main__':
     c.t_match.save_pic_loc('聊天标识', json_path, 0.8)
-    # 剧情()
+    剧情()

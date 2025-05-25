@@ -98,8 +98,9 @@ class match():
 
 
 if __name__ == '__main__':
-    time.sleep(2)
-    path = 'E:\python\pythonAuto\games/mc/image/'
-    g_match = match(path,0.9)
-
-    g_match.click('账号标识')
+    # time.sleep(2)
+    # path = 'E:\python\pythonAuto\games/mc/image/'
+    # g_match = match(path,0.9)
+    #
+    # g_match.click('账号标识')
+    pyautogui.moveTo([1042, 85])

@@ -2,6 +2,8 @@ import json,cv2,os,win32gui
 import sys
 import time
 import traceback
+import winreg
+
 import numpy as np
 import pygetwindow as gw
 import ctypes
@@ -93,6 +95,76 @@ def log(*args, sep=' ', end='\n', file=None, flush=False):
 
     print(f'{path_link} {content}', end=end, file=file, flush=flush)
 
+
+def get_installed_games_with_path():
+    uninstall_keys = [
+        r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+        r"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+    ]
+    res = []
+
+    for key_path in uninstall_keys:
+        try:
+            reg_key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, key_path)
+            for i in range(winreg.QueryInfoKey(reg_key)[0]):
+                subkey_name = winreg.EnumKey(reg_key, i)
+                subkey = winreg.OpenKey(reg_key, subkey_name)
+                try:
+                    display_name = winreg.QueryValueEx(subkey, "DisplayName")[0]
+                    if display_name == '崩坏：星穹铁道':
+                        pass
+                    try:
+                        install_location = winreg.QueryValueEx(subkey, "InstallLocation")[0]
+                    except:
+                        install_location = ""
+                    try:
+                        display_icon = winreg.QueryValueEx(subkey, "DisplayIcon")[0]
+                    except:
+                        display_icon = ""
+
+                    try:
+                        uninstall_string = winreg.QueryValueEx(subkey, "UninstallString")[0]
+                    except:
+                        uninstall_string = ""
+
+                    # 综合判断 exe 的可能位置
+                    exe_guess = ""
+                    if display_icon and display_icon.lower().endswith(".exe"):
+                        exe_guess = display_icon
+                    elif uninstall_string and uninstall_string.lower().endswith(".exe"):
+                        exe_guess = uninstall_string
+                    elif install_location:
+                        # 在安装目录下猜测主程序名
+                        for file in os.listdir(install_location):
+                            if file.lower().endswith(".exe"):
+                                exe_guess = os.path.join(install_location, file)
+                                break
+
+                    res.append((display_name, exe_guess))
+
+                except FileNotFoundError:
+                    continue
+        except:
+            continue
+
+    return res
+
+def find_game_name(game_name):
+    games = get_installed_games_with_path()
+    for name, path in games:
+        if game_name in name:
+            print(f"{name}")
+
+def open_game(game_name):
+    games = get_installed_games_with_path()
+    for name, path in games:
+        if name != game_name:
+            continue
+        if game_name == '崩坏：星穹铁道':
+            return path.replace('launcher.exe','Game\StarRail.exe')
+
+def reset_pic(pic,width,height):
+    return cv2.resize(pic, (width, height), interpolation=cv2.INTER_AREA)
 
 if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'

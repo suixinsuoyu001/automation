@@ -58,7 +58,7 @@ class t_match():
         image = get_pic(self.wt)
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         output_file = "screenshot.png"
-        cv2.imwrite(output_file, template)
+        # cv2.imwrite(output_file, template)
         result = self.get_match_result(image, template)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
         # 设置一个阈值来过滤低相关度的匹配

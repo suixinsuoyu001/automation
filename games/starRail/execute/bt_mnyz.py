@@ -1,4 +1,4 @@
-from games.starRail.action.starRail_task import *
+from games.starRail.action.bt_task import *
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 

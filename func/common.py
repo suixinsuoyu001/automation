@@ -3,13 +3,14 @@ import sys
 import time
 import traceback
 import winreg
-
+import win32con
 import numpy as np
 import pygetwindow as gw
 import ctypes
 from ctypes import wintypes
 
 import win32con
+
 
 
 def read_json(path):
@@ -173,6 +174,10 @@ def get_game_path(game_name):
             continue
         if game_name == '崩坏：星穹铁道':
             return path.replace('launcher.exe','Game\StarRail.exe')
+        elif game_name == '原神':
+            return path.replace('launcher.exe','Genshin Impact Game\YuanShen.exe')
+        else:
+            return path
 
 def reset_pic(pic,width,height):
     return cv2.resize(pic, (width, height), interpolation=cv2.INTER_AREA)
@@ -187,6 +192,7 @@ def game_start(windows_title):
         win32gui.ShowWindow(get_hwnd(windows_title), win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
         win32gui.SetForegroundWindow(get_hwnd(windows_title))  # 激活窗口
     else:
+        print(get_game_path(windows_title))
         os.startfile(get_game_path(windows_title))
         while True:
             focus = get_focus_window()

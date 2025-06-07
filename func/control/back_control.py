@@ -1,4 +1,4 @@
-import time,win32gui,win32con
+import time,win32gui,win32con,win32api
 from func.common import *
 from pynput.mouse import Controller
 
@@ -13,6 +13,45 @@ key_code = {
     'f4':win32con.VK_F4,
     'alt': 18
 }
+
+# 常量和结构体定义
+INPUT_MOUSE = 0
+MOUSEEVENTF_MOVE = 0x0001
+class MOUSEINPUT(ctypes.Structure):
+    _fields_ = [("dx", ctypes.c_long),
+                ("dy", ctypes.c_long),
+                ("mouseData", ctypes.c_ulong),
+                ("dwFlags", ctypes.c_ulong),
+                ("time", ctypes.c_ulong),
+                ("dwExtraInfo", ctypes.POINTER(ctypes.c_ulong))]
+
+
+class _INPUT_UNION(ctypes.Union):
+    _fields_ = [("mi", MOUSEINPUT)]
+
+
+class INPUT(ctypes.Structure):
+    _anonymous_ = ("u",)
+    _fields_ = [("type", ctypes.c_ulong),
+                ("u", _INPUT_UNION)]
+
+
+def move_mouse_relative(dx, dy):
+    extra = ctypes.c_ulong(0)
+    mi = MOUSEINPUT(dx, dy, 0, MOUSEEVENTF_MOVE, 0, ctypes.pointer(extra))
+    inp = INPUT(type=INPUT_MOUSE, u=_INPUT_UNION(mi=mi))
+    ctypes.windll.user32.SendInput(1, ctypes.byref(inp), ctypes.sizeof(inp))
+
+
+def smooth_move(to_x, to_y, steps=30, delay=0.01):
+    # 获取当前鼠标位置
+    from_x, from_y = win32api.GetCursorPos()
+    dx = (to_x - from_x) / steps
+    dy = (to_y - from_y) / steps
+
+    for i in range(steps):
+        move_mouse_relative(int(dx), int(dy))
+        time.sleep(delay)
 
 class POINT(ctypes.Structure):
     _fields_ = [("x", ctypes.c_long), ("y", ctypes.c_long)]
@@ -100,6 +139,23 @@ class Control():
         lParam = (y << 16) | (x & 0xFFFF)  # 手动构造 lParam
         wParam = (win32con.WHEEL_DELTA * count) << 16  # 高16位存滚轮增量，低16位为0
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_MOUSEWHEEL, wParam, lParam)
+
+
+    def move_scroll(self,point,delta):
+        x, y = point  # 点击的坐标（相对于窗口客户区）
+        ctypes.windll.user32.SetCursorPos(x, y)
+        l_param = (y << 16) | x  # 计算坐标参数
+        ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, l_param)
+        time.sleep(0.01)
+        smooth_move(x, y - delta, steps=20, delay=0.001)
+
+        time.sleep(0.3)
+
+    def block_user_input(self):
+        ctypes.windll.user32.BlockInput(True)
+
+    def unblock_user_input(self):
+        ctypes.windll.user32.BlockInput(False)
 
     def move(self):
         x, y = 500, 300  # 目标坐标

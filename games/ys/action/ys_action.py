@@ -117,6 +117,7 @@ def 打开betterGi():
 def 打开betterGi2():
     exe_path = r"games\ys\tool\betterGi\BetterGI.exe"
     subprocess.Popen(exe_path)
+    # m.click('betterGi')
     if m.waits_limit(['脚本_启动2','脚本_停止2']) == '脚本_启动2':
         m.click('脚本_启动2')
     else:
@@ -310,7 +311,9 @@ def 秘境_圣遗物(num):
     waits(['单人挑战'])
     while True:
         if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
-            click('任意位置关闭')
+            time.sleep(5)
+            if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
+                click('任意位置关闭')
         else:
             break
     if waits(['须弥复活点','菜单']) == '须弥复活点':
@@ -372,12 +375,14 @@ def 捕获晶蝶3():
     pyautogui.keyUp('space')
 
 def 晶蝶():
+    pyautogui.press("'")
     晶蝶传送('晶蝶传送点1')
     捕获晶蝶1()
     晶蝶传送('晶蝶传送点2')
     捕获晶蝶2()
     晶蝶传送('晶蝶传送点3')
     捕获晶蝶3()
+    pyautogui.press("'")
 
 def 须弥回血传送():
     waits(['菜单'])
@@ -428,12 +433,12 @@ def 每日(zh_num,n):
     枫丹合成台()
     res = 合成()
     if res:
-        # 切换副本队伍()
-        # 晶蝶()
+        切换副本队伍()
+        晶蝶()
         须弥回血传送()
         秘境_圣遗物(n)
         圣遗物分解()
-        # 切换常用队伍()
+        切换常用队伍()
     移动枫丹()
     枫丹凯瑟琳()
     历练点()
@@ -452,12 +457,14 @@ zh = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('任意位置关闭',json_path)
+    res = c.t_match.save_pic_loc('副本队伍标识1',json_path)
+
     game_start(windows_title)
     # log(res)
     # # m.wait('退出登录')
     c.check_start()
-    秘境_圣遗物(1)
+    晶蝶()
+
     c.check_stop()
 
 

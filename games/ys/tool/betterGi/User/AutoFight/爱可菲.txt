@@ -1,8 +1,8 @@
-申鹤 e,q
+爱可菲 e
 枫原万叶 e,attack(0.1)
 珊瑚宫心海 e
+申鹤 e,q
 爱可菲 e,q
 申鹤 e,q
 枫原万叶 e,attack(0.1),q
 珊瑚宫心海 q,attack(2)
-爱可菲 e,q

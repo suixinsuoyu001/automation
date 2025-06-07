@@ -80,14 +80,14 @@ def talk():
 
                        ]
         esc_names = ['空白位置1','阅读','获得物品']
-        names = ['L','M']
+        names = ['L','M','LB']
         matches = c.check_pic(click_names+esc_names+names,0.85)
         focus = get_focus_window()
         if focus and '星穹铁道' in focus:
             print(matches)
             pic_click(click_names, matches)
             pic_press(esc_names, matches,'esc')
-            if 'L' in matches or 'M' in matches:
+            if 'L' in matches or 'M' in matches or 'LB' in matches:
                 pyautogui.press(' ')
                 click()
 
@@ -126,7 +126,7 @@ def auto():
         time.sleep(0.2)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('活动1',json_path,0.8)
+    c.t_match.save_pic_loc('空白位置1',json_path,0.8)
     # print(res)
     # talk()
     # mnyz()

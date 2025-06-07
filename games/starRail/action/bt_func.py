@@ -14,7 +14,18 @@ control = Control(hwnd)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
-
+zhs = [
+    'suixin001007@163.com', #0
+    'suixin001006@163.com', #1
+    'suixin001009@163.com', #2
+    'suixin001001@163.com', #3
+    '13280859317',          #4
+    'suixin001005@163.com', #5
+    'suixin001002@163.com', #6
+    'suixin001003@163.com', #7
+    'suixin001004@163.com', #8
+    'suixin001008@163.com', #9
+]
 
 class check():
     def __init__(self,windows_title,num = 0.8,time_limit = 0):
@@ -78,6 +89,9 @@ class check():
     def match_one_pic(self,name,num):
         return self.t_match.match_pic(name,num,self.processed_screen)
 
+    def match_pics(self,name,num):
+        return self.t_match.match_pics(name,num,self.processed_screen)
+
     def check_one_pic(self,name,num,screen):
         if screen is None:
             return
@@ -121,6 +135,7 @@ class check():
             log("匹配失败")
 
     def post(self,func, a1=None, a2=None):
+        control.block_user_input()
         control.activate()
         time.sleep(0.01)
         x, y = control.get_mouse_position()
@@ -133,22 +148,44 @@ class check():
             func()
         time.sleep(0.02)
         control.inactivate()
-        time.sleep(0.02)
+        time.sleep(0.03)
         control.set_mouse_position(x, y)
+        control.unblock_user_input()
+
+
+    def click(self,name,num = None):
+        num = self.num if num is None else num
+        if self.processed_screen is None:
+            log('check_start未运行')
+            self.check_start()
+            # return
+        log(f'click:{name} 开始捕获')
+        while True:
+            position = self.check_one_pic(name, num, self.processed_screen)
+            if position is not None:
+                self.post(control.click, position[0])
+                break
+            time.sleep(0.02)
+        log(f'click:{name} 已捕获并点击')
+
+    def click_point(self,point):
+        self.post(control.click, point)
+        log(f'click:{point} 已点击')
 
     def wait_click(self,name,num = None):
         num = self.num if num is None else num
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         log(f'wait_click:{name} 开始捕获')
         flag = 0
         while True:
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click,get_position(position[0]))
+                self.post(control.click, get_position(position[0]))
                 flag = 1
-                time.sleep(1)
+                time.sleep(0.5)
             if flag and not position:
                 break
             time.sleep(0.02)
@@ -157,7 +194,8 @@ class check():
     def wait_click_limit(self,name,t = 2,num = 0.9):
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         log(f'wait_click_limit:{name} 开始捕获')
         flag = 0
         start_time = time.time()
@@ -167,7 +205,7 @@ class check():
             if position is not None:
                 self.post(control.click,position[0])
                 flag = 1
-                time.sleep(1)
+                time.sleep(0.5)
             if flag and not position:
                 log(f'wait_click_limit:{name} 已捕获并点击')
                 break
@@ -180,7 +218,8 @@ class check():
         num = self.num if num is None else num
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         log(f'click_until:{name} 开始捕获')
         while True:
             position = self.check_one_pic(name, num, self.processed_screen)
@@ -203,7 +242,8 @@ class check():
         log(f'waits:{names} 开始捕获')
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         while True:
             for name in names:
                 position = self.check_one_pic(name,num,self.processed_screen)
@@ -218,7 +258,8 @@ class check():
         start_time = time.time()
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         while True:
             for name in names:
                 position = self.check_one_pic(name,num,self.processed_screen)
@@ -235,7 +276,8 @@ class check():
         log(f'text_input:{name} 开始捕获录入')
         if self.processed_screen is None:
             log('check_start未运行')
-            return
+            self.check_start()
+            # return
         while True:
             position = self.check_one_pic(name,num,self.processed_screen)
             if position:
@@ -245,6 +287,7 @@ class check():
 
     def hold_click(self,point):
         control.activate()
+        log(f'hold_click: 点击坐标{point}')
         x, y = control.get_mouse_position()
         time.sleep(0.02)
         control.send_key_down('alt')
@@ -256,14 +299,76 @@ class check():
         time.sleep(0.02)
         control.set_mouse_position(x, y)
 
+    def move_click(self,sign,item,num = None):
+        num = self.num if num is None else num
+        log(f'move_scroll:{sign} 开始捕获')
+        while True:
+            position = self.check_one_pic(sign, num, self.processed_screen)
+            if position is None:
+                time.sleep(0.02)
+                continue
+            while True:
+                position2 = self.check_one_pic(item, 0.95, self.processed_screen)
+                if position2:
+                    self.post(control.click, get_position(position2[0]))
+                    break
+                self.post(control.move_scroll, get_position(position[0]),150)
 
+            break
+        log(f'click:{sign} 已捕获并点击')
+
+    def move_wait(self,sign,item,num = None):
+        num = self.num if num is None else num
+        log(f'move_scroll:{sign} 开始捕获')
+        while True:
+            position = self.check_one_pic(sign, num, self.processed_screen)
+            if position is None:
+                time.sleep(0.02)
+                continue
+            while True:
+                position2 = self.check_one_pic(item, 0.95, self.processed_screen)
+                if position2:
+                    break
+                self.post(control.move_scroll, get_position(position[0]),150)
+
+            break
+        log(f'click:{sign} 已捕获并点击')
+
+    def click_move_item(self,sign,item,num = None):
+        num = self.num if num is None else num
+        log(f'move_scroll:{sign} 开始捕获')
+        while True:
+            position = self.check_one_pic(sign, num, self.processed_screen)
+            if position is None:
+                time.sleep(0.02)
+                continue
+            while True:
+                matches = self.match_pics(item, num)
+                if not matches:
+                    continue
+                y = position[0][1]
+                for i in matches:
+                    log(i['y'],y)
+                    if i['y'] > y-100:
+                        self.post(control.click,[i['x'],i['y']])
+                        break
+                break
+
+            break
+        log(f'click:{sign} 已捕获并点击')
 
 if __name__ == '__main__':
     # game_start(windows_title)
     c = check(windows_title)
-    c.save_pic_loc('test',0.8)
-    #
+    # c.save_pic_loc('空白位置',0.8)
+
+
     c.check_start()
+    # c.move_click('拟造花萼金','侵蚀隧洞')
+    # c.move_wait('侵蚀隧洞标识', '遗器副本1')
+    c.click_move_item('遗器副本1','进入')
+
+    # c.check_start()
     # c.waits(['test'])
     # while True:
     #     c.wait_click('再来一次')

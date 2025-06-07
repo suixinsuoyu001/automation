@@ -2,7 +2,24 @@ import time
 
 from games.ys.action.ys_action import *
 
-zh = [
+
+
+def logins():
+    game_start(windows_title)
+    c.check_start()
+    for zh in zhs:
+        登录(zh)
+        log('等待按下0')
+        keyboard.wait('0')
+    c.check_stop()
+
+def login_one(n):
+    game_start(windows_title)
+    c.check_start()
+    登录(zh[n])
+    c.check_stop()
+
+zhs = [
         'kechengzhuang524@126.com',     #0
         'kemeihao694350@126.com',       #1
         'kenc40sklx6093@126.com',       #2
@@ -12,26 +29,8 @@ zh = [
         'k6597975255692@sohu.com',      #6
         '13280859317'                   #7
        ]
-
-def run():
-    m.click('原神图标2')
-    # 登录(zh[0])
-    # 登录(zh[1])
-    登录(zh[2])
-    登录(zh[3])
-    登录(zh[4])
-    登录(zh[5])
-    登录(zh[6])
-    登录(zh[7])
-
-    c.check_stop()
-
 if __name__ == '__main__':
-    # c.check_start()
-    # # 登录(zh[0])
-    # 邮件领取()
-    # # 每日(0,1)
-    # #
-    # # # 圣遗物分解()
-    # c.check_stop()
-    run()
+
+    logins()
+
+    # login_one(0)

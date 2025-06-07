@@ -126,7 +126,7 @@ def auto():
         time.sleep(0.2)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('活动1',json_path,0.8)
+    c.t_match.save_pic_loc('空白位置1',json_path,0.8)
     # print(res)
     # talk()
     # mnyz()

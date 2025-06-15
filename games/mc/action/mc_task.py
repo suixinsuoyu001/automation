@@ -211,11 +211,11 @@ def 切换账号(n):
 
 def 剧情():
     c.check_start()
-    click_names = ['跳过剧情2','快速旅行']
-    esc_names = ['跳过剧情']
+    click_names = ['跳过剧情2','快速旅行','提示翻页']
+    esc_names = ['跳过剧情','提示关闭']
     names = []
     while True:
-        matches = c.check_pic(click_names + esc_names + names, 0.8)
+        matches = c.check_pic(click_names + esc_names + names, 0.9)
         print(matches)
         for i,v in matches.items():
             if i in click_names:
@@ -223,8 +223,9 @@ def 剧情():
             if i in esc_names:
                 c.wait_press(i, 'esc')
 
-        time.sleep(0.2)
+        time.sleep(0.1)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('聊天标识', json_path, 0.8)
-    剧情()
+    c.t_match.save_pic_loc('提示翻页', json_path, 0.8)
+    # c.check_start()
+    # 剧情()

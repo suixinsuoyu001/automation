@@ -289,6 +289,8 @@ def 秘境_圣遗物(num):
         name = '圣遗物_罪祸的终末'
     elif num == 4:
         name = '圣遗物_岩中幽谷'
+    elif num == 5:
+        name = '圣遗物_荒废砌造坞'
     else:
         name = None
 
@@ -463,8 +465,7 @@ if __name__ == '__main__':
     # log(res)
     # # m.wait('退出登录')
     c.check_start()
-    晶蝶()
-
+    秘境_圣遗物(5)
     c.check_stop()
 
 

@@ -159,10 +159,8 @@ class Control():
 
     def move(self):
         x, y = 500, 300  # 目标坐标
-
         # lParam = 低16位为x坐标，高16位为y坐标
         lParam = (y << 16) | x
-
         # 发送 WM_MOUSEMOVE 消息
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_MOUSEMOVE, 0, lParam)
 

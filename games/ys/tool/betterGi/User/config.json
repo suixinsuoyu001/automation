@@ -29,7 +29,7 @@
     "recordGameTimeEnabled": false
   },
   "autoPickConfig": {
-    "enabled": false,
+    "enabled": true,
     "itemIconLeftOffset": 60,
     "itemTextLeftOffset": 115,
     "itemTextRightOffset": 400,
@@ -166,7 +166,7 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-05-25T19:56:02.2181851+08:00",
+    "lastUpdateScriptRepoTime": "2025-06-15T19:22:47.287688+08:00",
     "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"
@@ -431,7 +431,7 @@
   "captureMode": "BitBlt",
   "detailedErrorLogs": false,
   "notShowNewVersionNoticeEndVersion": "0.45.1",
-  "triggerInterval": 50,
+  "triggerInterval": 100,
   "autoFixWin11BitBlt": true,
   "inferenceDevice": "CPU",
   "nextScheduledTask": [],

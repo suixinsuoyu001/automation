@@ -28,47 +28,48 @@ def get_pic(window_title):
     if not hwnd:
         print(f"Window with title '{window_title}' not found.")
         return None
-    windll.user32.SetProcessDPIAware()
-    sp_left, sp_top, sp_right, sp_bot = win32gui.GetClientRect(hwnd)
-    sp_w = sp_right - sp_left
-    sp_h = sp_bot - sp_top
-    real_sp_w = int(sp_w)
-    real_sp_h = int(sp_h)
-    hwndDC = win32gui.GetWindowDC(hwnd)  # 获取窗口设备上下文（DC）
-    mfcDC = win32ui.CreateDCFromHandle(hwndDC)  # 创建MFC DC从hwndDC
-    saveDC = mfcDC.CreateCompatibleDC()  # 创建与mfcDC兼容的DC
-    saveBitMap = win32ui.CreateBitmap()  # 创建一个位图对象
-    # logger(f"int(real_sp_w), int(real_sp_h): {int(real_sp_w)}, {int(real_sp_h)}")
     try:
+        windll.user32.SetProcessDPIAware()
+        sp_left, sp_top, sp_right, sp_bot = win32gui.GetClientRect(hwnd)
+        sp_w = sp_right - sp_left
+        sp_h = sp_bot - sp_top
+        real_sp_w = int(sp_w)
+        real_sp_h = int(sp_h)
+        hwndDC = win32gui.GetWindowDC(hwnd)  # 获取窗口设备上下文（DC）
+        mfcDC = win32ui.CreateDCFromHandle(hwndDC)  # 创建MFC DC从hwndDC
+        saveDC = mfcDC.CreateCompatibleDC()  # 创建与mfcDC兼容的DC
+        saveBitMap = win32ui.CreateBitmap()  # 创建一个位图对象
+        # logger(f"int(real_sp_w), int(real_sp_h): {int(real_sp_w)}, {int(real_sp_h)}")
         saveBitMap.CreateCompatibleBitmap(
             mfcDC, int(real_sp_w), int(real_sp_h)
         )  # 创建与mfcDC兼容的位图
+        saveDC.SelectObject(saveBitMap)  # 选择saveDC的位图对象，准备绘图
+        # 尝试使用PrintWindow函数截取窗口图像
+        result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 3)
+        if result != 1:
+            return None  # 如果截取失败，则返回None
+        # 从位图中获取图像数据
+        bmp_info = saveBitMap.GetInfo()  # 获取位图信息
+        bmp_str = saveBitMap.GetBitmapBits(True)  # 获取位图数据
+        im = np.frombuffer(bmp_str, dtype="uint8")  # 将位图数据转换为numpy数组
+        im.shape = (bmp_info["bmHeight"], bmp_info["bmWidth"], 4)  # 设置数组形状
+        # im = im[:, :, [2, 1, 0, 3]][:, :, :3]  # 调整颜色通道顺序为RGB 并去掉alpha通道
+        # im = im[:, :, [2, 1, 0]]  # 交换通道 BGR -> RGB
+        im = im[:, :, :3]  # 保留 RGB 格式（不包括 alpha 通道）
+
+        win32gui.DeleteObject(saveBitMap.GetHandle())
+        saveDC.DeleteDC()
+        mfcDC.DeleteDC()
+        win32gui.ReleaseDC(hwnd, hwndDC)
+        im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
+        output_file = "screenshot.png"
+        # cv2.imwrite(output_file, im)
+
+
+        return im  # 返回截取到的图像waA
     except:
+        log('获取截图失败')
         return None
-    saveDC.SelectObject(saveBitMap)  # 选择saveDC的位图对象，准备绘图
-    # 尝试使用PrintWindow函数截取窗口图像
-    result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 3)
-    if result != 1:
-        return None  # 如果截取失败，则返回None
-    # 从位图中获取图像数据
-    bmp_info = saveBitMap.GetInfo()  # 获取位图信息
-    bmp_str = saveBitMap.GetBitmapBits(True)  # 获取位图数据
-    im = np.frombuffer(bmp_str, dtype="uint8")  # 将位图数据转换为numpy数组
-    im.shape = (bmp_info["bmHeight"], bmp_info["bmWidth"], 4)  # 设置数组形状
-    # im = im[:, :, [2, 1, 0, 3]][:, :, :3]  # 调整颜色通道顺序为RGB 并去掉alpha通道
-    # im = im[:, :, [2, 1, 0]]  # 交换通道 BGR -> RGB
-    im = im[:, :, :3]  # 保留 RGB 格式（不包括 alpha 通道）
-
-    win32gui.DeleteObject(saveBitMap.GetHandle())
-    saveDC.DeleteDC()
-    mfcDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, hwndDC)
-    im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
-    output_file = "screenshot.png"
-    # cv2.imwrite(output_file, im)
-
-
-    return im  # 返回截取到的图像waA
 
 
 if __name__ == '__main__':

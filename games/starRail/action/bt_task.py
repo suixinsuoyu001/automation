@@ -80,13 +80,11 @@ def 邮件领取():
     c.waits_limit(['Enter'])
     time.sleep(0.5)
     c.hold_click(phone_position)
-    if c.waits(['邮件1']) == '邮件1':
+    if c.waits(['邮件1','邮件2']) == '邮件1':
         c.wait_click('邮件1')
         c.wait_click('全部领取')
         c.wait_click('空白位置')
-        c.send_key('esc')
-        c.waits(['注销'])
-        c.send_key('esc')
+    返回主界面()
 
 def 巡星之礼领取():
     c.waits(['Enter'])
@@ -99,7 +97,7 @@ def 巡星之礼领取():
 def 返回主界面():
     while not c.waits_limit(['Enter'],0.5):
         c.send_key('esc')
-    control.activate()
+    # control.activate()
 
 def 抽卡兑换(flag = 1):
     c.waits(['Enter'])
@@ -129,17 +127,13 @@ def 每月抽卡兑换():
             抽卡兑换()
     c.check_stop()
 
-def 遗器(n):
-    c.waits(['Enter'])
-    c.send_key('f4')
-    c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','侵蚀隧洞')
-    c.move_wait('副本标识', f'遗器副本{n}')
-    c.click_move_item(f'遗器副本{n}','进入')
+def 战斗循环():
     c.click('挑战')
+    if c.waits(['确认','开始挑战']) == '确认':
+        return 返回主界面()
     c.click('开始挑战')
     while True:
-        res = c.waits(['C', '再来一次','开拓力补充'])
+        res = c.waits(['C', '再来一次','开拓力补充'],0.95)
         if res == 'C':
             c.click_point([2352, 66])
         elif res == '再来一次':
@@ -151,6 +145,17 @@ def 遗器(n):
             break
         time.sleep(1)
     返回主界面()
+
+def 遗器(n):
+    n = int(n)
+    c.waits(['Enter'])
+    c.send_key('f4')
+    c.click(c.waits(['生存索引1','生存索引2']))
+    c.move_click('拟造花萼金','侵蚀隧洞')
+    c.move_wait('副本标识', f'遗器副本{n}')
+    c.click_move_item(f'遗器副本{n}','进入')
+    战斗循环()
+
 
 def 行迹(name):
     c.waits(['Enter'])
@@ -161,22 +166,7 @@ def 行迹(name):
     c.click_move_item(f'行迹{name}','进入')
     for i in range(6):
         c.click('+')
-    c.click('挑战')
-    c.click('开始挑战')
-    c.click('再来一次')
-    while True:
-        res = c.waits(['C', '再来一次','开拓力补充'])
-        if res == 'C':
-            c.click_point([2352, 66])
-        elif res == '再来一次':
-            c.click('再来一次')
-        elif res == '开拓力补充':
-            c.click('取消')
-            c.click('取消')
-            c.click('退出关卡')
-            break
-        time.sleep(1)
-    返回主界面()
+    战斗循环()
 
 def 委托领取():
     now = datetime.now()
@@ -185,11 +175,11 @@ def 委托领取():
     c.hold_click(phone_position)
     c.click('委托')
     if now.hour >=20:
-        c.click('领取')
-        c.wait_click('再次派遣',0.9)
+        c.wait_click_limit('领取',0.5)
+        c.wait_click_limit('再次派遣',0.5,0.9)
     else:
-        c.click('一键领取')
-        c.wait_click('再次派遣',0.9)
+        c.wait_click_limit('一键领取',0.5)
+        c.wait_click_limit('再次派遣',0.5,0.9)
     返回主界面()
 
 def 合成():
@@ -198,6 +188,7 @@ def 合成():
     c.hold_click(phone_position)
     c.click('合成')
     c.click('合成2')
+    c.click('确认')
     返回主界面()
 
 def 每日奖励():
@@ -210,12 +201,14 @@ def 每日奖励():
         c.wait_click_limit('领取3',0.5)
         time.sleep(0.2)
 
-
     if c.waits(['每日奖励','每日奖励2']) == '每日奖励':
         c.click('每日奖励')
     else:
-        if c.waits(['每日_合成','每日_弱点击破']) == '每日_合成':
+        if c.waits(['每日_合成']) == '每日_合成':
+            返回主界面()
             合成()
+            返回主界面()
+            每日奖励()
 
     返回主界面()
 
@@ -233,16 +226,35 @@ def 无名勋礼():
         c.click('一键领取2')
     返回主界面()
 
+def 每日(n,type):
+    登录(zhs[n])
+    邮件领取()
+    if type.startswith('x'):
+        行迹(type.replace('x',''))
+    elif type.startswith('y'):
+        遗器(type.replace('y',''))
+    委托领取()
+    每日奖励()
+    无名勋礼()
 
 if __name__ == '__main__':
-    c.save_pic_loc('确认',0.85)
+    # game_start(windows_title)
+    control.hwnd = get_hwnd(windows_title)
+    c.save_pic_loc('开拓力补充',0.85)
     log('执行开始')
+    # 每日(0,'x巡猎2')
+    # 每日(1, 'y12')
+    # 每日(2, 'x巡猎1')
+    # 每日(3, 'y11')
+    # 每日(4, 'y11')
+    # 每日(5, 'x虚无2')
+    # 每日(6, 'x虚无2')
+    # 每日(9, 'y13')
+    邮件领取()
     # 返回主界面()
     # 行迹('虚无2')
-    遗器(13)
-
+    # 遗器(11)
     # 委托领取()
     # 每日奖励()
     # 无名勋礼()
-
     c.check_stop()

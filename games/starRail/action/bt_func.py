@@ -20,8 +20,8 @@ zhs = [
     'suixin001009@163.com', #2
     'suixin001001@163.com', #3
     '13280859317',          #4
-    'suixin001005@163.com', #5
-    'suixin001002@163.com', #6
+    'suixin001002@163.com', #5
+    'suixin001005@163.com', #6
     'suixin001003@163.com', #7
     'suixin001004@163.com', #8
     'suixin001008@163.com', #9
@@ -286,18 +286,27 @@ class check():
                 return name
 
     def hold_click(self,point):
+        control.block_user_input()
         control.activate()
         log(f'hold_click: 点击坐标{point}')
+
         x, y = control.get_mouse_position()
         time.sleep(0.02)
         control.send_key_down('alt')
         time.sleep(0.01)
-        control.click(point)
-        control.send_key_up('alt')
-        time.sleep(0.02)
-        control.inactivate()
-        time.sleep(0.02)
-        control.set_mouse_position(x, y)
+        ctypes.windll.user32.SetCursorPos(point[0],point[1])
+        if control.get_mouse_position() == point:
+            control.click(point)
+            control.send_key_up('alt')
+            time.sleep(0.02)
+            control.inactivate()
+            time.sleep(0.02)
+            control.set_mouse_position(x, y)
+        else:
+            time.sleep(0.5)
+            self.hold_click(point)
+        control.unblock_user_input()
+
 
     def move_click(self,sign,item,num = None):
         num = self.num if num is None else num
@@ -348,7 +357,6 @@ class check():
                     continue
                 y = position[0][1]
                 for i in matches:
-                    log(i['y'],y)
                     if i['y'] > y-100:
                         self.post(control.click,[i['x'],i['y']])
                         break

@@ -27,7 +27,7 @@ class check():
             if pic is not None:
                 self.processed_screen = get_pic(self.wt)
 
-    def check_start(self,time_limit = 0.02):
+    def check_start(self,time_limit = 0.05):
         self.time_limit = time_limit
         self.stop_event = threading.Event()
         flag = 1

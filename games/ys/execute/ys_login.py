@@ -32,5 +32,4 @@ zhs = [
 if __name__ == '__main__':
 
     logins()
-
-    # login_one(0)
+    # login_one(7)

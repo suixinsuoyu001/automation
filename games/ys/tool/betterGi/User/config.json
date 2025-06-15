@@ -166,7 +166,7 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-05-25T19:56:02.2181851+08:00",
+    "lastUpdateScriptRepoTime": "2025-06-14T17:12:43.8919661+08:00",
     "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"
@@ -209,7 +209,7 @@
     "autoFishingEnabledHotkeyType": "KeyboardMonitor",
     "autoGeniusInvokationHotkey": "",
     "autoGeniusInvokationHotkeyType": "KeyboardMonitor",
-    "autoPickEnabledHotkey": "",
+    "autoPickEnabledHotkey": "OemQuotes",
     "autoPickEnabledHotkeyType": "KeyboardMonitor",
     "autoSkipEnabledHotkey": "OemOpenBrackets",
     "autoSkipEnabledHotkeyType": "KeyboardMonitor",
@@ -431,7 +431,7 @@
   "captureMode": "BitBlt",
   "detailedErrorLogs": false,
   "notShowNewVersionNoticeEndVersion": "0.45.1",
-  "triggerInterval": 50,
+  "triggerInterval": 100,
   "autoFixWin11BitBlt": true,
   "inferenceDevice": "CPU",
   "nextScheduledTask": [],

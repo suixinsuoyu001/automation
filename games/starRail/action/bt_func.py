@@ -203,7 +203,7 @@ class check():
             control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click,position[0])
+                self.post(control.click,get_position(position[0]))
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -282,7 +282,7 @@ class check():
             position = self.check_one_pic(name,num,self.processed_screen)
             if position:
                 log(f'text_input: {name} 已找到开始点击输入')
-                self.post(control.click_input, position[0],text)
+                self.post(control.click_input, get_position(position[0]),text)
                 return name
 
     def hold_click(self,point):

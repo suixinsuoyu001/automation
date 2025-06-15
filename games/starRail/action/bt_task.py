@@ -97,7 +97,7 @@ def 巡星之礼领取():
 def 返回主界面():
     while not c.waits_limit(['Enter'],0.5):
         c.send_key('esc')
-    # control.activate()
+    control.activate()
 
 def 抽卡兑换(flag = 1):
     c.waits(['Enter'])
@@ -201,6 +201,7 @@ def 每日奖励():
         c.wait_click_limit('领取3',0.5)
         time.sleep(0.2)
 
+
     if c.waits(['每日奖励','每日奖励2']) == '每日奖励':
         c.click('每日奖励')
     else:
@@ -238,23 +239,14 @@ def 每日(n,type):
     无名勋礼()
 
 if __name__ == '__main__':
-    # game_start(windows_title)
-    control.hwnd = get_hwnd(windows_title)
-    c.save_pic_loc('开拓力补充',0.85)
+    c.save_pic_loc('确认',0.85)
     log('执行开始')
-    # 每日(0,'x巡猎2')
-    # 每日(1, 'y12')
-    # 每日(2, 'x巡猎1')
-    # 每日(3, 'y11')
-    # 每日(4, 'y11')
-    # 每日(5, 'x虚无2')
-    # 每日(6, 'x虚无2')
-    # 每日(9, 'y13')
-    邮件领取()
     # 返回主界面()
     # 行迹('虚无2')
-    # 遗器(11)
+    遗器(13)
+
     # 委托领取()
     # 每日奖励()
     # 无名勋礼()
+
     c.check_stop()

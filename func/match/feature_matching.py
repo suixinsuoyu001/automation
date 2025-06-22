@@ -2,7 +2,6 @@ from concurrent.futures import ThreadPoolExecutor
 import numpy as np
 import pyautogui,cv2,time
 from PIL import Image, ImageDraw, ImageFont
-from get_pic import *
 
 # 使用 SIFT 特征点检测器
 sift = cv2.SIFT_create()

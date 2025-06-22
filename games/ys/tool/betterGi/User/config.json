@@ -166,7 +166,7 @@
   },
   "scriptConfig": {
     "autoUpdateScriptRepoPeriod": 1,
-    "lastUpdateScriptRepoTime": "2025-06-15T19:22:47.287688+08:00",
+    "lastUpdateScriptRepoTime": "2025-06-17T21:35:16.0570632+08:00",
     "scriptRepoHintDotVisible": true,
     "subscribedScriptPaths": [
       "js/AutoCrystalfly"

@@ -1,7 +1,7 @@
 import time,win32gui,win32ui,cv2
 from ctypes import windll
 import numpy as np
-from func.common import get_hwnd
+from func.common import get_hwnd,log
 
 
 # def get_hwnd(target_title: str) -> str:
@@ -31,6 +31,7 @@ def get_pic(window_title):
     try:
         windll.user32.SetProcessDPIAware()
         sp_left, sp_top, sp_right, sp_bot = win32gui.GetClientRect(hwnd)
+
         sp_w = sp_right - sp_left
         sp_h = sp_bot - sp_top
         real_sp_w = int(sp_w)
@@ -64,7 +65,8 @@ def get_pic(window_title):
         im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
         output_file = "screenshot.png"
         # cv2.imwrite(output_file, im)
-
+        # 1450, 657
+        # 1795, 773
 
         return im  # 返回截取到的图像waA
     except:
@@ -76,9 +78,8 @@ if __name__ == '__main__':
 
     t = time.time()
     # 使用窗口标题调用
-    # get_pic("原神")
+    get_pic("原神")
     # get_pic("鸣潮  ")
     # get_pic("崩坏：星穹铁道")
     print(time.time() -t)
 
-    print(get_hwnd('原神'))

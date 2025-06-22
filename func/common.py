@@ -92,14 +92,24 @@ def get_item_hwnd(right, bot):
     return result if result else None
 
 
-def log(*args, sep=' ', end='\n', file=None, flush=False):
+def log(*args, sep=' ', end='\n', file=None, flush=False, level=1):
+    """
+    level: 栈帧向上多少层（默认1是调用log的位置，2是调用者的调用者）
+    """
     if file is None:
         file = sys.stdout
-    # 获取当前调用栈的最后一帧（调用者）
-    stack = traceback.extract_stack()[-2]  # 当前函数外部一层
-    path = stack.filename
-    line = stack.lineno
-    path_link = f'\033[34mFile "{path}", line {line}\033[0m' # 蓝色
+
+    # -1 是当前帧（log本身），-2 是 log 的调用者，-3 是再上层
+    stack = traceback.extract_stack()
+    if len(stack) >= level + 1:
+        caller = stack[-(level + 1)]
+        path = caller.filename
+        line = caller.lineno
+    else:
+        path = '<unknown>'
+        line = 0
+
+    path_link = f'\033[34mFile "{path}", line {line}\033[0m'  # 蓝色
     content = sep.join(str(arg) for arg in args)
 
     print(f'{path_link} {content}', end=end, file=file, flush=flush)
@@ -175,7 +185,7 @@ def get_game_path(game_name):
         if game_name == '崩坏：星穹铁道':
             return path.replace('launcher.exe','Game\StarRail.exe')
         elif game_name == '原神':
-            return path.replace('launcher.exe','Genshin Impact Game\YuanShen.exe')
+            return path.replace('miHoYo Launcher\\launcher.exe','Genshin Impact\Genshin Impact Game\YuanShen.exe')
         else:
             return path
 

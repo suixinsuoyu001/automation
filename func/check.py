@@ -4,6 +4,7 @@ from func.common import *
 from func.basic import *
 import threading
 from func.control.mc_control import *
+from games.ys.match.yolo_match import *
 control = Control()
 
 class check():
@@ -13,6 +14,7 @@ class check():
         self.t_match = t_match(wt, path)
         self.locs = read_json(json_path)
         self.processed_screen = None
+        self.size_diff = None
 
     def get_pic_loop(self):
         while True:
@@ -27,7 +29,7 @@ class check():
             if pic is not None:
                 self.processed_screen = get_pic(self.wt)
 
-    def check_start(self,time_limit = 0.05):
+    def check_start(self,time_limit = 0.02):
         self.time_limit = time_limit
         self.stop_event = threading.Event()
         flag = 1
@@ -46,6 +48,83 @@ class check():
         self.thread.join()  # 等待线程结束
         log("获取图片进程已停止")
 
+
+    def get_model_res_loop(self):
+        while True:
+            time.sleep(self.time_limit2)  # 10ms 检测一次鼠标移动
+            if self.processed_screen is None:
+                continue
+            match_res = model_match_pic(self.processed_screen)
+            position_x = setting['resolution'][0] // 2
+            if match_res:
+                size = (match_res[0][0]+match_res[0][2])/2
+                self.size_diff = size-position_x
+            else:
+                self.size_diff = None
+            if self.stop_event2.is_set():  # 当 e 事件被 set 时，退出循环
+                break
+
+    def model_loop_start(self,time_limit = 0.2):
+        self.time_limit2 = time_limit
+        self.stop_event2 = threading.Event()
+        flag = 1
+        while not get_hwnd(self.wt):
+            if flag:
+                log(f'等待{self.wt}启动')
+                flag = 0
+        self.thread2 = threading.Thread(target=self.get_model_res_loop)
+        self.thread2.start()
+        time.sleep(1)
+        log("获取石化古树检出循环已开始")
+
+    def model_loop_end(self):
+        self.stop_event2.set()  # 触发停止事件
+        self.thread2.join()  # 等待线程结束
+        log("获取石化古树检出循环已停止")
+
+    def func_loop(self, func):
+        while True:
+            func()
+            time.sleep(self.time_limit_func)
+            if self.stop_event_func.is_set():  # 当 e 事件被 set 时，退出循环
+                break
+
+    def func_loop_start(self,func,time_limit = 0.01):
+        self.time_limit_func = time_limit
+        self.stop_event_func = threading.Event()
+        flag = 1
+        while not get_hwnd(self.wt):
+            if flag:
+                log(f'等待{self.wt}启动')
+                flag = 0
+        self.thread_func = threading.Thread(target=self.func_loop, args=(func,))
+        self.thread_func.start()
+        time.sleep(1)
+        log(f"{func}循环已开始")
+
+    def func_loop_end(self):
+        self.stop_event_func.set()  # 触发停止事件
+        self.thread_func.join()  # 等待线程结束
+        log(f"循环已停止")
+
+    def wait_loop(self, name):
+        self.wait_flag = 0
+        self.waits([name])
+        self.wait_flag = 1
+
+    def wait_loop_start(self,name):
+        self.stop_event_wait = threading.Event()
+        flag = 1
+        while not get_hwnd(self.wt):
+            if flag:
+                log(f'等待{self.wt}启动')
+                flag = 0
+        self.thread_wait = threading.Thread(target=self.wait_loop, args=(name,))
+        self.thread_wait.start()
+        time.sleep(1)
+        log(f"wait_loop_start {name}循环已开始")
+
+
     def match_one_pic(self,name,num = 0.9):
         return self.t_match.match_pic(name,num,self.processed_screen)
 
@@ -60,6 +139,9 @@ class check():
                 log(f'wait: {name} 已找到')
                 time.sleep(0.5)
                 return True
+
+
+
 
     def wait_click(self,name,num = 0.9):
         if self.processed_screen is None:
@@ -129,6 +211,23 @@ class check():
                     log(f'wait: {name} 已找到')
                     time.sleep(0.5)
                     return name
+
+    def waits_limit(self,names,t = 0.5,num = 0.9):
+        log(f'waits:{names} 开始捕获')
+        if self.processed_screen is None:
+            log('check_start未运行')
+            return
+        start_time = time.time()
+        while True:
+            for name in names:
+                position = self.check_one_pic(name,num,self.processed_screen)
+                if position:
+                    log(f'wait: {name} 已找到')
+                    time.sleep(0.1)
+                    return name
+            if time.time() - start_time > t:
+                log(f'wait_limit:{names} 未捕获，超时取消')
+                break
 
     def click_loop_until(self,names,item_names,num = 0.9):
         log(f'click_loop_until: 开始循环遍历 {names}')
@@ -203,8 +302,10 @@ class check():
         window_name = "Processed Screen"
         while True:
             t0 = time.time()
-            processed_screen = self.processed_screen
-            processed_screen = reset_pic(processed_screen, 1600, 900)
+            processed_screen = get_pic('原神')
+            if processed_screen is None:
+                continue
+            # processed_screen = reset_pic(processed_screen, 1600, 900)
             cv2.imshow(window_name, processed_screen)
             # set_window_topmost(window_name)  # 设置窗口置顶
             # 退出条件

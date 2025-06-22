@@ -3,6 +3,9 @@ import time
 from func.common import *
 from func.check import *
 from func.control.global_match import *
+from func.control.mouse_move import *
+from games.ys.action.ys_funtion import *
+from games.ys.match.yolo_match import *
 import pyautogui
 import keyboard
 import subprocess
@@ -11,6 +14,8 @@ pyautogui.FAILSAFE = False  # 禁用 fail-safe
 
 image_path = 'games/ys/image/'
 json_path = 'games/ys/data/img_loc.json'
+
+AutoFight = read_json('games/ys/data/AutoFight.json')
 
 windows_title = '原神'
 
@@ -27,7 +32,7 @@ def click(name, num=num):
     if c.processed_screen is None:
         log('check_start未运行')
         return
-    log(f'click:{name} 开始捕获')
+    log(f'click:{name} 开始捕获',level=2)
     while True:
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
@@ -37,13 +42,13 @@ def click(name, num=num):
             time.sleep(0.4)
             break
         time.sleep(0.02)
-    log(f'click:{name} 已捕获并点击')
+    log(f'click:{name} 已捕获并点击',level=2)
 
 def move(name, num=num):
     if c.processed_screen is None:
         log('check_start未运行')
         return
-    log(f'click:{name} 开始捕获')
+    log(f'click:{name} 开始捕获',level=2)
     while True:
         focus = get_focus_window()
         position = c.check_one_pic(name, num, c.processed_screen)
@@ -52,13 +57,13 @@ def move(name, num=num):
             time.sleep(0.4)
             break
         time.sleep(0.02)
-    log(f'click:{name} 已捕获并点击')
+    log(f'click:{name} 已捕获并点击',level=2)
 
 def click_limit(name,t,num = 0.9):
     if c.processed_screen is None:
         log('check_start未运行')
         return
-    log(f'click_limit:{name} 开始捕获')
+    log(f'click_limit:{name} 开始捕获',level=2)
     start_time = time.time()
     while True:
         control.activate()
@@ -66,15 +71,15 @@ def click_limit(name,t,num = 0.9):
         if position is not None:
             pyautogui.click(get_position(position[0]))
             time.sleep(0.4)
-            log(f'click_limit:{name} 已捕获并点击')
+            log(f'click_limit:{name} 已捕获并点击',level=2)
             break
         time.sleep(0.02)
         if time.time() - start_time > t:
-            log(f'click_limit:{name} 未捕获，超时取消')
+            log(f'click_limit:{name} 未捕获，超时取消',level=2)
             break
 
 def waits(names,num = num):
-    log(f'waits:{names} 开始捕获')
+    log(f'waits:{names} 开始捕获',level=2)
     while c.processed_screen is None:
         log('check_start未运行')
     while True:
@@ -84,15 +89,29 @@ def waits(names,num = num):
         for name in names:
             position = c.check_one_pic(name,num,c.processed_screen)
             if position:
-                log(f'wait: {name} 已找到')
+                log(f'wait: {name} 已找到',level=2)
                 time.sleep(0.2)
+                return name
+
+def waits_speed(names,num = num):
+    log(f'waits:{names} 开始捕获',level=2)
+    while c.processed_screen is None:
+        log('check_start未运行')
+    while True:
+        focus = get_focus_window()
+        if not (focus and '原神' in focus):
+            continue
+        for name in names:
+            position = c.check_one_pic(name,num,c.processed_screen)
+            if position:
+                log(f'wait: {name} 已找到',level=2)
                 return name
 
 def scroll_click(name1,name2,num = num):
     while 1:
         match = c.match_one_pic(name1, num)
         if match:
-            log(f'scroll_click:已识别{name1}')
+            log(f'scroll_click:已识别{name1}',level=2)
             break
         for i in range(8):
             pyautogui.scroll(-5)
@@ -105,7 +124,50 @@ def scroll_click(name1,name2,num = num):
             pyautogui.click(get_position([i['x'],i['y']]))
             break
 
-    log(f'scroll_click:已识别{name2}并点击')
+    log(f'scroll_click:已识别{name2}并点击',level=2)
+
+
+
+
+def get_ego_angle():
+    x1,y1 = 200,130
+    x2,y2 = 250,190
+    image = f"{image_path}朝向模板.png"
+    cropped = c.processed_screen[y1:y2, x1:x2]
+    ego_angle = match_ego_angle(image, cropped)
+    pyautogui.middleClick()
+    if 270 > ego_angle > 90:
+        pyautogui.press('s')
+        time.sleep(0.2)
+        pyautogui.middleClick()
+        time.sleep(0.6)
+        cropped = c.processed_screen[y1:y2, x1:x2]
+        ego_angle = match_ego_angle(image, cropped)
+    c.model_loop_start()
+    while True:
+        if c.size_diff and 200 > abs(c.size_diff):
+            break
+        if ego_angle > 270:
+            smooth_mouse_move(100, 0, duration=0.2, steps=20)
+        else:
+            smooth_mouse_move(-100, 0, duration=0.2, steps=20)
+    pyautogui.keyDown('w')
+    while True:
+        size_diff = c.size_diff
+        log(size_diff)
+        if size_diff and size_diff > 100:
+            p('dd',0.1)
+        elif size_diff and size_diff < -100:
+            p('aa',0.1)
+        if c.waits_limit(['F']):
+            break
+    pyautogui.keyUp('w')
+    c.model_loop_end()
+    # smooth_mouse_move(500000, 0, duration=t, steps=50)
+
+
+
+
 
 def 打开betterGi():
     m.click('betterGi')
@@ -143,10 +205,12 @@ def 登录(zh):
     click('点击进入')
     if waits(['菜单','空月祝福']) == '空月祝福':
         click('空月祝福')
-        time.sleep(1)
-        click('空白位置')
-        time.sleep(1)
-        click('空白位置')
+        waits(['空白位置'])
+        t = time.time()
+        while True:
+            click('空白位置')
+            if time.time() - t > 1:
+                break
     邮件领取()
 
 def 邮件领取():
@@ -268,6 +332,7 @@ def 纪行():
 
 def 圣遗物分解():
     waits(['菜单'])
+    time.sleep(0.5)
     pyautogui.press('b')
     click(waits(['背包_圣遗物1','背包_圣遗物2']))
     click('分解')
@@ -280,7 +345,7 @@ def 圣遗物分解():
     click('关闭')
     click('关闭')
 
-def 秘境_圣遗物(num):
+def 秘境_圣遗物(zh_num,num):
     if num == 1:
         name = '圣遗物_虹灵的净土'
     elif num == 2:
@@ -293,6 +358,21 @@ def 秘境_圣遗物(num):
         name = '圣遗物_荒废砌造坞'
     else:
         name = None
+
+    if zh_num == 0:
+        fight_txt = '火茜希芙'
+    elif zh_num == 1:
+        fight_txt = '那维莱特'
+    elif zh_num == 2:
+        fight_txt = '散兵'
+    elif zh_num == 3:
+        fight_txt = '火艾'
+    elif zh_num == 6:
+        fight_txt = '仆人'
+    elif zh_num == 7:
+        fight_txt = '申鹤'
+    else:
+        fight_txt = None
 
     waits(['菜单'])
     pyautogui.press('f1')
@@ -309,17 +389,9 @@ def 秘境_圣遗物(num):
     pyautogui.rightClick()
     time.sleep(0.8)
     pyautogui.keyUp('w')
-    pyautogui.press('i')
-    waits(['单人挑战'])
-    while True:
-        if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
-            time.sleep(5)
-            if waits(['菜单', '任意位置关闭']) == '任意位置关闭':
-                click('任意位置关闭')
-        else:
-            break
-    if waits(['须弥复活点','菜单']) == '须弥复活点':
-        秘境_圣遗物(num)
+    副本战斗(fight_txt)
+    # if waits(['须弥复活点','菜单']) == '须弥复活点':
+    #     秘境_圣遗物(num)
 
 def 晶蝶传送(name):
     waits(['菜单'])
@@ -377,14 +449,14 @@ def 捕获晶蝶3():
     pyautogui.keyUp('space')
 
 def 晶蝶():
-    pyautogui.press("'")
     晶蝶传送('晶蝶传送点1')
+    c.func_loop_start(lambda : pyautogui.press('f'))
     捕获晶蝶1()
     晶蝶传送('晶蝶传送点2')
     捕获晶蝶2()
-    晶蝶传送('晶蝶传送点3')
-    捕获晶蝶3()
-    pyautogui.press("'")
+    # 晶蝶传送('晶蝶传送点3')
+    # 捕获晶蝶3()
+    c.func_loop_end()
 
 def 须弥回血传送():
     waits(['菜单'])
@@ -429,6 +501,91 @@ def 切换常用队伍():
         pyautogui.press('esc')
     click(waits(['关闭']))
 
+
+def p(s,t = 1.0):
+    start_time = time.time()
+    if s == 'A':
+        while True:
+            pyautogui.click()
+            time.sleep(0.05)
+            if time.time() - start_time >t:
+                break
+    elif s == 'AA':
+        pyautogui.mouseDown()
+        time.sleep(t)
+        pyautogui.mouseUp()
+    elif s == 'R':
+        pyautogui.rightClick()
+    elif s == 'AAA':
+        time.sleep(0.1)
+        pyautogui.mouseDown()
+        smooth_mouse_move(500000, 0, duration=t, steps=50)
+        pyautogui.mouseUp()
+        time.sleep(0.1)
+    elif type(s) == num:
+        pyautogui.press(s)
+    elif len(s)==1:
+        while True:
+            pyautogui.press(s)
+            time.sleep(0.05)
+            if time.time() - start_time >t:
+                break
+    elif len(s)==2:
+        time.sleep(0.1)
+        pyautogui.keyDown(s[0])
+        time.sleep(t)
+        pyautogui.keyUp(s[0])
+
+
+def 副本战斗(fight_txt):
+    while True:
+        res = waits(['副本标识','F'])
+        if res == 'F':
+            pyautogui.press('f')
+            click('挑战')
+            time.sleep(0.5)
+            click('挑战')
+            waits(['任意位置关闭'])
+            time.sleep(0.5)
+            click('任意位置关闭')
+            pyautogui.keyDown('w')
+            if waits_speed(['启动']):
+                pyautogui.keyUp('w')
+        pyautogui.press('f')
+        c.wait_loop_start('挑战达成')
+        while True:
+            for s in AutoFight[fight_txt].split(' '):
+                if c.wait_flag:
+                    break
+                if '(' in s:
+                    key = s.split('(')[0]
+                    t = s.split('(')[1].replace(')','')
+                    p(key, float(t))
+                else:
+                    p(s)
+            if c.wait_flag:
+                break
+        time.sleep(3)
+        get_ego_angle()
+        pyautogui.press('f')
+        pyautogui.moveTo([0,0])
+        if waits(['秘宝收取2','秘宝收取3'],0.95) == '秘宝收取3':
+            w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
+            click('使用')
+            if w_sz == '浓缩树脂1':
+                click('退出标识')
+                return
+            click('挑战')
+            waits(['任意位置关闭'])
+            time.sleep(0.5)
+            click('任意位置关闭')
+            pyautogui.keyDown('w')
+            if waits_speed(['启动']):
+                pyautogui.keyUp('w')
+
+
+
+
 def 每日(zh_num,n):
     登录(zh[zh_num])
     移动枫丹()
@@ -438,7 +595,7 @@ def 每日(zh_num,n):
         切换副本队伍()
         晶蝶()
         须弥回血传送()
-        秘境_圣遗物(n)
+        秘境_圣遗物(zh_num,n)
         圣遗物分解()
         切换常用队伍()
     移动枫丹()
@@ -459,14 +616,14 @@ zh = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('副本队伍标识1',json_path)
-
-    game_start(windows_title)
+    res = c.t_match.save_pic_loc('须弥地图标识2',json_path)
+    # time.sleep(10)
+    # game_start(windows_title)
     # log(res)
     # # m.wait('退出登录')
     c.check_start()
-    秘境_圣遗物(5)
+
+    w = waits(['F','启动','副本标识'])
+    if w in ['F','启动']:
+        副本战斗('火艾')
     c.check_stop()
-
-
-

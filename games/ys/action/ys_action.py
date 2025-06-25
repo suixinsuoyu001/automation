@@ -130,36 +130,53 @@ def scroll_click(name1,name2,num = num):
 
 
 def get_ego_angle():
-    x1,y1 = 200,130
-    x2,y2 = 250,190
-    image = f"{image_path}朝向模板.png"
-    cropped = c.processed_screen[y1:y2, x1:x2]
-    ego_angle = match_ego_angle(image, cropped)
+    c.model_loop_start()
     pyautogui.middleClick()
-    if 270 > ego_angle > 90:
+    if 270 > c.ego_angle > 90:
         pyautogui.press('s')
         time.sleep(0.2)
         pyautogui.middleClick()
         time.sleep(0.6)
-        cropped = c.processed_screen[y1:y2, x1:x2]
-        ego_angle = match_ego_angle(image, cropped)
-    c.model_loop_start()
     while True:
         if c.size_diff and 200 > abs(c.size_diff):
-            break
-        if ego_angle > 270:
+            time.sleep(0.1)
+            pyautogui.press('w')
+            time.sleep(1)
+            ego_angle = c.ego_angle
+            log(c.ego_angle, c.size_diff)
+            if 90 > ego_angle > 10:
+                pyautogui.keyDown('d')
+                time.sleep(0.2)
+                pyautogui.rightClick()
+                time.sleep(0.2)
+                pyautogui.keyUp('d')
+            elif 350 > ego_angle > 270:
+                pyautogui.keyDown('a')
+                time.sleep(0.2)
+                pyautogui.rightClick()
+                time.sleep(0.2)
+                pyautogui.keyUp('a')
+            else:
+                pyautogui.keyDown('w')
+                time.sleep(0.2)
+                pyautogui.keyDown('shift')
+                time.sleep(0.5)
+                pyautogui.keyUp('shift')
+                break
+        if c.ego_angle > 180:
             smooth_mouse_move(100, 0, duration=0.2, steps=20)
         else:
             smooth_mouse_move(-100, 0, duration=0.2, steps=20)
-    pyautogui.keyDown('w')
+
+
     while True:
         size_diff = c.size_diff
-        log(size_diff)
+        log(c.ego_angle,size_diff)
         if size_diff and size_diff > 100:
             p('dd',0.1)
         elif size_diff and size_diff < -100:
             p('aa',0.1)
-        if c.waits_limit(['F']):
+        if c.waits_limit(['F'],0.3):
             break
     pyautogui.keyUp('w')
     c.model_loop_end()
@@ -208,7 +225,7 @@ def 登录(zh):
         waits(['空白位置'])
         t = time.time()
         while True:
-            click('空白位置')
+            click_limit('空白位置',0.5)
             if time.time() - t > 1:
                 break
     邮件领取()
@@ -332,7 +349,7 @@ def 纪行():
 
 def 圣遗物分解():
     waits(['菜单'])
-    time.sleep(0.5)
+    time.sleep(1)
     pyautogui.press('b')
     click(waits(['背包_圣遗物1','背包_圣遗物2']))
     click('分解')
@@ -539,6 +556,7 @@ def p(s,t = 1.0):
 
 def 副本战斗(fight_txt):
     while True:
+        c.time_limit = 0.2
         res = waits(['副本标识','F'])
         if res == 'F':
             pyautogui.press('f')
@@ -551,8 +569,8 @@ def 副本战斗(fight_txt):
             pyautogui.keyDown('w')
             if waits_speed(['启动']):
                 pyautogui.keyUp('w')
-        pyautogui.press('f')
         c.wait_loop_start('挑战达成')
+        pyautogui.press('f')
         while True:
             for s in AutoFight[fight_txt].split(' '):
                 if c.wait_flag:
@@ -564,10 +582,13 @@ def 副本战斗(fight_txt):
                 else:
                     p(s)
             if c.wait_flag:
+                pyautogui.press('3')
                 break
+        c.time_limit = 0.02
         time.sleep(3)
         get_ego_angle()
         pyautogui.press('f')
+        time.sleep(1)
         pyautogui.moveTo([0,0])
         if waits(['秘宝收取2','秘宝收取3'],0.95) == '秘宝收取3':
             w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
@@ -622,7 +643,8 @@ if __name__ == '__main__':
     # log(res)
     # # m.wait('退出登录')
     c.check_start()
-
+    # c.model_loop_start()
+    # print(c.ego_angle)
     w = waits(['F','启动','副本标识'])
     if w in ['F','启动']:
         副本战斗('火艾')

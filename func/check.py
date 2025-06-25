@@ -5,6 +5,8 @@ from func.basic import *
 import threading
 from func.control.mc_control import *
 from games.ys.match.yolo_match import *
+from games.ys.action.ys_funtion import *
+
 control = Control()
 
 class check():
@@ -50,10 +52,16 @@ class check():
 
 
     def get_model_res_loop(self):
+        x1, y1 = get_position([200, 130])
+        x2, y2 = get_position([250, 190])
         while True:
             time.sleep(self.time_limit2)  # 10ms 检测一次鼠标移动
             if self.processed_screen is None:
                 continue
+            image = f"{self.path}朝向模板.png"
+            cropped = self.processed_screen[y1:y2, x1:x2]
+            self.ego_angle = match_ego_angle(image, cropped)
+
             match_res = model_match_pic(self.processed_screen)
             position_x = setting['resolution'][0] // 2
             if match_res:
@@ -64,7 +72,7 @@ class check():
             if self.stop_event2.is_set():  # 当 e 事件被 set 时，退出循环
                 break
 
-    def model_loop_start(self,time_limit = 0.2):
+    def model_loop_start(self,time_limit = 0.1):
         self.time_limit2 = time_limit
         self.stop_event2 = threading.Event()
         flag = 1
@@ -213,7 +221,7 @@ class check():
                     return name
 
     def waits_limit(self,names,t = 0.5,num = 0.9):
-        log(f'waits:{names} 开始捕获')
+        log(f'waits_limit:{names} 开始捕获',level=2)
         if self.processed_screen is None:
             log('check_start未运行')
             return
@@ -226,7 +234,7 @@ class check():
                     time.sleep(0.1)
                     return name
             if time.time() - start_time > t:
-                log(f'wait_limit:{names} 未捕获，超时取消')
+                log(f'wait_limit:{names} 未捕获，超时取消',level=2)
                 break
 
     def click_loop_until(self,names,item_names,num = 0.9):

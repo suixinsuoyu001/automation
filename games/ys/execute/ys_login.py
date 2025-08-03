@@ -8,7 +8,8 @@ def logins():
     game_start(windows_title)
     c.check_start()
     for zh in zhs:
-        登录(zh)
+        if zh not in [zhs[4],zhs[5]]:
+            登录(zh)
         log('等待按下0')
         keyboard.wait('0')
     c.check_stop()
@@ -29,7 +30,9 @@ zhs = [
         'k6597975255692@sohu.com',      #6
         '13280859317'                   #7
        ]
+
+
 if __name__ == '__main__':
 
-    # logins()
-    login_one(3)
+    logins()
+    # login_one(6)

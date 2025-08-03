@@ -10,7 +10,7 @@ import ctypes
 from ctypes import wintypes
 
 import win32con
-
+import win32process
 
 
 def read_json(path):
@@ -183,7 +183,7 @@ def get_game_path(game_name):
         if name != game_name:
             continue
         if game_name == '崩坏：星穹铁道':
-            return path.replace('launcher.exe','Game\StarRail.exe')
+            return path.replace('miHoYo Launcher\\launcher.exe','Star Rail\Game\StarRail.exe')
         elif game_name == '原神':
             return path.replace('miHoYo Launcher\\launcher.exe','Genshin Impact\Genshin Impact Game\YuanShen.exe')
         else:
@@ -198,11 +198,21 @@ def get_position(position):
     return x,y
 
 def game_start(windows_title):
-    if get_hwnd(windows_title):
+    hwnd = get_hwnd(windows_title)
+    if hwnd:
         win32gui.ShowWindow(get_hwnd(windows_title), win32con.SW_RESTORE)  # 还原窗口（如果最小化了）
         win32gui.SetForegroundWindow(get_hwnd(windows_title))  # 激活窗口
+        try:
+            win32gui.SetForegroundWindow(hwnd)
+        except Exception as e:
+            log("SetForegroundWindow失败，尝试强制切换前台：", e)
+            user32 = ctypes.windll.user32
+            tid = win32process.GetWindowThreadProcessId(hwnd)[0]
+            user32.AttachThreadInput(user32.GetCurrentThreadId(), tid, True)
+            win32gui.SetForegroundWindow(hwnd)
+            user32.AttachThreadInput(user32.GetCurrentThreadId(), tid, False)
     else:
-        print(get_game_path(windows_title))
+        log(get_game_path(windows_title))
         os.startfile(get_game_path(windows_title))
         while True:
             focus = get_focus_window()

@@ -3,7 +3,7 @@ import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 
 terminate_flag = False
-2
+
 
 # 控制标志位
 running_flag = True  # 默认开启节点

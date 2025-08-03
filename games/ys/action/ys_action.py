@@ -138,19 +138,19 @@ def get_ego_angle():
         pyautogui.middleClick()
         time.sleep(0.6)
     while True:
-        if c.size_diff and 200 > abs(c.size_diff):
+        if c.size_diff and 300 > abs(c.size_diff):
             time.sleep(0.1)
             pyautogui.press('w')
             time.sleep(1)
             ego_angle = c.ego_angle
             log(c.ego_angle, c.size_diff)
-            if 90 > ego_angle > 10:
+            if 90 > ego_angle > 30:
                 pyautogui.keyDown('d')
                 time.sleep(0.2)
                 pyautogui.rightClick()
                 time.sleep(0.2)
                 pyautogui.keyUp('d')
-            elif 350 > ego_angle > 270:
+            elif 330 > ego_angle > 270:
                 pyautogui.keyDown('a')
                 time.sleep(0.2)
                 pyautogui.rightClick()
@@ -432,6 +432,7 @@ def 捕获晶蝶1():
     pyautogui.keyDown('d')
     time.sleep(0.4)
     pyautogui.keyDown('shift')
+    time.sleep(0.3)
     pyautogui.keyDown('ctrl')
     time.sleep(3)
     pyautogui.keyUp('ctrl')
@@ -468,6 +469,7 @@ def 捕获晶蝶3():
 def 晶蝶():
     晶蝶传送('晶蝶传送点1')
     c.func_loop_start(lambda : pyautogui.press('f'))
+    time.sleep(0.5)
     捕获晶蝶1()
     晶蝶传送('晶蝶传送点2')
     捕获晶蝶2()
@@ -612,7 +614,7 @@ def 每日(zh_num,n):
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if res:
+    if 1:
         切换副本队伍()
         晶蝶()
         须弥回血传送()
@@ -644,8 +646,10 @@ if __name__ == '__main__':
     # # m.wait('退出登录')
     c.check_start()
     # c.model_loop_start()
-    # print(c.ego_angle)
+    # while 1:
+    #     print(c.ego_angle,c.size_diff)
+    #     time.sleep(0.1)
     w = waits(['F','启动','副本标识'])
     if w in ['F','启动']:
-        副本战斗('火艾')
+        副本战斗('仆人')
     c.check_stop()

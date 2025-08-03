@@ -30,7 +30,7 @@ def run():
 
 if __name__ == '__main__':
 
-    # c.check_start()
+    c.check_start()
     # # 登录(zh[0])
     # 邮件领取()
     # # 每日(0,1)

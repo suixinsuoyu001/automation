@@ -54,7 +54,7 @@ def on_press(key):
 
 
 if __name__ == '__main__':
-    # 启动进程（默认开启）
+    # 启动进程（默认开启）11
     start_node()
 
     # 启动键盘监听器

@@ -48,6 +48,9 @@ def rotate_image_clockwise(img, angle=1):
 
 
 def match_ego_angle(image_path, template):
+    # cv2.imshow("Detection Result", template)
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
     image = load_image_with_zh_path(image_path)
     # 将图像和模板转为灰度图
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

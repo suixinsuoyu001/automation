@@ -52,8 +52,10 @@ class check():
 
 
     def get_model_res_loop(self):
-        x1, y1 = get_position([200, 130])
-        x2, y2 = get_position([250, 190])
+        # x1, y1 = get_position([200, 130])
+        # x2, y2 = get_position([250, 190])
+        x1, y1 = [200, 130]
+        x2, y2 = [250, 190]
         while True:
             time.sleep(self.time_limit2)  # 10ms 检测一次鼠标移动
             if self.processed_screen is None:
@@ -63,7 +65,7 @@ class check():
             self.ego_angle = match_ego_angle(image, cropped)
 
             match_res = model_match_pic(self.processed_screen)
-            position_x = setting['resolution'][0] // 2
+            position_x = 2560 // 2
             if match_res:
                 size = (match_res[0][0]+match_res[0][2])/2
                 self.size_diff = size-position_x

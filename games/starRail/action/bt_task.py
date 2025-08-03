@@ -49,7 +49,7 @@ def 登录(zh):
         c.send_key('i')
 
 def logins():
-    game_start(windows_title)
+    # game_start(windows_title)
     control.hwnd = get_hwnd(windows_title)
     for zh in zhs:
         登录(zh)

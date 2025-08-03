@@ -142,14 +142,14 @@ def 战斗循环(flag = 1):
     elif flag == 2:
         if c.waits(['队伍7', '队伍7选中']) == '队伍7':
             c.click('队伍7')
-        c.click('支援')
+        c.wait_click('支援')
         c.click('入队')
     elif flag == 3:
         if c.waits(['队伍1', '队伍1选中']) == '队伍1':
             c.click('队伍1')
         c.click('支援')
         c.click('入队')
-    c.click('开始挑战')
+    c.wait_click('开始挑战')
     while True:
         res = c.waits(['C', '再来一次','开拓力补充'],0.95)
         if res == 'C':
@@ -281,7 +281,8 @@ def 无名勋礼():
     c.send_key('f2')
     if c.waits(['无名勋礼任务1','无名勋礼任务2'],0.95) == '无名勋礼任务2':
         c.click('无名勋礼任务2')
-        c.click('一键领取')
+        if c.waits_limit(['一键领取']):
+            c.click('一键领取')
     res = c.waits(['无名勋礼奖励1', '无名勋礼奖励2','无名勋礼奖励3'],0.95)
     if res != '无名勋礼奖励1':
         c.click_until(res,'一键领取2')

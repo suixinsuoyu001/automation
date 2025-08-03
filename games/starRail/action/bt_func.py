@@ -270,8 +270,7 @@ class check():
             for name in names:
                 position = self.check_one_pic(name,num,self.processed_screen)
                 if position:
-                    log(position)
-                    log(f'waits: {name} 已找到')
+                    log(f'waits: {name} 已找到',level=2)
                     time.sleep(0.5)
                     return name
 

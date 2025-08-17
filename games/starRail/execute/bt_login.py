@@ -38,5 +38,5 @@ zhs = [
 
 if __name__ == '__main__':
     c.zhs = zhs
-    logins()
-    # login_one(0)
+    # logins()
+    login_one(6)

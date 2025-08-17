@@ -350,7 +350,8 @@ def 纪行():
     pyautogui.press('f4')
     time.sleep(0.5)
     if waits(['纪行任务2','纪行任务1','菜单','关闭'],0.95) == '关闭':
-        click(waits(['关闭']))
+        if waits(['纪行任务2', '纪行任务1', '菜单', '关闭'], 0.95) == '关闭':
+            click(waits(['关闭']))
     if waits(['纪行任务2','纪行任务1','菜单'],0.95) == '纪行任务2':
         click('纪行任务2')
         click('一键领取')
@@ -404,7 +405,7 @@ def 秘境_圣遗物(zh_num,num):
         fight_txt = '火艾'
     elif zh_num == 4:
         fight_txt = '火希娜班'
-    elif zh_num == 4:
+    elif zh_num == 5:
         fight_txt = '火希钟班'
     elif zh_num == 6:
         fight_txt = '仆人'
@@ -494,8 +495,8 @@ def 晶蝶():
     捕获晶蝶1()
     晶蝶传送('晶蝶传送点2')
     捕获晶蝶2()
-    # 晶蝶传送('晶蝶传送点3')
-    # 捕获晶蝶3()
+    晶蝶传送('晶蝶传送点3')
+    捕获晶蝶3()
     c.func_loop_end()
 
 def 须弥回血传送():
@@ -671,13 +672,17 @@ def 幽境危战战斗循环(zh_num,n):
     if zh_num == 0:
         fight_txt = '火茜希芙_幽境危战'
     elif zh_num == 1:
-        fight_txt = '丝柯克_幽境危战'
+        fight_txt = '丝爱芙夜_幽境危战'
     elif zh_num == 2:
-        fight_txt = '散兵_幽境危战'
-    # elif zh_num == 3:
-    #     fight_txt = '火艾'
+        fight_txt = '散茜米莱_幽境危战'
+    elif zh_num == 3:
+        fight_txt = '火艾'
+    elif zh_num == 4:
+        fight_txt = '火希娜班_幽境危战'
+    elif zh_num == 5:
+        fight_txt = '火希钟班_幽境危战'
     elif zh_num == 6:
-        fight_txt = '仆人_幽境危战'
+        fight_txt = '仆钟希班_幽境危战'
     elif zh_num == 7:
         fight_txt = '恰斯卡_幽境危战'
     else:
@@ -716,6 +721,8 @@ def 幽境危战战斗循环(zh_num,n):
 
 def 幽境危战奖励领取():
     waits(['离开副本'])
+    pyautogui.press('s')
+    time.sleep(0.2)
     pyautogui.middleClick()
     time.sleep(0.5)
     while True:
@@ -779,7 +786,7 @@ def 每日2(zh_num,n):
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if 1:
+    if res:
         晶蝶()
         移动幽境危战()
         幽境危战战斗循环(zh_num,n)
@@ -808,9 +815,17 @@ if __name__ == '__main__':
 
     c.check_start()
     # print(c.ego_angle)
-    w = waits(['F','启动','副本标识'])
-    if w in ['F','启动']:
-        副本战斗('火希钟班')
-
-
+    # w = waits(['F','启动','副本标识'])
+    # if w in ['F','启动']:
+    #     副本战斗('火希钟班')
+    # 每日2(0,2)
+    # 每日2(1,2)
+    # 每日2(2,1)
+    # 每日2(3,2)
+    # 每日2(4,2)
+    # 每日2(5,2)
+    每日2(6,2)
+    每日2(7,2)
+    # 幽境危战战斗循环(6, 2)
+    # 纪行()
     c.check_stop()

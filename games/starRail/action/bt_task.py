@@ -84,7 +84,7 @@ def 邮件领取():
     if c.waits(['邮件1','邮件2'],0.92) == '邮件1':
         c.wait_click('邮件1')
         c.wait_click('全部领取')
-        c.wait_click('空白位置')
+        c.wait_click('空白位置',0.9)
     返回主界面()
 
 def 巡星之礼领取():
@@ -133,7 +133,7 @@ def 每月抽卡兑换():
 
 # 1 循环战斗 2 单次战斗 （默认队伍1战斗）
 def 战斗循环(flag = 1):
-    c.click('挑战')
+    c.wait_click('挑战')
     if flag == 1:
         if c.waits(['确认','开始挑战']) == '确认':
             return 返回主界面()
@@ -283,8 +283,8 @@ def 无名勋礼():
         c.click('无名勋礼任务2')
         if c.waits_limit(['一键领取']):
             c.click('一键领取')
-    res = c.waits(['无名勋礼奖励1', '无名勋礼奖励2','无名勋礼奖励3'],0.95)
-    if res != '无名勋礼奖励1':
+    res = c.waits(['无名勋礼奖励1', '无名勋礼奖励2','无名勋礼奖励3','无名勋礼奖励4'],0.95)
+    if res in ['无名勋礼奖励2','无名勋礼奖励3']:
         c.click_until(res,'一键领取2')
         c.click('一键领取2')
     返回主界面()
@@ -309,11 +309,12 @@ def 每日(n,type):
     无名勋礼()
 
 def 剧情():
+    num = 0.95
     while 1:
         other_list = ['L','M','LB','消息标识']
         click_list = ['确认','前往','关闭1','关闭消息','教程翻页','教程翻页2','传送','成就领取','领取','再来一次']
         esc_names = ['空白位置1', '阅读','获得物品']
-        res = c.waits_speed(other_list + click_list + esc_names)
+        res = c.waits_speed(other_list + click_list + esc_names,num)
         if res is None:
             continue
         log(res+' 识别')
@@ -357,7 +358,7 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'取消',0.85)
+    c.save_pic_loc(r'空白位置',0.85)
     log('执行开始')
     # 返回主界面()
     # 行迹('虚无2')

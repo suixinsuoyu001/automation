@@ -12,7 +12,7 @@ c = check('原神',image_path,json_path)
 def pic_click(names,matches):
     for i in names:
         if i in matches:
-            pyautogui.click(matches[i][0])
+            pyautogui.click(get_position(matches[i][0]))
             return
 
 def pic_press(names,matches,s):

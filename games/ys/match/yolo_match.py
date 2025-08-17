@@ -81,7 +81,11 @@ class BigTreeYoloPredictor:
 def model_match_pic(image,is_show = False):
     model_path = "games/ys/match/big_tree.onnx"
     predictor = BigTreeYoloPredictor(model_path)
-    detections = predictor.detect(image)
+    try:
+        detections = predictor.detect(image)
+    except:
+        detections = None
+        log('detections获取失败')
     if is_show:
         image = image.copy()
         image_with_boxes = predictor.draw_boxes(image, detections)

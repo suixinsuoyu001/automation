@@ -151,19 +151,19 @@ def get_ego_angle():
         pyautogui.middleClick()
         time.sleep(0.6)
     while True:
-        if c.size_diff and 200 > abs(c.size_diff):
+        if c.size_diff and 300 > abs(c.size_diff):
             time.sleep(0.1)
             pyautogui.press('w')
             time.sleep(1)
             ego_angle = c.ego_angle
             log(c.ego_angle, c.size_diff)
-            if 90 > ego_angle > 10:
+            if 90 > ego_angle > 30:
                 pyautogui.keyDown('d')
                 time.sleep(0.2)
                 pyautogui.rightClick()
                 time.sleep(0.2)
                 pyautogui.keyUp('d')
-            elif 350 > ego_angle > 270:
+            elif 330 > ego_angle > 270:
                 pyautogui.keyDown('a')
                 time.sleep(0.2)
                 pyautogui.rightClick()
@@ -456,6 +456,7 @@ def 捕获晶蝶1():
     pyautogui.keyDown('d')
     time.sleep(0.4)
     pyautogui.keyDown('shift')
+    time.sleep(0.3)
     pyautogui.keyDown('ctrl')
     time.sleep(3)
     pyautogui.keyUp('ctrl')

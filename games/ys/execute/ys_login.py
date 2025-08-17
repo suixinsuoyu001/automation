@@ -8,8 +8,9 @@ def logins():
     game_start(windows_title)
     c.check_start()
     for zh in zhs:
-        if zh not in [zhs[4],zhs[5]]:
-            登录(zh)
+        # if zh in [zhs[4],zhs[5]]:
+        #     continue
+        登录(zh)
         log('等待按下0')
         keyboard.wait('0')
     c.check_stop()

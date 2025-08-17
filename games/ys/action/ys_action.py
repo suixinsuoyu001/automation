@@ -107,6 +107,19 @@ def waits_speed(names,num = num):
                 log(f'wait: {name} 已找到',level=2)
                 return name
 
+def waits_check_speed(names,num = num):
+    log(f'waits:{names} 开始捕获',level=2)
+    while c.processed_screen is None:
+        log('check_start未运行')
+    focus = get_focus_window()
+    if not (focus and '原神' in focus):
+        return None
+    for name in names:
+        position = c.check_one_pic(name,num,c.processed_screen)
+        if position:
+            log(f'wait: {name} 已找到',level=2)
+            return name
+
 def scroll_click(name1,name2,num = num):
     while 1:
         match = c.match_one_pic(name1, num)
@@ -138,19 +151,19 @@ def get_ego_angle():
         pyautogui.middleClick()
         time.sleep(0.6)
     while True:
-        if c.size_diff and 250 > abs(c.size_diff):
+        if c.size_diff and 300 > abs(c.size_diff):
             time.sleep(0.1)
             pyautogui.press('w')
             time.sleep(1)
             ego_angle = c.ego_angle
             log(c.ego_angle, c.size_diff)
-            if 90 > ego_angle > 20:
+            if 90 > ego_angle > 30:
                 pyautogui.keyDown('d')
                 time.sleep(0.2)
                 pyautogui.rightClick()
                 time.sleep(0.2)
                 pyautogui.keyUp('d')
-            elif 340 > ego_angle > 270:
+            elif 330 > ego_angle > 270:
                 pyautogui.keyDown('a')
                 time.sleep(0.2)
                 pyautogui.rightClick()
@@ -222,6 +235,8 @@ def 登录(zh):
     click('点击进入')
     if waits(['菜单','空月祝福']) == '空月祝福':
         click('空月祝福')
+        if waits(['空月祝福', '空白位置']) == '空月祝福':
+            click('空月祝福')
         waits(['空白位置'])
         t = time.time()
         while True:
@@ -332,8 +347,11 @@ def 合成():
 def 纪行():
     waits(['菜单'])
     pyautogui.press('f4')
-    waits(['关闭'])
-    if waits(['纪行任务2','纪行任务1'],0.95) == '纪行任务2':
+    time.sleep(0.5)
+    if waits(['纪行任务2','纪行任务1','菜单','关闭'],0.95) == '关闭':
+        if waits(['纪行任务2', '纪行任务1', '菜单', '关闭'], 0.95) == '关闭':
+            click(waits(['关闭']))
+    if waits(['纪行任务2','纪行任务1','菜单'],0.95) == '纪行任务2':
         click('纪行任务2')
         click('一键领取')
         time.sleep(0.5)
@@ -345,11 +363,11 @@ def 纪行():
             click('珍珠纪行2')
             click('一键领取')
             click('空白位置')
-    click(waits(['关闭']))
+        click(waits(['关闭']))
 
 def 圣遗物分解():
     waits(['菜单'])
-    time.sleep(1)
+    time.sleep(1.5)
     pyautogui.press('b')
     click(waits(['背包_圣遗物1','背包_圣遗物2']))
     click('分解')
@@ -418,6 +436,7 @@ def 晶蝶传送(name):
     waits(['菜单'])
     time.sleep(0.5)
     pyautogui.press('m')
+    c.func_loop_start(lambda : pyautogui.press('f'))
     waits(['关闭'])
     for i in range(5):
         pyautogui.click(get_position([62, 591]))
@@ -436,6 +455,7 @@ def 捕获晶蝶1():
     pyautogui.keyDown('d')
     time.sleep(0.4)
     pyautogui.keyDown('shift')
+    time.sleep(0.3)
     pyautogui.keyDown('ctrl')
     time.sleep(3)
     pyautogui.keyUp('ctrl')
@@ -470,13 +490,13 @@ def 捕获晶蝶3():
     pyautogui.keyUp('space')
 
 def 晶蝶():
+
     晶蝶传送('晶蝶传送点1')
-    c.func_loop_start(lambda : pyautogui.press('f'))
     捕获晶蝶1()
     晶蝶传送('晶蝶传送点2')
     捕获晶蝶2()
-    # 晶蝶传送('晶蝶传送点3')
-    # 捕获晶蝶3()
+    晶蝶传送('晶蝶传送点3')
+    捕获晶蝶3()
     c.func_loop_end()
 
 def 须弥回血传送():
@@ -537,6 +557,8 @@ def p(s,t = 1.0):
         pyautogui.mouseUp()
     elif s == 'R':
         pyautogui.rightClick()
+    elif s == 'S':
+        time.sleep(t)
     elif s == 'AAA':
         time.sleep(0.1)
         pyautogui.mouseDown()
@@ -556,6 +578,7 @@ def p(s,t = 1.0):
         pyautogui.keyDown(s[0])
         time.sleep(t)
         pyautogui.keyUp(s[0])
+
 
 
 def 副本战斗(fight_txt):
@@ -608,7 +631,135 @@ def 副本战斗(fight_txt):
             if waits_speed(['启动']):
                 pyautogui.keyUp('w')
 
+def 移动幽境危战():
+    waits(['菜单'])
+    pyautogui.press('m')
+    waits(['关闭'])
+    for i in range(6):
+        pyautogui.click(get_position([63, 846]))
+    click('地图标识')
+    click(waits(['地图标识蒙德1','地图标识蒙德2']))
+    pyautogui.click(get_position([925, 1394]))
+    time.sleep(0.5)
+    click_limit('传送',1)
 
+def 幽境危战战斗(fight_txt):
+    waits(['离开副本'])
+    time.sleep(3)
+    p('ww',0.2)
+    pyautogui.rightClick()
+    while True:
+        focus = get_focus_window()
+        if focus and '原神' not in focus:
+            continue
+        for s in AutoFight[fight_txt].split(' '):
+            if waits_check_speed(['退出标识']):
+                break
+            if '(' in s:
+                key = s.split('(')[0]
+                t = s.split('(')[1].replace(')', '')
+                p(key, float(t))
+            else:
+                p(s)
+        if waits_check_speed(['退出标识']):
+            pyautogui.press('3')
+            break
+    click('退出标识')
+
+def 幽境危战战斗循环(zh_num,n):
+    boss2 = [310,720]
+    boss3 = [255, 960]
+    if zh_num == 0:
+        fight_txt = '火茜希芙_幽境危战'
+    elif zh_num == 1:
+        fight_txt = '丝爱芙夜_幽境危战'
+    elif zh_num == 2:
+        fight_txt = '散茜米莱_幽境危战'
+    elif zh_num == 3:
+        fight_txt = '火艾'
+    elif zh_num == 4:
+        fight_txt = '火希娜班_幽境危战'
+    elif zh_num == 5:
+        fight_txt = '火希钟班_幽境危战'
+    elif zh_num == 6:
+        fight_txt = '仆钟希班_幽境危战'
+    elif zh_num == 7:
+        fight_txt = '恰斯卡_幽境危战'
+    else:
+        fight_txt = None
+    waits(['菜单'])
+    waits(['F'])
+    time.sleep(1)
+    pyautogui.press('f')
+    dif_list = [f'幽境危战_{i}难度' for i in ['普通','进阶','困难','险恶','无畏']]
+    if waits(dif_list) != '幽境危战_困难难度':
+        time.sleep(0.5)
+        click('幽境危战_难度下拉')
+        click('幽境危战_困难难度选择')
+    time.sleep(0.5)
+    click('挑战')
+    waits(['离开副本'])
+    time.sleep(0.5)
+    pyautogui.keyDown('w')
+    if waits_speed(['F']):
+        pyautogui.keyUp('w')
+    pyautogui.press('f')
+    waits(['挑战'])
+    if n == 2:
+        pyautogui.click(get_position(boss2))
+    elif n == 3:
+        pyautogui.click(get_position(boss3))
+    click('挑战')
+    while True:
+        幽境危战战斗(fight_txt)
+        if 幽境危战奖励领取():
+            waits(['离开副本'])
+            pyautogui.press('esc')
+            click('退出登录标识')
+            return
+
+
+def 幽境危战奖励领取():
+    waits(['离开副本'])
+    pyautogui.press('s')
+    time.sleep(0.2)
+    pyautogui.middleClick()
+    time.sleep(0.5)
+    while True:
+        position = c.check_one_pic('幽境危战_地脉奖励', num, c.processed_screen)
+        print(position)
+        focus = get_focus_window()
+        if focus and '原神' not in focus:
+            continue
+        if not position:
+            continue
+        if waits_check_speed(['激活地脉之花']):
+            break
+        if position and 1480 > position[0][0] > 1080 and 800 > position[0][1] > 300:
+            p('ww',0.5)
+            continue
+        if 450 > position[0][1] > 350:
+            if position[0][0] > 1280:
+                smooth_mouse_move(100, 0, duration=0.2, steps=20)
+            else:
+                smooth_mouse_move(-100, 0, duration=0.2, steps=20)
+        else:
+            if position[0][0] > 1280:
+                smooth_mouse_move(100, 0, duration=0.2, steps=20)
+
+            else:
+                smooth_mouse_move(-100, 0, duration=0.2, steps=20)
+
+    pyautogui.press('f')
+    pyautogui.moveTo([0, 0])
+    if waits(['秘宝收取2', '秘宝收取3'], 0.95) == '秘宝收取3':
+        w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
+        log(w_sz)
+        click('使用')
+        if w_sz == '浓缩树脂1':
+            click('退出标识')
+            return True
+        click('挑战')
 
 
 def 每日(zh_num,n):
@@ -616,13 +767,30 @@ def 每日(zh_num,n):
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if 1:
+    if res:
         切换副本队伍()
         晶蝶()
         须弥回血传送()
         秘境_圣遗物(zh_num,n)
         圣遗物分解()
         切换常用队伍()
+    移动枫丹()
+    枫丹凯瑟琳()
+    历练点()
+    探索派遣()
+    每日委托()
+    纪行()
+
+def 每日2(zh_num,n):
+    登录(zh[zh_num])
+    移动枫丹()
+    枫丹合成台()
+    res = 合成()
+    if res:
+        晶蝶()
+        移动幽境危战()
+        幽境危战战斗循环(zh_num,n)
+        圣遗物分解()
     移动枫丹()
     枫丹凯瑟琳()
     历练点()
@@ -641,15 +809,23 @@ zh = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('须弥地图标识2',json_path)
-    # time.sleep(10)
-    # game_start(windows_title)
-    # log(res)
-    # # m.wait('退出登录')
+    log('开始执行')
+    res = c.t_match.save_pic_loc('幽境危战_困难难度选择',json_path)
+    game_start(windows_title)
+
     c.check_start()
-    # c.model_loop_start()
     # print(c.ego_angle)
-    w = waits(['F','启动','副本标识'])
-    if w in ['F','启动']:
-        副本战斗('火希娜班')
+    # w = waits(['F','启动','副本标识'])
+    # if w in ['F','启动']:
+    #     副本战斗('火希钟班')
+    # 每日2(0,2)
+    # 每日2(1,2)
+    # 每日2(2,1)
+    # 每日2(3,2)
+    # 每日2(4,2)
+    # 每日2(5,2)
+    每日2(6,2)
+    每日2(7,2)
+    # 幽境危战战斗循环(6, 2)
+    # 纪行()
     c.check_stop()

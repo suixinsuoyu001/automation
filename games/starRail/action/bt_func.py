@@ -265,6 +265,7 @@ class check():
         if self.processed_screen is None:
             log('check_start未运行')
             self.check_start()
+            self.hwnd = get_hwnd(windows_title)
             # return
         while True:
             for name in names:

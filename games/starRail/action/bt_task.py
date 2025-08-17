@@ -327,7 +327,7 @@ def 剧情():
         if res in click_list:
             if res == '获得物品':
                 c.wait_click_limit(res, 0.05,0.95)
-            c.wait_click_limit(res, 0.05)
+            c.wait_click_limit(res, 0.05,0.8)
         if res in esc_names:
             c.send_key('esc')
         if res == '消息标识':

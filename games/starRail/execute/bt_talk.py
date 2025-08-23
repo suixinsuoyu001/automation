@@ -54,8 +54,7 @@ def on_press(key):
     except AttributeError:
         pass
 
-
-if __name__ == '__main__':
+def bt_talk():
     # 启动进程（默认开启）
     start_node()
 
@@ -64,3 +63,7 @@ if __name__ == '__main__':
     listener.start()
 
     listener.join()
+
+
+if __name__ == '__main__':
+    bt_talk()

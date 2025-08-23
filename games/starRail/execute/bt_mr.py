@@ -40,5 +40,7 @@ if __name__ == '__main__':
     c.zhs = zhs
     game_start(windows_title)
 
-    mr()
+
+    每日(4, 'y13')
+    # mr()
     c.check_stop()

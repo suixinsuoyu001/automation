@@ -211,6 +211,8 @@ def 委托领取():
     c.hold_click(phone_position)
     c.click('委托')
     c.waits('i')
+    time.sleep(0.3)
+    c.click((c.waits(['委托_专属材料1','委托_专属材料2'])))
     if now.hour >=20:
         c.wait_click_limit('领取',0.5)
         c.wait_click_limit('再次派遣',0.5,0.9)
@@ -299,6 +301,7 @@ def 每日(n,type):
 
     登录(c.zhs[n])
     邮件领取()
+    巡星之礼领取()
     每日助战(str)
     if type.startswith('x'):
         行迹(type.replace('x',''),flag)
@@ -358,8 +361,10 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'空白位置',0.85)
+    c.save_pic_loc(r'委托_专属材料1',0.85)
     log('执行开始')
+    委托领取()
+
     # 返回主界面()
     # 行迹('虚无2')
     # 遗器(13)
@@ -369,4 +374,4 @@ if __name__ == '__main__':
     # 无名勋礼()
     # control.activate()
     # 活动()
-    # c.check_stop()
+    c.check_stop()

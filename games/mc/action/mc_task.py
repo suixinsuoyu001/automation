@@ -75,19 +75,34 @@ def mr(flag = 1):
         c.wait_click('月卡标识')
         c.wait_click('空白位置')
     if flag == 1:
-        讨伐强敌()
-        战歌重奏()
+        # 讨伐强敌()
+        # 战歌重奏()
+        # 凝素领域('佩枪2')
+        无音清剿('哀恸谷')
+
+
+def test():
+    c.scroll_click('长刃2','前往')
+
+def 凝素领域(name = '长刃2',num_limit = 3):
+    num = 0
     c.wait_press('聊天标识','f2')
     c.wait('关闭菜单2')
-    c.click_point_until([100, 593],'周期挑战标识',0.8) #点击周期挑战
-    c.scroll_click('长刃2','前往')
+    # 106, 408
+    c.click_point_until([100, 408],'周期挑战标识',0.8) #点击周期挑战
+    c.scroll_click(f'凝素领域_{name}','前往')
     c.wait_click('快速旅行')
     c.wait('聊天标识')
     c.run_until('F','w',0.8)
     c.wait_press('F','f',0.8)
     c.wait_click('单人挑战')
     while 1:
+        num += 1
         c.click_loop_until(['开启挑战'], ['聊天标识'], 0.95)
+        if num-1 == num_limit:
+            c.wait_press('聊天标识', 'esc')
+            c.wait_click('确认')
+            return
         time.sleep(0.5)
         c.run_until('F', 'w',0.8)
         c.wait_press('F', 'f', 0.8)
@@ -121,14 +136,57 @@ def mr(flag = 1):
         elif wait_res == '提示':
             c.wait_click('取消')
             break
+
     c.wait_click('退出副本')
 
-def test():
-    c.scroll_click('长刃2','前往')
+def 奖励领取():
+    res = 1 # 1可继续挑战 2体力耗尽
+    c.wait_click('双倍领取')
+    wait_1 = c.waits(['确定','补充结晶波片'])
+    if wait_1 == '确定':
+        c.wait_click('确定')
+    elif wait_1 == '补充结晶波片':
+        c.wait_click('取消')
+        c.wait_click('单倍领取')
+        wait_2 = c.waits(['确定', '补充结晶波片'])
+        res = 0
+        if wait_2 == '确定':
+            c.wait_click('确定')
+        elif wait_2 == '补充结晶波片':
+            c.wait_click('取消')
+            c.wait_press('单倍领取', 'esc')
+    c.waits(['聊天标识'])
+    return res
+
+
+def 无音清剿(name,num_limit = 2):
+    num = 0
+    while 1:
+        num += 1
+        c.wait_press('聊天标识', 'f2')
+        c.wait('关闭菜单2')
+        c.click_point_until([100, 408], '周期挑战标识', 0.8)  # 点击周期挑战
+        c.click(c.waits(['无音清剿标识1', '无音清剿标识2']))
+        c.scroll_click(f'无音清剿_{name}', '前往')
+        c.wait_click('快速旅行')
+        c.wait('聊天标识')
+        c.run(4)
+        c.waits(['F', '领取奖励'], 0.8)
+        time.sleep(2)
+        wait_res = c.waits(['F', '领取奖励'], 0.8)
+        if wait_res == 'F':
+            c.wait_press('F', 'f', 0.8)
+        elif wait_res == '领取奖励':
+            loc_jl()
+            c.wait_press('F', 'f', 0.8)
+        res = 奖励领取()
+        if num == num_limit or res == 0:
+            return
+
 
 def 战歌重奏():
     c.wait_press('聊天标识', 'f2')
-    c.click_point_until([100, 593], '周期挑战标识') #点击周期挑战
+    c.click_point_until([100, 410], '周期挑战标识') #点击周期挑战
     c.wait_click('战歌重奏')
     c.scroll_click('乌龟','前往')
     c.wait_click('快速旅行')
@@ -142,7 +200,7 @@ def 战歌重奏():
 
 def 讨伐强敌():
     c.wait_press('聊天标识', 'f2')
-    c.click_point_until([100, 593], '周期挑战标识') #点击周期挑战
+    c.click_point_until([100, 410], '周期挑战标识') #点击周期挑战
     c.wait_click('讨伐强敌')
     c.scroll_click('辉萤军势','前往')
     c.wait_click('快速旅行')
@@ -226,6 +284,8 @@ def 剧情():
         time.sleep(0.1)
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('提示翻页', json_path, 0.8)
-    # c.check_start()
+    c.t_match.save_pic_loc('确定', json_path, 0.8)
+    c.check_start()
     # 剧情()
+    # 无音清剿(name='哀恸谷')
+    # 凝素领域('佩枪2',3)

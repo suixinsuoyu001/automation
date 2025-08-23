@@ -8,7 +8,7 @@ import numpy as np
 import pygetwindow as gw
 import ctypes
 from ctypes import wintypes
-
+import psutil
 import win32con
 import win32process
 
@@ -218,6 +218,21 @@ def game_start(windows_title):
             focus = get_focus_window()
             if focus and windows_title in focus:
                 break
+
+def close_exe(name):
+    name += ".exe"
+    for process in psutil.process_iter(['pid', 'name']):
+        try:
+            # 检查进程名称是否匹配
+            if process.info['name'].lower() == name.lower():
+                log(f"检测到程序进程: {name}, 正在关闭...")
+                process.terminate()  # 终止进程
+                process.wait(timeout=5)  # 等待进程完全关闭
+                log(f"已成功关闭程序: {name}")
+                return
+        except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
+            pass
+    log(f"未检测到程序进程: {name}")
 
 if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'

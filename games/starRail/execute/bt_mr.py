@@ -6,8 +6,8 @@ zhs = [
     'suixin001009@163.com', #2
     'suixin001001@163.com', #3
     '13280859317',          #4
-    'suixin001002@163.com', #5
-    'suixin001005@163.com', #6
+    'suixin001002@163.com', #5 遐蝶
+    'suixin001005@163.com', #6 万敌
     'suixin001003@163.com', #7
     'suixin001004@163.com', #8
     'suixin001008@163.com', #9
@@ -34,13 +34,13 @@ def mr():
 # y10	击破套+追击套	y11	增益套+战技套	y12	记忆套+量子套
 # y13	治疗套+船长套
 
-if __name__ == '__main__':
+def mr_execute():
     log('执行开始')
-
     c.zhs = zhs
     game_start(windows_title)
-
-
-    每日(4, 'y13')
-    # mr()
+    mr()
     c.check_stop()
+
+
+if __name__ == '__main__':
+    mr_execute()

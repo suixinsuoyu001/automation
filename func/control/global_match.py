@@ -62,7 +62,7 @@ class match():
                 break
 
     def waits(self,names, num=None):
-        log(f'waits:{names} 开始捕获')
+        log(f'waits:{names} 开始捕获',level=2)
         if num is None:
             num = self.num
         while True:
@@ -70,7 +70,7 @@ class match():
                 matches = self.find_image_on_screen(name,num)
                 if matches:
                     time.sleep(0.2)
-                    log(f'wait: {name} 已找到')
+                    log(f'wait: {name} 已找到',level=2)
                     return name
 
     def waits_limit(self,names,t = 3, num=None):

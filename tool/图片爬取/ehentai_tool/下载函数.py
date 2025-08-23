@@ -64,6 +64,11 @@ def image_download(img_url, save_path, file_name=None):
         image_download(img_url, save_path, file_name)
 
 def get_url_jpg(url,save_path,file_name):
+    file_path = os.path.join(save_path, file_name)
+    # 如果文件已存在，直接返回
+    if os.path.exists(file_path):
+        print(f"{file_name} 已存在，跳过下载")
+        return
     page_text = get_url_text(url)
     img_url = get_image_url(page_text)
     image_download(img_url, save_path,file_name)

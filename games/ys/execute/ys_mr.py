@@ -25,8 +25,19 @@ def run():
     每日(5, 1)
     每日(6, 1)
     每日(7, 1)
+    c.check_stop()
 
-
+def run2():
+    game_start(windows_title)
+    c.check_start()
+    每日2(0,2)
+    每日2(1,2)
+    每日2(2,1)
+    每日2(3,2)
+    每日2(4,2)
+    每日2(5,2)
+    每日2(6,2)
+    每日2(7,2)
     c.check_stop()
 
 if __name__ == '__main__':

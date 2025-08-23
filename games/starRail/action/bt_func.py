@@ -9,8 +9,6 @@ from func.control.back_control import Control
 
 windows_title = '崩坏：星穹铁道'
 
-hwnd = get_hwnd(windows_title)
-control = Control(hwnd)
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
@@ -33,11 +31,12 @@ class check():
         self.time_limit = time_limit
         self.num = num
         self.hwnd = get_hwnd(windows_title)
-        path = current_dir.replace('action','image\\')
+        self.control = Control(self.hwnd)
+        image_path = current_dir.replace('action','image\\')
         json_path = current_dir.replace('action','data\img_loc.json')
-        self.path = path
+        self.path = image_path
         self.json_path = json_path
-        self.t_match = t_match(windows_title, path)
+        self.t_match = t_match(self.wt, self.path)
         self.locs = read_json(json_path)
         self.processed_screen = None
         self.focus = False
@@ -62,7 +61,12 @@ class check():
             if pic is not None:
                 self.processed_screen = get_pic(self.wt)
                 self.focus = self.is_focus()
-
+            else:
+                while not get_hwnd(self.wt):
+                    log(f'等待{self.wt}启动')
+                    time.sleep(5)
+                self.hwnd = get_hwnd(self.wt)
+                self.control = Control(self.hwnd)
     def check_start(self):
         self.stop_event = threading.Event()
         flag = 1
@@ -70,6 +74,9 @@ class check():
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
+        self.hwnd = get_hwnd(self.wt)
+        self.t_match = t_match(self.wt, self.path)
+        self.control = Control(self.hwnd)
         self.thread = threading.Thread(target=self.get_pic_loop)
         self.thread.start()
         time.sleep(1)
@@ -144,10 +151,10 @@ class check():
             log("匹配失败")
 
     def post(self,func, a1=None, a2=None):
-        control.block_user_input()
-        control.activate()
+        self.control.block_user_input()
+        self.control.activate()
         time.sleep(0.01)
-        x, y = control.get_mouse_position()
+        x, y = self.control.get_mouse_position()
         time.sleep(0.01)
         if a2:
             func(a1, a2)
@@ -156,12 +163,12 @@ class check():
         else:
             func()
         time.sleep(0.02)
-        control.inactivate()
+        self.control.inactivate()
         time.sleep(0.03)
-        control.set_mouse_position(x, y)
-        control.unblock_user_input()
+        self.control.set_mouse_position(x, y)
+        self.control.unblock_user_input()
         if self.focus:
-            control.activate()
+            self.control.activate()
 
 
     def click(self,name,num = None):
@@ -174,7 +181,7 @@ class check():
         while True:
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click, position[0])
+                self.post(self.control.click, get_position(position[0]))
                 break
             time.sleep(0.02)
         log(f'click:{name} 已捕获并点击',level=2)
@@ -186,11 +193,11 @@ class check():
             self.check_start()
         position = self.check_one_pic(name, num, self.processed_screen)
         if position is not None:
-            self.post(control.click, position[0])
+            self.post(self.control.click, get_position(position[0]))
         log(f'click_speed:{name} 已捕获并点击',level=2)
 
     def click_point(self,point):
-        self.post(control.click, point)
+        self.post(self.control.click, point)
         log(f'click:{point} 已点击',level=2)
 
     def wait_click(self,name,num = None):
@@ -204,7 +211,7 @@ class check():
         while True:
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click, get_position(position[0]))
+                self.post(self.control.click, get_position(position[0]))
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -222,10 +229,10 @@ class check():
         start_time = time.time()
         while True:
             if not self.focus:
-                control.activate()
+                self.control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                self.post(control.click,get_position(position[0]))
+                self.post(self.control.click,get_position(position[0]))
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -250,14 +257,14 @@ class check():
                 log(f'click_until:{item_position} 已识别结束循环',level=2)
                 break
             if position is not None:
-                self.post(control.click,get_position(position[0]))
+                self.post(self.control.click,get_position(position[0]))
                 log(f'click_until:{name} 已捕获并点击',level=2)
                 time.sleep(1)
             time.sleep(0.02)
 
     def send_key(self,key):
         log(f'send_key: 按下 {key}',level=2)
-        self.post(control.send_key_up, key)
+        self.post(self.control.send_key_up, key)
 
     def waits(self,names,num = None):
         num = self.num if num is None else num
@@ -315,32 +322,32 @@ class check():
             position = self.check_one_pic(name,num,self.processed_screen)
             if position:
                 log(f'text_input: {name} 已找到开始点击输入',level=2)
-                self.post(control.click_input, get_position(position[0]),text)
+                self.post(self.control.click_input, get_position(position[0]),text)
                 return name
 
     def hold_click(self,point):
-        control.block_user_input()
+        self.control.block_user_input()
         if not self.focus:
-            control.activate()
+            self.control.activate()
         log(f'hold_click: 点击坐标{point}',level=2)
 
-        x, y = control.get_mouse_position()
+        x, y = self.control.get_mouse_position()
         time.sleep(0.02)
-        control.send_key_down('alt')
+        self.control.send_key_down('alt')
         time.sleep(0.01)
         ctypes.windll.user32.SetCursorPos(point[0],point[1])
-        if control.get_mouse_position() == point:
-            control.click(point)
-            control.send_key_up('alt')
+        if self.control.get_mouse_position() == point:
+            self.control.click(point)
+            self.control.send_key_up('alt')
             time.sleep(0.02)
             if not self.focus:
-                control.inactivate()
+                self.control.inactivate()
             time.sleep(0.02)
-            control.set_mouse_position(x, y)
+            self.control.set_mouse_position(x, y)
         else:
             time.sleep(0.5)
             self.hold_click(point)
-        control.unblock_user_input()
+        self.control.unblock_user_input()
 
 
 
@@ -353,11 +360,11 @@ class check():
                 time.sleep(0.02)
                 continue
             while True:
-                position2 = self.check_one_pic(item, 0.95, self.processed_screen)
+                position2 = self.check_one_pic(item, num, self.processed_screen)
                 if position2:
-                    self.post(control.click, get_position(position2[0]))
+                    self.post(self.control.click, get_position(position2[0]))
                     break
-                self.post(control.move_scroll, get_position(position[0]),150)
+                self.post(self.control.move_scroll, get_position(position[0]),150)
 
             break
         log(f'click:{sign} 已捕获并点击',level=2)
@@ -374,7 +381,7 @@ class check():
                 position2 = self.check_one_pic(item, 0.95, self.processed_screen)
                 if position2:
                     break
-                self.post(control.move_scroll, get_position(position[0]),150)
+                self.post(self.control.move_scroll, get_position(position[0]),150)
 
             break
         log(f'click:{sign} 已捕获并点击')
@@ -394,12 +401,12 @@ class check():
                 y = position[0][1]
                 for i in matches:
                     if i['y'] > y-100:
-                        self.post(control.click,[i['x'],i['y']])
+                        self.post(self.control.click,get_position([i['x'],i['y']]))
                         break
                 break
 
             break
-        log(f'click:{sign} 已捕获并点击')
+        log(f'click:{sign} 已捕获并点击',level=2)
 
 if __name__ == '__main__':
     # game_start(windows_title)

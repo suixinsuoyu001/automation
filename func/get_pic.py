@@ -26,7 +26,7 @@ def get_pic(window_title):
     # print(hwnd)
     # hwnd = 4195764
     if not hwnd:
-        print(f"Window with title '{window_title}' not found.")
+        log(f"Window with title '{window_title}' not found.",level=2)
         return None
     try:
         windll.user32.SetProcessDPIAware()

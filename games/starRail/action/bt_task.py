@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from games.starRail.action.bt_func import check,windows_title,control
+from games.starRail.action.bt_func import check,windows_title
 from func.common import *
 import keyboard
 
@@ -50,7 +50,7 @@ def 登录(zh):
                         break
             focus = get_focus_window()
             if focus and '星穹铁道' in focus:
-                control.activate()
+                c.control.activate()
             break
         elif res == '月卡标识':
             while True:
@@ -65,7 +65,7 @@ def 登录(zh):
 
 def 批量账号执行(fun1 = None ,fun2 = None, fun3 = None):
     game_start(windows_title)
-    control.hwnd = get_hwnd(windows_title)
+    c.control.hwnd = get_hwnd(windows_title)
     for zh in c.zhs:
         登录(zh)
         if fun1:
@@ -101,7 +101,7 @@ def 返回主界面():
     while not c.waits_limit(['Enter'],0.4):
         c.send_key('esc')
         time.sleep(0.3)
-    control.activate()
+    c.control.activate()
 
 def 抽卡兑换(flag = 1):
     c.waits(['Enter'])
@@ -122,7 +122,7 @@ def 抽卡兑换(flag = 1):
 
 def 每月抽卡兑换():
     game_start(windows_title)
-    control.hwnd = get_hwnd(windows_title)
+    c.control.hwnd = get_hwnd(windows_title)
     for zh in c.zhs:
         登录(zh)
         if '003' in zh or '004' in zh or '008' in zh or '009' in zh:
@@ -134,9 +134,9 @@ def 每月抽卡兑换():
 # 1 循环战斗 2 单次战斗 （默认队伍1战斗）
 def 战斗循环(flag = 1):
     c.wait_click('挑战')
+    if c.waits(['确认', '开始挑战']) == '确认':
+        return 返回主界面()
     if flag == 1:
-        if c.waits(['确认','开始挑战']) == '确认':
-            return 返回主界面()
         if c.waits(['队伍1', '队伍1选中']) == '队伍1':
             c.click('队伍1')
     elif flag == 2:
@@ -151,9 +151,9 @@ def 战斗循环(flag = 1):
         c.click('入队')
     c.wait_click('开始挑战')
     while True:
-        res = c.waits(['C', '再来一次','开拓力补充'],0.95)
+        res = c.waits(['C', '再来一次','开拓力补充'],0.9)
         if res == 'C':
-            c.click_point([2352, 66])
+            c.click_point(get_position([2352, 66]))
         elif flag == 2 and res == '再来一次':
             c.click('退出关卡')
             break
@@ -172,7 +172,7 @@ def 遗器(n,flag = 1):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','侵蚀隧洞')
+    c.move_click('拟造花萼金','侵蚀隧洞',0.7)
     c.move_wait('副本标识', f'遗器副本{n}')
     c.click_move_item(f'遗器副本{n}','进入')
     战斗循环(flag)
@@ -182,7 +182,7 @@ def 行迹(name,flag = 1):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','拟造花萼赤')
+    c.move_click('拟造花萼金','拟造花萼赤',0.7)
     c.move_wait('副本标识', f'行迹{name}')
     c.click_move_item(f'行迹{name}','进入')
     for i in range(6):
@@ -196,7 +196,7 @@ def 每日助战(sign = None):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','拟造花萼赤')
+    c.move_click('拟造花萼金','拟造花萼赤',0.7)
     c.click_move_item(sign, '进入')
     c.waits('+')
     for i in range(2):
@@ -309,7 +309,7 @@ def 每日(n,type):
     无名勋礼()
 
 def 剧情():
-    num = 0.95
+    num = 0.85
     while 1:
         other_list = ['L','M','LB','消息标识']
         click_list = ['确认','前往','关闭1','关闭消息','教程翻页','教程翻页2','传送','成就领取','领取','再来一次']
@@ -322,7 +322,7 @@ def 剧情():
             if c.waits_speed(['确认','对话标识1', '对话标识3', '对话标识2']):
                 c.wait_click_limit(c.waits_speed(['确认','对话标识1', '对话标识3', '对话标识2']),0.1)
             else:
-                c.click_point([2090,78])
+                c.click_point(get_position([2090,78]))
                 time.sleep(0.3)
 
         if res in click_list:
@@ -358,7 +358,7 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'空白位置',0.85)
+    c.save_pic_loc(r'生存索引2',0.85)
     log('执行开始')
     # 返回主界面()
     # 行迹('虚无2')
@@ -367,6 +367,6 @@ if __name__ == '__main__':
     # 委托领取()
     # 每日奖励()
     # 无名勋礼()
-    # control.activate()
+    # c.control.activate()
     # 活动()
     # c.check_stop()

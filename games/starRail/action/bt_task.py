@@ -211,6 +211,8 @@ def 委托领取():
     c.hold_click(phone_position)
     c.click('委托')
     c.waits('i')
+    time.sleep(0.3)
+    c.click((c.waits(['委托_专属材料1','委托_专属材料2'])))
     if now.hour >=20:
         c.wait_click_limit('领取',0.5)
         c.wait_click_limit('再次派遣',0.5,0.9)

@@ -151,7 +151,21 @@ class check():
                 return True
 
 
-
+    def click(self,name,num = 0.9):
+        if self.processed_screen is None:
+            log('check_start未运行')
+            self.check_start()
+            # return
+        log(f'click:{name} 开始捕获',level=2)
+        while True:
+            control.activate()
+            position = self.check_one_pic(name, num, self.processed_screen)
+            if position is not None:
+                control.click(position[0])
+                time.sleep(0.5)
+                break
+            time.sleep(0.02)
+        log(f'click:{name} 已捕获并点击',level=2)
 
     def wait_click(self,name,num = 0.9):
         if self.processed_screen is None:
@@ -264,6 +278,15 @@ class check():
         while not self.check_one_pic(name, num, self.processed_screen):
             control.send_key(key, 0.5)
         log(f'run_until:已移动到{name}位置')
+
+    def run(self,t):
+        control.send_key_down('w')
+        time.sleep(0.3)
+        control.send_key_down('shift')
+        time.sleep(t)
+        control.send_key_up('shift')
+        time.sleep(0.3)
+        control.send_key_up('w')
 
     def scroll_click(self,name1,name2,num = 0.9):
         while self.match_one_pic(name1,num) is None:

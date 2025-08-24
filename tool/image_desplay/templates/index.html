@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>首页</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .search-container {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .search-input {
+            width: 50%;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background-color: #222;
+            color: white;
+        }
+
+        .directory-container {
+            margin: 20px auto;
+            padding: 10px;
+            border: 1px solid #444;
+            background-color: #111;
+            max-width: 1350px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .directory-title-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .directory-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            text-align: center;
+            color: white;
+            position: relative;
+        }
+
+        .checkbox-container {
+            position: relative;
+        }
+
+        .checkbox {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            z-index: 10;
+            transform: scale(1.2);
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            border-radius: 5px;
+            padding: 5px;
+        }
+
+        img {
+            width: 200px;
+            height: auto;
+            display: block;
+            border: 1px solid #444;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s ease;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        img.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        a {
+            text-decoration: none;
+            color: white;
+        }
+
+        button {
+            color: white;
+            background-color: #333;
+            border: 2px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+
+        button:active {
+            color: #333;
+            border-color: #333;
+        }
+            .custom-alert {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .custom-alert-content {
+        background-color: #222;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .custom-alert-content p {
+        margin: 0 0 20px;
+        font-size: 16px;
+    }
+
+    .custom-alert-content button {
+        background-color: #555;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .custom-alert-content button:hover {
+        background-color: #777;
+    }
+    </style>
+</head>
+<body>
+    <h1>首页</h1>
+    <div style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
+        <button id="saveLogsButton">保存记录</button>
+        <button id="viewLogsButton" onclick="location.href='/save_display'">查看记录</button>
+
+    </div>
+    <div class="search-container">
+        <input
+            type="text"
+            class="search-input"
+            placeholder="输入名字以检索..."
+            id="searchInput"
+        />
+    </div>
+
+    {% for dir_name, images in grouped_images.items() %}
+    <div class="directory-container" data-dir="{{ dir_name }}">
+        <div class="directory-title-container">
+            <div class="directory-title">{{ dir_name }}</div>
+            <input type="checkbox" class="directory-checkbox" data-dir="{{ dir_name }}">
+        </div>
+        <div id="customAlert" class="custom-alert" style="display: none;">
+            <div class="custom-alert-content">
+                 <input type="text" class="search-input" placeholder="输入存档名称" id="saveInput" >
+                <p id="alertMessage"></p>
+                <button id="saveButton">保存</button>
+                <button id="closeButton">取消</button>
+            </div>
+        </div>
+        <div class="image-container">
+            {% for image in images %}
+            <div class="card" data-name="{{ image.dir_name | lower }}" data-dir="{{ dir_name }}">
+                <input type="checkbox" class="checkbox" data-name="{{ image.dir_name | lower }}">
+                <a href="/gallery/{{ image.dir_path }}" target="_blank">
+                    <img
+                        data-src="{{ url_for('serve_image', filename=image.first_image) }}"
+                        alt="Directory Image"
+                        class="lazy-image"
+                    >
+                    <p>{{ image.dir_name }}</p>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const lazyImages = document.querySelectorAll('.lazy-image');
+
+            // 懒加载图片
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            const src = img.dataset.src;
+
+                            if (src) {
+                                img.src = src;
+                                img.onload = () => img.classList.add('visible');
+                                observer.unobserve(img);
+                            } else {
+                                console.error("Image source missing for:", img);
+                            }
+                        }
+                    });
+                });
+
+                lazyImages.forEach(image => observer.observe(image));
+            } else {
+                lazyImages.forEach(img => {
+                    const src = img.dataset.src;
+
+                    if (src) {
+                        img.src = src;
+                        img.onload = () => img.classList.add('visible');
+                    } else {
+                        console.error("Image source missing for:", img);
+                    }
+                });
+            }
+
+            const localStorageKey = 'stickyState';
+
+            function getStickyState() {
+                return JSON.parse(localStorage.getItem(localStorageKey)) || { groups: [], images: {} };
+            }
+
+            function saveStickyState(groups, images) {
+                localStorage.setItem(localStorageKey, JSON.stringify({ groups, images }));
+            }
+
+            function applyStickyState() {
+                const state = getStickyState();
+
+                const directories = document.querySelectorAll('.directory-container');
+                const parentContainer = document.body;
+
+                directories.forEach(dir => {
+                    const dirName = dir.dataset.dir;
+                    if (state.groups.includes(dirName)) {
+                        const siblings = Array.from(parentContainer.querySelectorAll('.directory-container'));
+                        const index = siblings.indexOf(dir);
+                        if (index > 0) {
+                            parentContainer.insertBefore(dir, siblings[0]);
+                        }
+                        dir.querySelector('.directory-checkbox').checked = true;
+                    }
+                });
+
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    const dirName = card.dataset.dir;
+                    const imageName = card.dataset.name;
+                    if (state.images[dirName] && state.images[dirName].includes(imageName)) {
+                        const container = card.parentElement;
+                        container.prepend(card);
+                        card.querySelector('.checkbox').checked = true;
+                    }
+                });
+            }
+
+            const groupCheckboxes = document.querySelectorAll('.directory-checkbox');
+            groupCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const state = getStickyState();
+                    const dirName = this.dataset.dir;
+
+                    if (this.checked) {
+                        if (!state.groups.includes(dirName)) {
+                            state.groups.push(dirName);
+                        }
+                    } else {
+                        state.groups = state.groups.filter(group => group !== dirName);
+                    }
+
+                    saveStickyState(state.groups, state.images);
+                });
+            });
+
+            const imageCheckboxes = document.querySelectorAll('.checkbox');
+            imageCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function () {
+                    const state = getStickyState();
+                    const dirName = this.closest('.card').dataset.dir;
+                    const imageName = this.dataset.name;
+
+                    if (this.checked) {
+                        state.images[dirName] = state.images[dirName] || [];
+                        if (!state.images[dirName].includes(imageName)) {
+                            state.images[dirName].push(imageName);
+                        }
+                    } else {
+                        state.images[dirName] = (state.images[dirName] || []).filter(img => img !== imageName);
+                    }
+
+                    saveStickyState(state.groups, state.images);
+                });
+            });
+
+            applyStickyState();
+
+            const searchInput = document.getElementById('searchInput');
+            searchInput.addEventListener('input', function () {
+                const filter = searchInput.value.toLowerCase();
+                const directories = document.querySelectorAll('.directory-container');
+
+                directories.forEach(directory => {
+                    const images = directory.querySelectorAll('.card');
+                    let visibleCount = 0;
+
+                    images.forEach(card => {
+                        const name = card.dataset.name.toLowerCase();
+                        if (name.includes(filter)) {
+                            card.style.display = 'block';
+                            visibleCount++;
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+
+                    directory.style.display = visibleCount > 0 ? 'block' : 'none';
+                });
+            });
+
+            // 按钮事件绑定
+            const saveLogsButton = document.getElementById('saveLogsButton');
+            const saveButton = document.getElementById('saveButton');
+            saveLogsButton.addEventListener("click", function () {
+                fetch('/get_logs')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const formattedData = data.join('\n'); // 将数组内容逐行拼接
+                        showAlert(`\n当前打开链接:\n${formattedData}`); // 调用 showAlert 显示
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+            saveButton.addEventListener("click", function () {
+                const name = document.getElementById('saveInput').value
+                fetch('/save_logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: name,
+                    })
+                }).then(response => {
+                    if (response.ok) {
+                        console.log('Click logged successfully.');
+                    } else {
+                        alert('名称重复或姓名有误')
+                        console.error('Failed to log click.');
+                    }
+                }).catch(error => console.error('Error logging click:', error));
+            });
+
+
+
+            function showAlert(message) {
+                const alertBox = document.getElementById("customAlert");
+                const alertMessage = document.getElementById("alertMessage");
+                alertMessage.innerText = decodeURIComponent(message); // 使用 innerText 保证换行
+                // alertMessage.textContent = message;
+                alertBox.style.display = "flex";
+
+                const saveButton = document.getElementById("saveButton");
+                saveButton.onclick = () => {
+                    alertBox.style.display = "none";
+                };
+                const closeButton = document.getElementById("closeButton");
+                closeButton.onclick = () => {
+                    alertBox.style.display = "none";
+                };
+            }
+        });
+    </script>
+</body>
+</html>

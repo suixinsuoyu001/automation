@@ -1,0 +1,42 @@
+{
+    "信号無視": [
+        "http://127.0.0.1:5000/view_image?dir_path=YD/信号無視&index=23&offsetY=0.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/信号無視&index=22&offsetY=0.0&scale=1.00"
+    ],
+    "XX_ROM": [
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=20&offsetY=200.0&scale=1.10",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=21&offsetY=-250.0&scale=1.10",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=22&offsetY=-250.0&scale=1.30",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=23&offsetY=100.0&scale=1.00"
+    ],
+    "绿箭侠": [
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=22&offsetY=50.0&scale=1.90",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=26&offsetY=50.0&scale=1.90",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=28&offsetY=50.0&scale=2.00",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=29&offsetY=-70.0&scale=1.90",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=30&offsetY=-138.0&scale=2.10",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=31&offsetY=0.0&scale=1.70",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=34&offsetY=-100.0&scale=2.50",
+        "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=39&offsetY=100.0&scale=2.30"
+    ],
+    "圆香深喉": [
+        "http://127.0.0.1:5000/view_image?dir_path=YD/圆香深喉&index=3&offsetY=-150.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/圆香深喉&index=5&offsetY=287.0&scale=1.20",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/圆香深喉&index=5&offsetY=-300.0&scale=1.30",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=9&offsetY=323.0&scale=1.40",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=9&offsetY=-246.0&scale=1.20",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=12&offsetY=222.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=12&offsetY=-333.0&scale=1.60",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=13&offsetY=-300.0&scale=1.40",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=14&offsetY=250.0&scale=1.20",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/真夏の夜の夢&index=14&offsetY=-331.0&scale=1.50",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢&index=15&offsetY=-233.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢&index=16&offsetY=-326.0&scale=1.40",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢&index=17&offsetY=304.0&scale=1.30",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢&index=17&offsetY=-283.0&scale=1.20",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢&index=18&offsetY=353.0&scale=1.60",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢+3&index=33&offsetY=-258.0&scale=1.60",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢+3&index=32&offsetY=126.0&scale=1.90",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/紫の夢+3&index=32&offsetY=-300.0&scale=1.40"
+    ]
+}

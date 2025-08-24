@@ -1,5 +1,5 @@
-from games.starRail.action.bt_task2 import *
-from games.starRail.action.bt_task import *
+from games.starRail.action.bt_task2 import c
+from games.starRail.action.bt_task import 剧情
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 

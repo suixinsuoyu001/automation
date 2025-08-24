@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Image - {{ dir_path }}</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            flex-direction: column;
+            position: relative;
+        }
+        img {
+            display: block;
+            max-width: 120%;
+            max-height: 120vh;
+            border: 1px solid #444;
+            cursor: grab; /* 默认光标状态 */
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
+            position: relative;
+        }
+        .controls {
+            position: absolute;
+            top: 50%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+        .controls a {
+            color: white;
+            text-decoration: none;
+            padding: 30px;
+            font-size: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        .controls a:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            color: black;
+        }
+        .controls a:active {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .back-to-gallery {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            text-align: center;
+            display: inline-block;
+        }
+        .back-to-gallery:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .back-to-gallery:active {
+            background-color: rgba(255, 255, 255, 0.4);
+        }
+    </style>
+</head>
+<body>
+<!--    <img-->
+<!--        id="currentImage"-->
+<!--        src="{{ url_for('serve_image', filename=dir_path + '/' + images[index]) }}"-->
+<!--        alt="Current Image"-->
+<!--    >-->
+    <a id="imageLink" href="javascript:void(0)">
+        <img
+            id="currentImage"
+            src="{{ url_for('serve_image', filename=dir_path + '/' + images[index]) }}"
+            alt="Current Image"
+        >
+    </a>
+    <div class="controls">
+        <a id="prevButton" href="javascript:void(0)">
+            &#10094;
+        </a>
+        <a id="nextButton" href="javascript:void(0)">
+            &#10095;
+        </a>
+    </div>
+
+    <a class="back-to-gallery" href="/gallery/{{ dir_path }}" target="_blank">
+        返回目录
+    </a>
+
+
+    <script>
+    const images = {{ images|tojson }};
+    const dir_path = "{{ dir_path }}";
+
+    const urlParams = new URLSearchParams(window.location.search);
+    let index = parseInt(urlParams.get('index'), 10) || {{ index }};
+
+    const prevButton = document.getElementById('prevButton');
+    const nextButton = document.getElementById('nextButton');
+    const currentImage = document.getElementById('currentImage');
+    let isImageLoading = false;
+
+    // 缩放比例和位移变量
+    let scale = 1;
+    let offsetY = 0;
+
+    function updateImage() {
+        isImageLoading = true;
+        currentImage.src = "/static/images/" + dir_path + '/' + images[index];
+        const newUrl = `${window.location.pathname}?dir_path=${encodeURIComponent(dir_path)}&index=${index}`;
+        window.history.pushState({ index }, '', newUrl);
+    }
+
+    currentImage.onload = function () {
+        isImageLoading = false;
+    };
+
+    function prevImage() {
+        if (!isImageLoading) {
+            index = (index - 1 + images.length) % images.length;
+            updateImage();
+        }
+    }
+
+    function nextImage() {
+        if (!isImageLoading) {
+            index = (index + 1) % images.length;
+            updateImage();
+        }
+    }
+
+    prevButton.addEventListener('click', prevImage);
+    nextButton.addEventListener('click', nextImage);
+
+    // 鼠标滚轮事件整合
+    document.addEventListener('wheel', function(event) {
+        const target = event.target;
+
+        if (target === currentImage) {
+            // 在图片上滚动，缩放图片
+            if (event.deltaY < 0) {
+                scale = Math.min(scale + 0.1, 10); // 最大放大3倍
+            } else {
+                scale = Math.max(scale - 0.1, 0.3); // 最小缩小到0.5倍
+            }
+        } else {
+            // 在图片外滚动，调整图片的上下位置
+            offsetY -= event.deltaY > 0 ? 20 : -20;
+        }
+
+        // 应用缩放和位移
+        currentImage.style.transform = `scale(${scale}) translateY(${offsetY}px)`;
+    });
+
+    let touchStartX = 0;
+    currentImage.addEventListener('touchstart', function(e) {
+        touchStartX = e.touches[0].clientX;
+    });
+
+    currentImage.addEventListener('touchend', function(e) {
+        const touchEndX = e.changedTouches[0].clientX;
+        if (!isImageLoading) {
+            if (touchStartX - touchEndX > 50) {
+                nextImage();
+            } else if (touchEndX - touchStartX > 50) {
+                prevImage();
+            }
+        }
+    });
+
+    currentImage.addEventListener('click', function(event) {
+        if (!isImageLoading) {
+            const rect = currentImage.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const imageWidth = rect.width;
+
+            if (clickX < imageWidth / 2) {
+                prevImage();
+            } else {
+                nextImage();
+            }
+        }
+    });
+    //     // 页面卸载时记录事件
+    //     window.addEventListener("beforeunload", function () {
+    //         navigator.sendBeacon('/log_page_close', JSON.stringify({
+    //             path: window.location.pathname,
+    //             timestamp: new Date().toISOString()
+    //         }));
+    //     });
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+    const Url = window.location.href;
+    const data = {
+        src: Url,  // 你想要发送的数据
+        type: "close",
+    };
+
+    // 页面关闭时发送请求
+    window.addEventListener('beforeunload', function () {
+        fetch('/log_click', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        }).then(response => {
+            if (!response.ok) {
+                console.error('Failed to send data on page unload');
+            }
+        }).catch(error => {
+            console.error('Error logging page close:', error);
+        });
+    });
+});
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const images = {{ images|tojson }};
+    const dir_path = "{{ dir_path }}";
+    const currentImage = document.getElementById('currentImage');
+    const imageLink = document.getElementById('imageLink');
+
+    let index = parseInt(new URLSearchParams(window.location.search).get('index'), 10) || {{ index }};
+
+    function updateImage() {
+        // 更新图片源
+        currentImage.src = "/static/images/" + dir_path + '/' + images[index];
+        // 更新链接的 href
+        imageLink.href = `${window.location.pathname}?dir_path=${encodeURIComponent(dir_path)}&index=${index}`;
+        // 更新浏览器历史记录
+        window.history.pushState({ index }, '', imageLink.href);
+    }
+
+    // 点击左半部分跳转到上一张，右半部分跳转到下一张
+    currentImage.addEventListener('click', function (event) {
+        const rect = currentImage.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const imageWidth = rect.width;
+
+        if (clickX < imageWidth / 2) {
+            // 左侧点击：上一张
+            index = (index - 1 + images.length) % images.length;
+        } else {
+            // 右侧点击：下一张
+            index = (index + 1) % images.length;
+        }
+        updateImage();
+    });
+
+    // 初始化设置图片链接
+    updateImage();
+
+    const newUrl = window.location.href;
+    if (currentImage) {
+        currentImage.addEventListener('click', function (event) {
+            // 可选：将点击事件信息发送到后端
+            fetch('/log_click', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    src: newUrl,
+                    index:index,
+                    type:'change'
+                }),
+            }).then(response => console.log('Log sent:', response.ok))
+              .catch(error => console.error('Error logging image click:', error));
+        });
+    }
+
+
+
+});
+
+
+// 用于拖动图片外区域来控制图片上下移动
+let isDragging = false;
+let startY = 0; // 鼠标按下时的 Y 坐标
+let initialOffsetY = offsetY; // 记录开始时的图片偏移量
+
+// 监听鼠标按下事件，检测是否在图片外区域拖动
+document.addEventListener('mousedown', function(event) {
+    if (event.target !== currentImage) { // 如果鼠标点击在图片外区域
+        isDragging = true;
+        startY = event.clientY; // 记录鼠标初始位置
+        initialOffsetY = offsetY; // 记录当前图片的偏移量
+        document.body.style.cursor = 'grabbing'; // 修改光标为拖动状态
+    }
+});
+
+// 监听鼠标移动事件
+document.addEventListener('mousemove', function(event) {
+    if (isDragging) {
+        // 计算鼠标移动的距离
+        const deltaY = event.clientY - startY;
+        offsetY = initialOffsetY + deltaY; // 更新图片的偏移量
+        currentImage.style.transform = `scale(${scale}) translateY(${offsetY}px)`; // 应用新的偏移量
+    }
+});
+
+// 监听鼠标释放事件
+document.addEventListener('mouseup', function() {
+    isDragging = false; // 结束拖动
+    document.body.style.cursor = 'grab'; // 恢复光标为正常状态
+});
+
+
+    </script>
+</body>
+</html>

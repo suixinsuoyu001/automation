@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>index</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000; /* 背景颜色为黑色 */
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+            color: white;
+        }
+        .image-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .card {
+            text-align: center;
+            color: white;
+        }
+        img {
+            width: 200px;
+            height: auto; /* 高度自适应 */
+            display: block;
+            border: 1px solid #444;
+            box-shadow: 0 4px 8px rgba(255, 255, 255, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s ease;
+            opacity: 0; /* 初始状态隐藏 */
+            transform: translateY(10px); /* 初始偏移 */
+        }
+        img.visible {
+            opacity: 1; /* 图片加载后显示 */
+            transform: translateY(0); /* 回到初始位置 */
+        }
+        a {
+            text-decoration: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>首页</h1>
+    <div class="image-container">
+        {% for image in first_images %}
+        <div class="card">
+            <a href="/gallery/{{ image.dir_path }}"target="_blank">
+                <img
+                    data-src="{{ url_for('serve_image', filename=image.first_image) }}"
+                    alt="Directory Image"
+                    class="lazy-image"
+                >
+                <p>{{ image.dir_name }}</p>
+            </a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // 使用 Intersection Observer 实现懒加载
+        document.addEventListener("DOMContentLoaded", function () {
+            const lazyImages = document.querySelectorAll('.lazy-image');
+
+            if ('IntersectionObserver' in window) {
+                const observer = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            img.src = img.dataset.src; // 将 data-src 的值赋给 src
+                            img.onload = () => img.classList.add('visible'); // 图片加载后添加可见样式
+                            observer.unobserve(img); // 停止观察
+                        }
+                    });
+                });
+
+                lazyImages.forEach(image => {
+                    observer.observe(image); // 观察每个图片
+                });
+            } else {
+                // 不支持 IntersectionObserver 的降级处理
+                lazyImages.forEach(img => {
+                    img.src = img.dataset.src;
+                    img.onload = () => img.classList.add('visible');
+                });
+            }
+        });
+
+    </script>
+</body>
+</html>

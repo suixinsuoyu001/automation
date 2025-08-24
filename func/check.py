@@ -17,12 +17,13 @@ class check():
         self.locs = read_json(json_path)
         self.processed_screen = None
         self.size_diff = None
-        self.check_game_state()
+        # self.check_game_state()
 
-    def check_game_state(self):
-        while not get_hwnd(self.wt):
-            log(f'等待{self.wt}启动')
-        self.check_start()
+    # def check_game_state(self):
+    #     log(f'等待{self.wt}启动',level=3)
+    #     while not get_hwnd(self.wt):
+    #         time.sleep(1)
+    #     self.check_start()
 
     def get_pic_loop(self):
         while True:

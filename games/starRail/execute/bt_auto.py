@@ -53,7 +53,7 @@ def on_press(key):
         pass
 
 
-if __name__ == '__main__':
+def bt_auto():
     # 启动进程（默认开启）
     start_node()
 
@@ -62,3 +62,6 @@ if __name__ == '__main__':
     listener.start()
 
     listener.join()
+
+if __name__ == '__main__':
+    bt_auto()

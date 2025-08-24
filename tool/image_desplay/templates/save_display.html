@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>存档目录</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+
+        h1 {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .link-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 10px auto;
+            padding: 10px 20px;
+            width: 80%;
+            border: 2px solid #555;
+            border-radius: 5px;
+            background-color: #111;
+            color: white;
+            font-size: 16px;
+        }
+
+        .link-container a {
+            text-decoration: none;
+            color: white;
+            font-size: 18px;
+            flex-grow: 1;
+        }
+
+        .close-btn {
+            background-color: #383838;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .close-btn:hover {
+            background-color: #797979;
+        }
+        #index_button {
+            color: white;
+            background-color: #333;
+            border: 2px solid #555;
+            border-radius: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #index_button:hover {
+            background-color: #555;
+        }
+
+        #index_button:active {
+            color: #333;
+            border-color: #333;
+        }
+            .custom-alert {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+    </style>
+</head>
+<body>
+    <div style="position: fixed; top: 10px; left: 10px; z-index: 1000;">
+        <button id="index_button" onclick="location.href='/'">返回首页</button>
+    </div>
+    <h1>存档目录</h1>
+
+    <div id="links-container">
+        {% for name in names %}
+        <div class="link-container">
+            <a href="/log_view/{{ name }}">{{ name }}</a>
+            <button class="close-btn" onclick="removeLink(this, '{{ name }}')">×</button>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        // 删除对应的链接容器
+        function removeLink(button,name) {
+            const linkContainer = button.parentElement;
+            linkContainer.remove();
+
+            // 向后端发送删除请求
+            fetch('/remove_save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name }), // 发送 name
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Success:', data);
+
+                // 如果后端成功处理，移除对应的 DOM 元素
+                linkContainer.remove();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('删除失败，请重试！');
+            });
+        }
+    </script>
+</body>
+</html>

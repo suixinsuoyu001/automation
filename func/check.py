@@ -17,6 +17,13 @@ class check():
         self.locs = read_json(json_path)
         self.processed_screen = None
         self.size_diff = None
+        # self.check_game_state()
+
+    # def check_game_state(self):
+    #     log(f'等待{self.wt}启动',level=3)
+    #     while not get_hwnd(self.wt):
+    #         time.sleep(1)
+    #     self.check_start()
 
     def get_pic_loop(self):
         while True:
@@ -171,7 +178,7 @@ class check():
         if self.processed_screen is None:
             log('check_start未运行')
             return
-        log(f'wait_click:{name} 开始捕获')
+        log(f'wait_click:{name} 开始捕获',level=2)
         flag = 0
         while True:
             control.activate()
@@ -183,13 +190,13 @@ class check():
             if flag and not position:
                 break
             time.sleep(0.02)
-        log(f'wait_click:{name} 已捕获并点击')
+        log(f'wait_click:{name} 已捕获并点击',level=2)
 
     def wait_click_limit(self,name,t,num = 0.9):
         if self.processed_screen is None:
             log('check_start未运行')
             return
-        log(f'wait_click_limit:{name} 开始捕获')
+        log(f'wait_click_limit:{name} 开始捕获',level=2)
         flag = 0
         start_time = time.time()
         while True:
@@ -200,16 +207,16 @@ class check():
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
-                log(f'wait_click_limit:{name} 已捕获并点击')
+                log(f'wait_click_limit:{name} 已捕获并点击',level=2)
                 break
             time.sleep(0.02)
             if time.time() - start_time > t:
-                log(f'wait_click_limit:{name} 未捕获，超时取消')
+                log(f'wait_click_limit:{name} 未捕获，超时取消',level=2)
                 break
 
 
     def wait_press(self,name,key,num = 0.9):
-        log(f'wait_press:{name} 开始捕获')
+        log(f'wait_press:{name} 开始捕获',level=2)
         flag = 0
         while True:
             control.activate()
@@ -221,7 +228,7 @@ class check():
             if flag and not position:
                 break
             time.sleep(0.02)
-        log(f'wait_press:{name} 捕获 {key}已按下')
+        log(f'wait_press:{name} 捕获 {key}已按下',level=2)
 
     def waits(self,names,num = 0.9):
         log(f'waits:{names} 开始捕获')
@@ -291,9 +298,9 @@ class check():
     def scroll_click(self,name1,name2,num = 0.9):
         while self.match_one_pic(name1,num) is None:
             if not self.match_one_pic(name2, num):
-                log('name2', self.match_one_pic(name1, num))
+                log(f'{name2}', self.match_one_pic(name1, num))
                 continue
-            log('name2',self.match_one_pic(name1, num))
+            log(f'{name2}未找到 继续滑动')
             point = self.match_one_pic(name2,num)[0]
             control.scroll(-1, point)
             time.sleep(1)

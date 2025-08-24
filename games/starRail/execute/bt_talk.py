@@ -1,5 +1,5 @@
-from games.starRail.action.bt_task2 import *
-from games.starRail.action.bt_task import *
+from games.starRail.action.bt_task2 import c
+from games.starRail.action.bt_task import 剧情
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 
@@ -54,8 +54,7 @@ def on_press(key):
     except AttributeError:
         pass
 
-
-if __name__ == '__main__':
+def bt_talk():
     # 启动进程（默认开启）
     start_node()
 
@@ -64,3 +63,7 @@ if __name__ == '__main__':
     listener.start()
 
     listener.join()
+
+
+if __name__ == '__main__':
+    bt_talk()

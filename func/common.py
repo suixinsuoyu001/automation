@@ -238,7 +238,7 @@ if __name__ == '__main__':
     path = 'E:\python\pythonAuto\data\img_loc.json'
     # 16384554
     # print(get_hwnd('鸣潮'))
-    enum_all_windows()
+    # enum_all_windows()
     # time.sleep(3)
     # # 获取 user32 函数
     # user32 = ctypes.WinDLL('user32')

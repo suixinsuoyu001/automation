@@ -52,8 +52,7 @@ def on_press(key):
     except AttributeError:
         pass
 
-
-if __name__ == '__main__':
+def ys_talk():
     # 启动进程（默认开启）11
     start_node()
 
@@ -62,3 +61,6 @@ if __name__ == '__main__':
     listener.start()
 
     listener.join()
+
+if __name__ == '__main__':
+    ys_talk()

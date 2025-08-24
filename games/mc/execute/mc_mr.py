@@ -1,21 +1,19 @@
-from games.mc.action.mc_task import *
+from games.mc.action.mc_task import g_match,c,每日
+from games.mc.action.ok import open_ok_ww,close_ok_ww
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 
-def 每日():
-    c.check_start()
-    mr()
-    每日奖励()
-    先约电台()
-    change_zh()
-    c.check_stop()
 
 def run():
-    每日()
-    # 切换账号(3)
-    # 每日()
-    # 切换账号(4)
-    # 每日()
+    g_match.click('鸣潮图标')
+    c.check_start()
+    pid = open_ok_ww()
+    每日(1, 无音清剿='哀恸谷')
+    每日(2, 凝素领域='佩枪2')
+    每日(3, 无音清剿='哀恸谷')
+    c.check_stop()
+    close_ok_ww(pid)
+
 
 if __name__ == '__main__':
     run()

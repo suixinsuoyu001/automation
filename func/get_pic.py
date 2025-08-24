@@ -1,7 +1,7 @@
 import time,win32gui,win32ui,cv2
 from ctypes import windll
 import numpy as np
-from func.common import get_hwnd,log
+from func.common import get_hwnd,log,setting
 
 
 # def get_hwnd(target_title: str) -> str:
@@ -62,7 +62,8 @@ def get_pic(window_title):
         saveDC.DeleteDC()
         mfcDC.DeleteDC()
         win32gui.ReleaseDC(hwnd, hwndDC)
-        im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
+        if setting.get('resolution') != [2560, 1440]:
+           im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
         output_file = "screenshot.png"
         # cv2.imwrite(output_file, im)
         # 1450, 657

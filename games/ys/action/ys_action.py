@@ -243,7 +243,6 @@ def 登录(zh):
             click_limit('空白位置',0.5)
             if time.time() - t > 1:
                 break
-    邮件领取()
 
 def 邮件领取():
     waits(['菜单'])
@@ -768,6 +767,7 @@ def 幽境危战奖励领取():
 
 def 每日(zh_num,n):
     登录(zh[zh_num])
+    邮件领取()
     移动枫丹()
     枫丹合成台()
     res = 合成()

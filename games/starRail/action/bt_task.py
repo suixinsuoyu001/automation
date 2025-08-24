@@ -313,14 +313,14 @@ def 每日(n,type):
 def 剧情():
     num = 0.85
     while 1:
-        other_list = ['L','M','LB','消息标识']
+        other_list = ['L','M','LB','RB','消息标识']
         click_list = ['确认','前往','关闭1','关闭消息','教程翻页','教程翻页2','传送','成就领取','领取','再来一次']
         esc_names = ['空白位置1', '阅读','获得物品']
         res = c.waits_speed(other_list + click_list + esc_names,num)
         if res is None:
             continue
         log(res+' 识别')
-        if res in ['L','M','LB']:
+        if res in ['L','M','LB','RB']:
             if c.waits_speed(['确认','对话标识1', '对话标识3', '对话标识2']):
                 c.wait_click_limit(c.waits_speed(['确认','对话标识1', '对话标识3', '对话标识2']),0.1)
             else:
@@ -360,9 +360,11 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'生存索引2',0.85)
+    time.sleep(1)
+    c.save_pic_loc(r'M',0.85)
     log('执行开始')
-    委托领取()
+    c.check_start()
+    # 委托领取()
     # 返回主界面()
     # 行迹('虚无2')
     # 遗器(13)

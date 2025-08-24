@@ -18,6 +18,7 @@ def open_ok_ww():
         stderr=None
     )
     time.sleep(5)
+    pyautogui.press('f9')
     return process.pid
 
 def close_ok_ww(pid):
@@ -26,4 +27,4 @@ def close_ok_ww(pid):
 
 if __name__ == '__main__':
     pid = open_ok_ww()
-    pyautogui.press('f9')
+

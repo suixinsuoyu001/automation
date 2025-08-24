@@ -336,7 +336,7 @@ def 登录账号(n = 1):
         g_match.click(f'账号{n}_待选择')
         g_match.click('登录')
     while c.waits(['月卡标识','聊天标识','点击连接']) == '点击连接':
-        c.wait_click_limit('点击连接',2)
+        c.wait_click_limit('点击连接',2,0.8)
         time.sleep(2)
     c.waits(['月卡标识','聊天标识'])
     time.sleep(0.5)

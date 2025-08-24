@@ -141,13 +141,25 @@
         border-radius: 10px;
         text-align: center;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+
+        max-height: 80vh;  /* 最大高度限制为窗口的 80% */
+        display: flex;
+        flex-direction: column; /* 让内容和按钮分开 */
     }
 
     .custom-alert-content p {
         margin: 0 0 20px;
         font-size: 16px;
-    }
 
+        flex: 1;              /* 占据剩余空间 */
+        overflow-y: auto;     /* 超出时出现滚动条 */
+        text-align: left;     /* 内容对齐更好看 */
+    }
+    .custom-alert-content .buttons {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
     .custom-alert-content button {
         background-color: #555;
         color: white;
@@ -187,10 +199,12 @@
         </div>
         <div id="customAlert" class="custom-alert" style="display: none;">
             <div class="custom-alert-content">
-                 <input type="text" class="search-input" placeholder="输入存档名称" id="saveInput" >
+                <input type="text" class="search-input" placeholder="输入存档名称" id="saveInput">
                 <p id="alertMessage"></p>
-                <button id="saveButton">保存</button>
-                <button id="closeButton">取消</button>
+                <div class="buttons">
+                    <button id="saveButton">保存</button>
+                    <button id="closeButton">取消</button>
+                </div>
             </div>
         </div>
         <div class="image-container">

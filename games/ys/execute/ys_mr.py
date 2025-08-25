@@ -17,7 +17,7 @@ def run():
     # 打开betterGi2()
     game_start(windows_title)
     c.check_start()
-    每日(0, 1)
+    # 每日(0, 1)
     每日(1, 3)
     每日(2, 4)
     每日(3, 1)

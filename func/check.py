@@ -30,8 +30,9 @@ class check():
             time.sleep(self.time_limit)  # 10ms 检测一次鼠标移动
             if self.stop_event.is_set():  # 当 e 事件被 set 时，退出循环
                 break
+            pic = get_pic(self.wt)
             try:
-                pic = get_pic(self.wt)
+                pass
             except:
                 pic = None
                 log('图片获取失败')

@@ -93,6 +93,25 @@ def waits(names,num = num):
                 time.sleep(0.2)
                 return name
 
+def waits_many(names,num = num):
+    log(f'waits:{names} 开始捕获',level=2)
+    while c.processed_screen is None:
+        log('check_start未运行')
+    res = []
+    position = None
+    while position is None:
+        focus = get_focus_window()
+        if not (focus and '原神' in focus):
+            continue
+        for name in names:
+            if position is None:
+                position = c.check_one_pic(name,num,c.processed_screen)
+    for name in names:
+        position = c.check_one_pic(name, num, c.processed_screen)
+        if position:
+            res.append(name)
+    return res
+
 def waits_speed(names,num = num):
     log(f'waits:{names} 开始捕获',level=2)
     while c.processed_screen is None:
@@ -372,6 +391,10 @@ def 圣遗物分解():
     waits(['菜单'])
     time.sleep(1.5)
     pyautogui.press('b')
+    waits_1 = waits_many(['确认','背包_圣遗物1','背包_圣遗物2'])
+    if '确认' in waits_1:
+        click('确认')
+        time.sleep(0.5)
     click(waits(['背包_圣遗物1','背包_圣遗物2']))
     click('分解')
     click('快速选择')
@@ -814,9 +837,9 @@ zh = [
        ]
 if __name__ == '__main__':
     log('开始执行')
-    res = c.t_match.save_pic_loc('幽境危战_困难难度选择',json_path)
-    game_start(windows_title)
+    res = c.t_match.save_pic_loc('确认',json_path)
+    # game_start(windows_title)
     c.check_start()
-
+    圣遗物分解()
     # 幽境危战战斗循环(6, 2)
     c.check_stop()

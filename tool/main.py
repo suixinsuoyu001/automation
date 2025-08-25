@@ -35,6 +35,6 @@ ys_zhs = [
 
 if __name__ == '__main__':
     # bt_logins()
-    bt_login_one(6)
+    # bt_login_one(7)
     # ys_logins()
-    # ys_login_one(7)
+    ys_login_one(3)

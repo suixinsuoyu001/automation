@@ -93,6 +93,25 @@ def waits(names,num = num):
                 time.sleep(0.2)
                 return name
 
+def waits_limit(names,t = 0.5,num = num):
+    log(f'waits_limit:{names} 开始捕获',level=2)
+    while c.processed_screen is None:
+        log('check_start未运行')
+    t1 = time.time()
+    while True:
+        focus = get_focus_window()
+        if not (focus and '原神' in focus):
+            continue
+        for name in names:
+            position = c.check_one_pic(name,num,c.processed_screen)
+            if position:
+                log(f'wait: {name} 已找到',level=2)
+                time.sleep(0.2)
+                return name
+        t2 = time.time() - t1
+        if t2 > t:
+            break
+
 def waits_many(names,num = num):
     log(f'waits:{names} 开始捕获',level=2)
     while c.processed_screen is None:
@@ -262,6 +281,10 @@ def 登录(zh):
             click_limit('空白位置',0.5)
             if time.time() - t > 1:
                 break
+def 返回主界面():
+    while not waits_limit(['菜单']):
+        pyautogui.press('esc')
+        time.sleep(0.5)
 
 def 邮件领取():
     waits(['菜单'])
@@ -270,9 +293,10 @@ def 邮件领取():
     if waits(['邮件待领取','邮件'],0.95) == '邮件待领取':
         click('邮件待领取')
         click('全部领取')
-        click('空白位置')
-        click('关闭')
-    pyautogui.press('esc')
+        if waits(['空白位置','关闭']) == '空白位置':
+            click('空白位置')
+    返回主界面()
+
 
 def 移动枫丹():
     waits(['菜单'])
@@ -840,6 +864,6 @@ if __name__ == '__main__':
     res = c.t_match.save_pic_loc('确认',json_path)
     # game_start(windows_title)
     c.check_start()
-    圣遗物分解()
+    邮件领取()
     # 幽境危战战斗循环(6, 2)
     c.check_stop()

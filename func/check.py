@@ -7,7 +7,6 @@ from func.control.mc_control import *
 from games.ys.match.yolo_match import *
 from games.ys.action.ys_funtion import *
 
-control = Control()
 
 class check():
     def __init__(self,wt,path,json_path):
@@ -17,6 +16,8 @@ class check():
         self.locs = read_json(json_path)
         self.processed_screen = None
         self.size_diff = None
+        self.control = Control()
+
         # self.check_game_state()
 
     # def check_game_state(self):
@@ -50,7 +51,9 @@ class check():
         self.thread = threading.Thread(target=self.get_pic_loop)
         self.thread.start()
         time.sleep(1)
-        control.activate()
+        self.control.hwnd = get_hwnd('鸣潮  ')
+
+        self.control.activate()
         log("获取图片进程已开始")
 
     def check_stop(self):
@@ -166,10 +169,10 @@ class check():
             # return
         log(f'click:{name} 开始捕获',level=2)
         while True:
-            control.activate()
+            self.control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                control.click(position[0])
+                self.control.click(position[0])
                 time.sleep(0.5)
                 break
             time.sleep(0.02)
@@ -182,10 +185,10 @@ class check():
         log(f'wait_click:{name} 开始捕获',level=2)
         flag = 0
         while True:
-            control.activate()
+            self.control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                control.click(position[0])
+                self.control.click(position[0])
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -201,10 +204,10 @@ class check():
         flag = 0
         start_time = time.time()
         while True:
-            control.activate()
+            self.control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                control.click(position[0])
+                self.control.click(position[0])
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -220,10 +223,10 @@ class check():
         log(f'wait_press:{name} 开始捕获',level=2)
         flag = 0
         while True:
-            control.activate()
+            self.control.activate()
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
-                control.send_key(key)
+                self.control.send_key(key)
                 flag = 1
                 time.sleep(0.5)
             if flag and not position:
@@ -268,7 +271,7 @@ class check():
                 position = self.check_one_pic(name,num,self.processed_screen)
                 if position:
                     if name in names:
-                        control.click(position[0])
+                        self.control.click(position[0])
                         log(f'click_loop_until: 点击 {name}')
                         time.sleep(0.5)
                     else:
@@ -278,23 +281,23 @@ class check():
     def click_point_until(self,point,key,num = 0.9):
         log(f'click_point_until:开始获取 {key}')
         while not self.check_one_pic(key, num, self.processed_screen):
-            control.click(point)
+            self.control.click(point)
         log(f'click_point_until:已捕获 {key}')
 
     def run_until(self,name,key,num = 0.9):
         log(f'run_until:开始朝{name}移动')
         while not self.check_one_pic(name, num, self.processed_screen):
-            control.send_key(key, 0.5)
+            self.control.send_key(key, 0.5)
         log(f'run_until:已移动到{name}位置')
 
     def run(self,t):
-        control.send_key_down('w')
+        self.control.send_key_down('w')
         time.sleep(0.3)
-        control.send_key_down('shift')
+        self.control.send_key_down('shift')
         time.sleep(t)
-        control.send_key_up('shift')
+        self.control.send_key_up('shift')
         time.sleep(0.3)
-        control.send_key_up('w')
+        self.control.send_key_up('w')
 
     def scroll_click(self,name1,name2,num = 0.9):
         while self.match_one_pic(name1,num) is None:
@@ -303,7 +306,7 @@ class check():
                 continue
             log(f'{name2}未找到 继续滑动')
             point = self.match_one_pic(name2,num)[0]
-            control.scroll(-1, point)
+            self.control.scroll(-1, point)
             time.sleep(1)
         while 1:
             item_point = self.match_one_pic(name1,num)
@@ -312,7 +315,7 @@ class check():
 
             for i in self.match_pics(name2,num):
                 if item_point[0][1]<i['y']+100:
-                    control.click([i['x'],i['y']])
+                    self.control.click([i['x'],i['y']])
                     break
         log(f'scroll_click:已查找到{name1}')
     def check_one_pic(self,name,num,screen):

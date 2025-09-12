@@ -5,13 +5,11 @@ from func.common import *
 from func.check import *
 import ctypes
 import time
-from func.control.mc_control import *
 from func.control.global_match import match
 from games.mc.data.mc_data import *
 
 
 
-control = Control()
 g_match = match(image_path,0.9)
 
 
@@ -21,7 +19,7 @@ c = check(windows_title,image_path,json_path)
 def pic_click(names,matches):
     for i in names:
         if i in matches:
-            control.click(matches[i][0])
+            c.control.click(matches[i][0])
             return
 
 # def pic_press(names,matches,s):
@@ -33,20 +31,20 @@ def pic_click(names,matches):
 def loc_jl():
     print('loc_jl:开始朝奖励位置移动')
     def left_top():
-        control.send_key_down('w')
-        control.send_key_down('a')
+        c.control.send_key_down('w')
+        c.control.send_key_down('a')
         time.sleep(0.2)
-        control.send_key_up('w')
-        control.send_key_up('a')
-        control.click_mid()
+        c.control.send_key_up('w')
+        c.control.send_key_up('a')
+        c.control.click_mid()
         time.sleep(0.2)
     def right_top():
-        control.send_key_down('w')
-        control.send_key_down('d')
+        c.control.send_key_down('w')
+        c.control.send_key_down('d')
         time.sleep(0.2)
-        control.send_key_up('w')
-        control.send_key_up('d')
-        control.click_mid()
+        c.control.send_key_up('w')
+        c.control.send_key_up('d')
+        c.control.click_mid()
         time.sleep(0.2)
     while 1:
         item_point = [1257, 694]
@@ -61,7 +59,7 @@ def loc_jl():
         elif dis_x < -700:
             left_top()
         else:
-            control.send_key('w',0.5)
+            c.control.send_key('w',0.5)
         time.sleep(0.2)
     print('loc_jl:已移动至奖励位置')
 
@@ -93,11 +91,11 @@ def 传送到安全区域():
     传送点坐标 = [828, 623]
     c.wait_press('Tab', 'm')
     time.sleep(0.5)
-    control.click(切换地图坐标)
+    c.control.click(切换地图坐标)
     time.sleep(0.8)
-    control.click(黎那汐塔地图坐标)
+    c.control.click(黎那汐塔地图坐标)
     time.sleep(1)
-    control.click(传送点坐标)
+    c.control.click(传送点坐标)
     c.wait_click('快速旅行')
 
 
@@ -124,7 +122,7 @@ def 凝素领域战斗(name = '长刃2',num_limit = None):
         time.sleep(0.5)
         c.run_until('F', 'w',0.8)
         c.wait_press('F', 'f', 0.8)
-        control.send_key('shift')
+        c.control.send_key('shift')
         time.sleep(5)
         c.waits(['F', '领取奖励'], 0.8)
         time.sleep(2)
@@ -213,11 +211,11 @@ def 战歌重奏():
     c.scroll_click('乌龟','前往')
     c.wait_click('快速旅行')
     c.wait('聊天标识')
-    control.send_key_down('w')
+    c.control.send_key_down('w')
     time.sleep(0.5)
-    control.click_right()
+    c.control.click_right()
     time.sleep(4)
-    control.send_key_up('w')
+    c.control.send_key_up('w')
     c.waits(['F','领取奖励'], 0.8)
 
 def 讨伐强敌():
@@ -227,11 +225,11 @@ def 讨伐强敌():
     c.scroll_click('辉萤军势','前往')
     c.wait_click('快速旅行')
     c.wait('聊天标识')
-    control.send_key_down('w')
+    c.control.send_key_down('w')
     time.sleep(0.5)
-    control.click_right()
+    c.control.click_right()
     time.sleep(4)
-    control.send_key_up('w')
+    c.control.send_key_up('w')
     c.waits(['F','领取奖励'], 0.8)
 
 def 每日奖励():
@@ -277,7 +275,7 @@ def 活动():
         print(matches)
         for i,v in matches.items():
             if i in click_names:
-                control.click(v[0])
+                c.control.click(v[0])
             if i in esc_names:
                 c.wait_press(i, 'esc')
 
@@ -299,7 +297,7 @@ def 剧情():
         print(matches)
         for i,v in matches.items():
             if i in click_names:
-                control.click(v[0])
+                c.control.click(v[0])
             if i in esc_names:
                 c.wait_press(i, 'esc')
 

@@ -361,9 +361,10 @@ def 活动():
 
 if __name__ == '__main__':
     time.sleep(1)
-    c.save_pic_loc(r'M',0.85)
+    # c.save_pic_loc(r'M',0.85)
     log('执行开始')
-    c.check_start()
+
+    # c.check_start()
     # 委托领取()
     # 返回主界面()
     # 行迹('虚无2')

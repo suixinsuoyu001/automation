@@ -115,6 +115,16 @@ def log(*args, sep=' ', end='\n', file=None, flush=False, level=1):
     print(f'{path_link} {content}', end=end, file=file, flush=flush)
 
 
+
+def wake_screen():
+    for i in range(3):
+        # 模拟鼠标移动
+        ctypes.windll.user32.mouse_event(1, 0, 0, 0, 0)
+        time.sleep(0.1)
+        ctypes.windll.user32.mouse_event(1, 20, 0, 0, 0)
+
+
+
 def get_installed_games_with_path():
     uninstall_keys = [
         r"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
@@ -248,3 +258,4 @@ if __name__ == '__main__':
     # # 获取当前活动窗口句柄
     # hwnd = user32.GetForegroundWindow()
     # print(hwnd)
+    wake_screen()

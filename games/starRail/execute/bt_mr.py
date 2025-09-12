@@ -14,7 +14,7 @@ zhs = [
 ]
 
 def mr():
-    game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
     每日(0, 'y11')			# 流萤
     每日(1, 'y13')			# 阿格莱雅
     每日(2, 'x毁灭1')		# 希儿
@@ -37,7 +37,7 @@ def mr():
 def mr_execute():
     log('执行开始')
     c.zhs = zhs
-    game_start(windows_title)
+    # game_start(windows_title)
     mr()
     c.check_stop()
 

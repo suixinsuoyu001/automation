@@ -6,6 +6,7 @@ from func.common import *
 from func.get_pic import get_pic
 from func.match.template_match import t_match
 from func.control.back_control import Control
+from func.control.global_match import match
 
 windows_title = '崩坏：星穹铁道'
 
@@ -41,6 +42,7 @@ class check():
         self.processed_screen = None
         self.focus = False
         self.zhs = zhs
+        self.g_match = match(image_path,self.num)
 
     def is_focus(self):
         focus = get_focus_window()

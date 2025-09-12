@@ -66,7 +66,7 @@ def click_limit(name,t,num = 0.9):
     log(f'click_limit:{name} 开始捕获',level=2)
     start_time = time.time()
     while True:
-        control.activate()
+        c.control.activate()
         position = c.check_one_pic(name, num, c.processed_screen)
         if position is not None:
             pyautogui.click(get_position(position[0]))
@@ -861,9 +861,12 @@ zh = [
        ]
 if __name__ == '__main__':
     log('开始执行')
-    res = c.t_match.save_pic_loc('确认',json_path)
-    # game_start(windows_title)
+    time.sleep(1)
+    res = c.t_match.save_pic_loc('每日委托',json_path)
     c.check_start()
-    邮件领取()
+
+    click('使用')
+    # game_start(windows_title)
+    # 邮件领取()
     # 幽境危战战斗循环(6, 2)
     c.check_stop()

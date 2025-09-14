@@ -40,6 +40,7 @@ def run_process_with_timeout(fun, timeout):
 
 def BT_login():
     print('崩铁每日登录')
+    wake_screen()
     from games.starRail.execute.bt_mr import mr_execute
     mr_execute()
     close_exe('starrail')
@@ -48,6 +49,7 @@ def BT_login():
 
 def YS_login():
     print('原神登录')
+    wake_screen()
     from games.ys.execute.ys_mr import run
     run()
     close_exe('yuanshen')

@@ -32,9 +32,8 @@ ys_zhs = [
         'k6597975255692@sohu.com',      #6
         '13280859317'                   #7
        ]
-
 if __name__ == '__main__':
-    # bt_logins()
+    bt_logins()
     # bt_login_one(7)
     # ys_logins()
-    ys_login_one(3)
+    # ys_login_one(1)

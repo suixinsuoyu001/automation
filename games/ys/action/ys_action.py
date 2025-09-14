@@ -24,8 +24,8 @@ m = match(image_path,0.9)
 
 num = 0.9
 
-
-
+原粹树脂使用坐标 = (1686, 658)
+浓缩树脂使用坐标 = (1683, 815)
 
 
 def click(name, num=num):
@@ -632,6 +632,7 @@ def p(s,t = 1.0):
 
 
 def 副本战斗(fight_txt):
+    n = 0
     while True:
         c.time_limit = 0.2
         res = waits(['副本标识','F'])
@@ -667,19 +668,36 @@ def 副本战斗(fight_txt):
         pyautogui.press('f')
         time.sleep(1)
         pyautogui.moveTo([0,0])
-        if waits(['秘宝收取2','秘宝收取3'],0.95) == '秘宝收取3':
+        w1 = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识'])
+        if '秘宝领取_浓缩树脂' in w1:
             w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
-            click('使用')
-            if w_sz == '浓缩树脂1':
+            pyautogui.click(get_position(浓缩树脂使用坐标))
+            log(n)
+            if w_sz == '浓缩树脂1' and n > 2:
                 click('退出标识')
                 return
-            click('挑战')
-            waits(['任意位置关闭'])
+        if '秘宝领取_转换标识' in w1:
+            click('秘宝领取_转换')
             time.sleep(0.5)
-            click('任意位置关闭')
-            pyautogui.keyDown('w')
-            if waits_speed(['启动']):
-                pyautogui.keyUp('w')
+            pyautogui.click(get_position(原粹树脂使用坐标))
+            click('退出标识')
+            return
+        if w1 == ['秘宝领取_原粹树脂']:
+            pyautogui.press('esc')
+            time.sleep(0.5)
+            pyautogui.press('esc')
+            click('确认标识')
+            return
+
+        click('挑战')
+        waits(['任意位置关闭'])
+        time.sleep(0.5)
+        click('任意位置关闭')
+        pyautogui.keyDown('w')
+        if waits_speed(['启动']):
+            pyautogui.keyUp('w')
+
+        n += 1
 
 def 移动幽境危战():
     waits(['菜单'])
@@ -861,11 +879,12 @@ zh = [
        ]
 if __name__ == '__main__':
     log('开始执行')
-    time.sleep(1)
-    res = c.t_match.save_pic_loc('每日委托',json_path)
+    # time.sleep(1)
+    res = c.t_match.save_pic_loc('确认标识',json_path)
     c.check_start()
-
-    click('使用')
+    w = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识'])
+    log(w)
+    # click('使用')
     # game_start(windows_title)
     # 邮件领取()
     # 幽境危战战斗循环(6, 2)

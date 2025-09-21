@@ -820,7 +820,8 @@ def 幽境危战奖励领取():
 
     pyautogui.press('f')
     pyautogui.moveTo([0, 0])
-    if waits(['秘宝收取2', '秘宝收取3'], 0.95) == '秘宝收取3':
+    w1 = waits_many(['秘宝领取_原粹树脂', '秘宝领取_浓缩树脂', '秘宝领取_转换标识'])
+    if '秘宝领取_浓缩树脂' in w1:
         w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
         log(w_sz)
         click('使用')
@@ -855,8 +856,8 @@ def 每日2(zh_num,n):
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if res:
-        晶蝶()
+    if 1:
+        # 晶蝶()
         移动幽境危战()
         幽境危战战斗循环(zh_num,n)
         圣遗物分解()
@@ -880,12 +881,11 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('确认标识',json_path)
+    # res = c.t_match.save_pic_loc('地图标识蒙德1',json_path)
     c.check_start()
-    w = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识'])
-    log(w)
     # click('使用')
     # game_start(windows_title)
     # 邮件领取()
     # 幽境危战战斗循环(6, 2)
+    每日2(4,1)
     c.check_stop()

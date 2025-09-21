@@ -60,4 +60,4 @@ def get_jpgs(id, Artists, name, n=1):
 
 
 if __name__ == '__main__':
-    get_jpgs('557940', '戦乙女-mashu', '女武神')
+    get_jpgs('593948', 'YD', '圆香足')

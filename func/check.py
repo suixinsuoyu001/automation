@@ -6,7 +6,7 @@ import threading
 from func.control.mc_control import *
 from games.ys.match.yolo_match import *
 from games.ys.action.ys_funtion import *
-
+from func.control.global_match import match
 
 class check():
     def __init__(self,wt,path,json_path):
@@ -17,7 +17,8 @@ class check():
         self.processed_screen = None
         self.size_diff = None
         self.control = Control()
-
+        self.num = 0.9
+        self.g_match = match(path, self.num)
         # self.check_game_state()
 
     # def check_game_state(self):

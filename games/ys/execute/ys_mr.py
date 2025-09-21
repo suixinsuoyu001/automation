@@ -15,7 +15,8 @@ zh = [
 
 def run():
     # 打开betterGi2()
-    game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
+    # game_start(windows_title)
     c.check_start()
     每日(0, 1)
     每日(1, 3)

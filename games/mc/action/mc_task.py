@@ -253,6 +253,7 @@ def 先约电台():
     c.wait_click_limit('一键领取', 1)
     c.wait_click_limit('确定', 1)
     c.wait_click_limit('空白位置', 1)
+    c.wait_click_limit('确认', 0.5)
     c.wait_click('关闭电台')
 
 def change_zh():
@@ -311,8 +312,11 @@ def 根据特征码获取账号信息():
     return id_mapping[tzm]
 
 def 登录账号(n = 1):
-    game_start(windows_title)
-    login_match = g_match.waits(['点击连接', '登录', 'Tab'])
+    login_match = g_match.waits(['点击连接', '登录', 'Tab','鸣潮图标'])
+    if login_match == '鸣潮图标':
+        g_match.click('鸣潮图标')
+        login_match = g_match.waits(['点击连接', '登录', 'Tab'])
+
     if login_match in ['Tab']:
         id_num = 根据特征码获取账号信息()
         if id_num != n:
@@ -352,7 +356,7 @@ def 每日(n,凝素领域 = None,无音清剿 = None):
 
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('Tab', json_path, 0.8)
+    c.t_match.save_pic_loc('确认', json_path, 0.8)
     #
     #
     # 剧情()
@@ -361,4 +365,4 @@ if __name__ == '__main__':
     # 每日(3,param1='佩枪2*3',param2='哀恸谷')
 
 
-    c.check_stop()
+    # c.check_stop()

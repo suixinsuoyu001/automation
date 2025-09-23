@@ -22,7 +22,7 @@ windows_title = '原神'
 c = check(windows_title,image_path,json_path)
 m = match(image_path,0.9)
 
-num = 0.9
+num = 0.85
 
 原粹树脂使用坐标 = (1686, 658)
 浓缩树脂使用坐标 = (1683, 815)
@@ -306,7 +306,7 @@ def 移动枫丹():
         pyautogui.click(get_position([62, 591]))
     pyautogui.click(get_position([63, 846]))
     click('地图标识')
-    click(waits(['枫丹地图标识1','枫丹地图标识2']))
+    click(waits(['地图标识枫丹1','地图标识枫丹2']))
     pyautogui.click(get_position([1287, 716]))
     time.sleep(0.5)
     click_limit('传送点',1)
@@ -853,10 +853,11 @@ def 每日(zh_num,n):
 
 def 每日2(zh_num,n):
     登录(zh[zh_num])
+    邮件领取()
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if 1:
+    if res:
         # 晶蝶()
         移动幽境危战()
         幽境危战战斗循环(zh_num,n)
@@ -881,11 +882,11 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    # res = c.t_match.save_pic_loc('地图标识蒙德1',json_path)
-    c.check_start()
+    res = c.t_match.save_pic_loc('地图标识枫丹2',json_path)
+    # c.check_start()
     # click('使用')
     # game_start(windows_title)
     # 邮件领取()
     # 幽境危战战斗循环(6, 2)
-    每日2(4,1)
-    c.check_stop()
+    # 每日2(4,1)
+    # c.check_stop()

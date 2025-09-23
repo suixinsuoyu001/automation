@@ -48,6 +48,7 @@ def get_pic(window_title):
     # 尝试使用PrintWindow函数截取窗口图像
     result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 3)
     if result != 1:
+        log('PrintWindow函数截取窗口图像失败')
         return None  # 如果截取失败，则返回None
     # 从位图中获取图像数据
     bmp_info = saveBitMap.GetInfo()  # 获取位图信息

@@ -281,6 +281,10 @@ def 无名勋礼():
     c.waits(['Enter'])
     time.sleep(0.5)
     c.send_key('f2')
+    time.sleep(0.5)
+    w1 = c.waits_many(['Enter','无名勋礼任务1', '无名勋礼任务2'])
+    if 'Enter' in w1:
+        return
     if c.waits(['无名勋礼任务1','无名勋礼任务2'],0.95) == '无名勋礼任务2':
         c.click('无名勋礼任务2')
         if c.waits_limit(['一键领取']):
@@ -363,8 +367,10 @@ if __name__ == '__main__':
     time.sleep(1)
     # c.save_pic_loc(r'M',0.85)
     log('执行开始')
+    c.check_start()
+    无名勋礼()
 
-    # c.check_start()
+
     # 委托领取()
     # 返回主界面()
     # 行迹('虚无2')
@@ -375,4 +381,4 @@ if __name__ == '__main__':
     # 无名勋礼()
     # c.control.activate()
     # 活动()
-    # c.check_stop()
+    c.check_stop()

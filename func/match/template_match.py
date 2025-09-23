@@ -59,6 +59,7 @@ class t_match():
             log(f'{self.wt}未启动')
             return None
         image = get_pic(self.wt)
+
         template = load_image_with_zh_path(f'{self.path}{name}.png')
         output_file = "screenshot.png"
         # cv2.imwrite(output_file, template)

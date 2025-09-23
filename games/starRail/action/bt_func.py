@@ -245,6 +245,26 @@ class check():
                 log(f'wait_click_limit:{name} 未捕获，超时取消',level=2)
                 break
 
+    def waits_many(self, names, num=None):
+        num = self.num if num is None else num
+        if self.processed_screen is None:
+            log('check_start未运行')
+            self.check_start()
+        log(f'waits_many:{names} 开始捕获',level=2)
+        res = []
+        position = None
+        while position is None:
+            if not self.focus:
+                self.control.activate()
+            for name in names:
+                if position is None:
+                    position = self.check_one_pic(name,num,self.processed_screen)
+        for name in names:
+            position = self.check_one_pic(name, num, self.processed_screen)
+            if position:
+                res.append(name)
+        return res
+
     def click_until(self,name,item_name,num = None):
         num = self.num if num is None else num
         if self.processed_screen is None:

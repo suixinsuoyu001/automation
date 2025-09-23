@@ -33,7 +33,7 @@ ys_zhs = [
         '13280859317'                   #7
        ]
 if __name__ == '__main__':
-    bt_logins()
-    # bt_login_one(7)
+    # bt_logins()
+    # bt_login_one(9)
     # ys_logins()
-    # ys_login_one(1)
+    ys_login_one(5)

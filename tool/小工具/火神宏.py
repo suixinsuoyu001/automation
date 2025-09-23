@@ -1,7 +1,8 @@
 from games.starRail.action.bt_task2 import c
-import multiprocessing, time, pyautogui, os, signal
-from pynput import keyboard
+import multiprocessing, time, os, signal
+import pynput
 import pyautogui
+import keyboard
 
 terminate_flag = False
 
@@ -52,7 +53,9 @@ def right_hold_click(t = 0.5):
     pyautogui.mouseUp(button='right')
 
 def click_loop():
-    while True:
+    while 1:
+        print('等待按下v')
+        keyboard.wait('v')
         left_hold_click(0.25)
         left_down()
         time.sleep(0.15)
@@ -68,7 +71,7 @@ def click_loop():
         left_up()
         time.sleep(0.05)
         right_up()
-        time.sleep(5)
+        print('操作结束')
 
 
 
@@ -106,7 +109,7 @@ def stop_nodes():
 def on_press(key):
     global running_flag
     try:
-        if hasattr(key, 'vk') and key.vk == 86:
+        if hasattr(key, 'vk') and key.vk == 98:
             if running_flag:
                 stop_nodes()
             else:
@@ -117,10 +120,11 @@ def on_press(key):
 
 def start():
     # 启动键盘监听器
-    listener = keyboard.Listener(on_press=on_press)
+    listener = pynput.keyboard.Listener(on_press=on_press)
     listener.start()
     listener.join()
 
 
 if __name__ == '__main__':
     start()
+

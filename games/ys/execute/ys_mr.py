@@ -2,6 +2,13 @@ import time
 
 from games.ys.action.ys_action import *
 
+# 1 纳塔套
+# 2 生命之契燃烧套
+# 3 枫丹套
+# 4 层岩套
+# 5 下落套
+# 6 挪德卡莱套
+
 zh = [
         'kechengzhuang524@126.com',     #0
         'kemeihao694350@126.com',       #1
@@ -19,13 +26,13 @@ def run():
     # game_start(windows_title)
     c.check_start()
     每日(0, 1)
-    每日(1, 3)
+    每日(1, 5)
     每日(2, 4)
-    每日(3, 1)
+    每日(3, 5)
     每日(4, 1)
     每日(5, 1)
     每日(6, 1)
-    每日(7, 1)
+    每日(7, 5)
     c.check_stop()
 
 def run2():

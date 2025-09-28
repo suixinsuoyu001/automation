@@ -853,13 +853,18 @@ def 每日(zh_num,n):
     每日委托()
     纪行()
 
+def 成就领取():
+    while 1:
+        click('成就领取')
+        click('空白位置')
+
 def 每日2(zh_num,n):
     登录(zh[zh_num])
     邮件领取()
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if res:
+    if 1:
         # 晶蝶()
         移动幽境危战()
         幽境危战战斗循环(zh_num,n)
@@ -884,11 +889,11 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('地图标识枫丹2',json_path)
+    res = c.t_match.save_pic_loc('地图标识枫丹1',json_path)
     # c.check_start()
-    # click('使用')
-    # game_start(windows_title)
-    # 邮件领取()
-    # 幽境危战战斗循环(6, 2)
-    # 每日2(4,1)
-    # c.check_stop()
+    # # game_start(windows_title)
+    # # 邮件领取()
+    # # 幽境危战战斗循环(6, 2)
+    # # 每日2(4,1)
+    # # c.check_stop()
+    # 成就领取()

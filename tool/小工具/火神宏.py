@@ -53,9 +53,11 @@ def right_hold_click(t = 0.5):
     pyautogui.mouseUp(button='right')
 
 def click_loop():
+    pyautogui.press('q')
+    time.sleep(1.5)
     while 1:
         print('等待按下v')
-        keyboard.wait('v')
+        # keyboard.wait('v')
         left_hold_click(0.25)
         left_down()
         time.sleep(0.15)
@@ -67,10 +69,12 @@ def click_loop():
         left_down()
         time.sleep(0.15)
         right_down()
-        time.sleep(0.1)
+        time.sleep(0.4)
         left_up()
         time.sleep(0.05)
         right_up()
+        time.sleep(0.5)
+
         print('操作结束')
 
 
@@ -109,7 +113,7 @@ def stop_nodes():
 def on_press(key):
     global running_flag
     try:
-        if hasattr(key, 'vk') and key.vk == 98:
+        if hasattr(key, 'vk') and key.vk == 86:
             if running_flag:
                 stop_nodes()
             else:

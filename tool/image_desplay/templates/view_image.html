@@ -208,7 +208,7 @@
         document.addEventListener('wheel', (event) => {
             if (event.target === currentImage) {
                 scale += event.deltaY < 0 ? 0.1 : -0.1;
-                scale = Math.max(0.5, Math.min(5, scale)); // 限制缩放范围
+                scale = Math.max(0.1, Math.min(10, scale)); // 限制缩放范围
             } else {
                 offsetY -= event.deltaY > 0 ? 50 : -50;
             }

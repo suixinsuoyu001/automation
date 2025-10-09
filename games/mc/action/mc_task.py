@@ -158,8 +158,12 @@ def 凝素领域战斗(name = '长刃2',num_limit = None):
 
 def 奖励领取():
     res = 1 # 1刚使用完120体力 2刚使用完60体力 3体力耗尽
-    c.wait_click('双倍领取')
-    wait_1 = c.waits(['确定','补充结晶波片'])
+    wait_0 = c.waits(['双倍领取','确认'])
+    if wait_0 == '双倍领取':
+        c.wait_click('双倍领取')
+    else:
+        c.wait_click('确认')
+    wait_1 = c.waits(['确定','确认','补充结晶波片'])
     if wait_1 == '确定':
         c.wait_click('确定')
     elif wait_1 == '补充结晶波片':

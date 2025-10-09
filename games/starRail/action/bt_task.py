@@ -347,7 +347,7 @@ def 活动():
     while 1:
         num = 0.95
         other_list = []
-        click_list = ['kz','qd','ys','fh','s0','s7','s8']
+        click_list = ['ks1','jx1','xyz','qd','sx','zb','kspg','qr','ts']
         esc_names = ['空白位置1', '阅读','获得物品']
         click_list = [f'活动/{i}' for i in click_list]
         res = c.waits_speed(other_list + click_list + esc_names,num)
@@ -364,11 +364,10 @@ def 活动():
 
 
 if __name__ == '__main__':
-    time.sleep(1)
-    # c.save_pic_loc(r'M',0.85)
+    c.save_pic_loc(r'活动/kspg',0.85)
     log('执行开始')
     c.check_start()
-    无名勋礼()
+    # 无名勋礼()
 
 
     # 委托领取()

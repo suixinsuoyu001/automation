@@ -380,4 +380,5 @@ if __name__ == '__main__':
     # 无名勋礼()
     # c.control.activate()
     # 活动()
+    遗器('14')
     c.check_stop()

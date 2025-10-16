@@ -19,6 +19,10 @@ AutoFight = read_json('games/ys/data/AutoFight.json')
 
 windows_title = '原神'
 
+with open('games/ys/data/兑换码.txt', "r", encoding="utf-8") as fp:
+    codes = [line.strip() for line in fp]
+fp.close()
+
 c = check(windows_title,image_path,json_path)
 m = match(image_path,0.9)
 
@@ -234,25 +238,6 @@ def get_ego_angle():
     # smooth_mouse_move(500000, 0, duration=t, steps=50)
 
 
-
-
-
-def 打开betterGi():
-    m.click('betterGi')
-    if m.waits(['脚本_启动','脚本_停止']) == '脚本_启动':
-        m.click('脚本_启动')
-    else:
-        m.click('原神图标')
-
-def 打开betterGi2():
-    exe_path = r"games\ys\tool\betterGi\BetterGI.exe"
-    subprocess.Popen(exe_path)
-    # m.click('betterGi')
-    if m.waits_limit(['脚本_启动2','脚本_停止2']) == '脚本_启动2':
-        m.click('脚本_启动2')
-    else:
-        m.click('原神图标2')
-
 def 登录(zh):
     wait_start = waits(['菜单','退出登录'])
     if wait_start == '菜单':
@@ -297,6 +282,34 @@ def 邮件领取():
             click('空白位置')
     返回主界面()
 
+def 兑换码():
+    waits(['菜单'])
+    time.sleep(0.5)
+    pyautogui.press('esc')
+    if waits(['邮件待领取','邮件'],0.95):
+        pyautogui.click([55, 1096])
+    waits(['关闭'])
+    pyautogui.click([227, 753])
+    for code in codes:
+        click('兑换码_前往兑换')
+        click('兑换码_输入兑换码')
+        keyboard.write(code, delay=0.01)
+        waits(['兑换码_兑换'])
+        time.sleep(0.3)
+        click('兑换码_兑换')
+        if c.waits(['兑换码_兑换码已被使用','兑换码_确认']) == '兑换码_兑换码已被使用':
+            click('退出标识')
+        else:
+            click('兑换码_确认')
+            click('退出标识')
+    time.sleep(0.5)
+    click('关闭')
+    if waits(['邮件待领取','邮件'],0.95) == '邮件待领取':
+        click('邮件待领取')
+        click('全部领取')
+        if waits(['空白位置','关闭']) == '空白位置':
+            click('空白位置')
+    返回主界面()
 
 def 移动枫丹():
     waits(['菜单'])
@@ -889,11 +902,12 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('须弥地图标识1',json_path)
+    res = c.t_match.save_pic_loc('退出标识',json_path)
     c.check_start()
     # # game_start(windows_title)
     # # 邮件领取()
     # # 幽境危战战斗循环(6, 2)
     # # 每日2(4,1)
-    成就领取()
+    # 成就领取()
+    兑换码()
     c.check_stop()

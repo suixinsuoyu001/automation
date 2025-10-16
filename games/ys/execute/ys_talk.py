@@ -17,7 +17,7 @@ def worker1():
         talk()
 
 
-# 定义启动节点的函数（启动所有进程）
+# 定义启动节点的函数（启动所有进程）1
 def start_node():
     global processes
     print("Starting processes...")

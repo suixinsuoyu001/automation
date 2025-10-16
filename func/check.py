@@ -17,7 +17,7 @@ class check():
         self.processed_screen = None
         self.size_diff = None
         self.control = Control()
-        self.num = 0.9
+        self.num = 0.85
         self.g_match = match(path, self.num)
         # self.check_game_state()
 
@@ -220,7 +220,9 @@ class check():
                 break
 
 
-    def wait_press(self,name,key,num = 0.9):
+    def wait_press(self,name,key,num = None):
+        if num is None:
+            num = self.num
         log(f'wait_press:{name} 开始捕获',level=2)
         flag = 0
         while True:

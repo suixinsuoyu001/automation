@@ -10,7 +10,7 @@ from games.mc.data.mc_data import *
 
 
 
-g_match = match(image_path,0.9)
+g_match = match(image_path,0.85)
 
 
 c = check(windows_title,image_path,json_path)
@@ -360,7 +360,9 @@ def 每日(n,凝素领域 = None,无音清剿 = None):
 
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('确认', json_path, 0.8)
+    c.t_match.save_pic_loc('Tab', json_path, 0.8)
+    c.check_start()
+    c.wait_press('Tab', 'esc')
     #
     #
     # 剧情()

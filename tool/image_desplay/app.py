@@ -69,7 +69,6 @@ def gallery(dir_path):
         images = sorted(images, key=lambda x: int(os.path.splitext(x)[0]))
     except:
         pass
-    print(images)
     if not images:
         return render_template("gallery.html", images=[], dir_path=dir_path, error="No images found in this directory.")
     return render_template("gallery.html", images=images, dir_path=dir_path)

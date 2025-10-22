@@ -902,7 +902,7 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('退出标识',json_path)
+    res = c.t_match.save_pic_loc('登录其他账号',json_path)
     c.check_start()
     # # game_start(windows_title)
     # # 邮件领取()

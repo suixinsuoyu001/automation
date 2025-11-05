@@ -98,7 +98,7 @@ def 巡星之礼领取():
     返回主界面()
 
 def 返回主界面():
-    while not c.waits_limit(['Enter'],0.4):
+    while not c.waits_limit(['Enter'],0.8):
         c.send_key('esc')
         time.sleep(0.3)
     c.control.activate()
@@ -130,6 +130,7 @@ def 每月抽卡兑换():
         else:
             抽卡兑换()
     c.check_stop()
+
 
 # 1 循环战斗 2 单次战斗 （默认队伍1战斗）
 def 战斗循环(flag = 1):
@@ -167,6 +168,7 @@ def 战斗循环(flag = 1):
         time.sleep(1)
     返回主界面()
 
+
 def 遗器(n,flag = 1):
     n = int(n)
     c.waits(['Enter'])
@@ -201,8 +203,8 @@ def 每日助战(sign = None):
     c.waits('+')
     for i in range(2):
         c.click('+')
-
     战斗循环(2)
+
 
 def 委托领取():
     now = datetime.now()
@@ -220,6 +222,7 @@ def 委托领取():
         c.wait_click_limit('一键领取',0.5)
         c.wait_click_limit('再次派遣',0.5,0.9)
     返回主界面()
+
 
 def 合成():
     c.waits(['Enter'])
@@ -345,7 +348,7 @@ def 剧情():
 
 def 活动():
     while 1:
-        num = 0.95
+        num = 0.8
         other_list = []
         click_list = ['ks1','jx1','xyz','qd','sx','zb','kspg','qr','ts']
         esc_names = ['空白位置1', '阅读','获得物品']
@@ -364,7 +367,7 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'活动/kspg',0.85)
+    c.save_pic_loc(r'退出关卡',0.85)
     log('执行开始')
     c.check_start()
     # 无名勋礼()

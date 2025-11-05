@@ -14,16 +14,16 @@ windows_title = '崩坏：星穹铁道'
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 zhs = [
-    'suixin001007@163.com', #0
-    'suixin001006@163.com', #1
-    'suixin001009@163.com', #2
-    'suixin001001@163.com', #3
-    '13280859317',          #4
-    'suixin001002@163.com', #5
-    'suixin001005@163.com', #6
-    'suixin001003@163.com', #7
-    'suixin001004@163.com', #8
-    'suixin001008@163.com', #9
+    'suixin001007@163.com', #0	流萤
+    'suixin001006@163.com', #1	阿格莱雅
+    'suixin001001@163.com', #2	大黑塔
+    '13280859317',          #3	黄泉
+    'suixin001002@163.com', #4 	遐蝶
+    'suixin001005@163.com', #5 	万敌
+    'suixin001008@163.com', #6	风堇
+    'suixin001009@163.com', #7	希儿
+    'suixin001003@163.com', #8	龙丹
+    'suixin001004@163.com', #9	暂无
 ]
 
 class check():

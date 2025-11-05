@@ -1,8 +1,0 @@
-钟离 e(hold)
-纳西妲 e(hold)
-八重神子 e,wait(0.35),e,wait(0.35),e,wait(0.5)
-久岐忍 e,q,wait(5)
-钟离 e(hold)
-纳西妲 e(hold),q
-八重神子 e,wait(0.35),e,wait(0.35),e,wait(0.5)
-久岐忍 e,q,wait(5)

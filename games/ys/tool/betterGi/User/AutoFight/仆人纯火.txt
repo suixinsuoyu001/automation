@@ -1,5 +1,0 @@
-仆人 e,charge(1)
-钟离 s(0.1),e(hold)
-希诺宁 e,attack(0.8),q
-班尼特 e,q
-仆人 attack(2),dash,attack(2),dash

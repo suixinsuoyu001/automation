@@ -43,6 +43,6 @@ def talk():
         time.sleep(0.1)
 
 if __name__ == '__main__':
-    res = c.t_match.save_pic_loc('对话标识1',json_path)
+    res = c.t_match.save_pic_loc('剧情标识',json_path)
     # print(res)
     # talk()

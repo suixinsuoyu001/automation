@@ -63,7 +63,7 @@ def move(name, num=num):
         time.sleep(0.02)
     log(f'click:{name} 已捕获并点击',level=2)
 
-def click_limit(name,t,num = 0.9):
+def click_limit(name,t,num = num):
     if c.processed_screen is None:
         log('check_start未运行')
         return
@@ -260,7 +260,7 @@ def 登录(zh):
         click('空月祝福')
         if waits(['空月祝福', '空白位置']) == '空月祝福':
             click('空月祝福')
-        waits(['空白位置'])
+        waits(['空白位置'],0.8)
         t = time.time()
         while True:
             click_limit('空白位置',0.5)
@@ -767,7 +767,7 @@ def 幽境危战战斗循环(zh_num,n):
     elif zh_num == 6:
         fight_txt = '仆钟希班_幽境危战'
     elif zh_num == 7:
-        fight_txt = '恰斯卡_幽境危战'
+        fight_txt = '菲伊砂心_幽境危战'
     else:
         fight_txt = None
     waits(['菜单'])
@@ -837,7 +837,7 @@ def 幽境危战奖励领取():
     pyautogui.moveTo([0, 0])
     w1 = waits_many(['秘宝领取_原粹树脂', '秘宝领取_浓缩树脂', '秘宝领取_转换标识'])
     if '秘宝领取_浓缩树脂' in w1:
-        w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
+        w_sz = waits(['浓缩树脂1', '浓缩树脂标识'],0.95)
         log(w_sz)
         click('使用')
         if w_sz == '浓缩树脂1':
@@ -877,7 +877,7 @@ def 每日2(zh_num,n):
     移动枫丹()
     枫丹合成台()
     res = 合成()
-    if 1:
+    if res:
         # 晶蝶()
         移动幽境危战()
         幽境危战战斗循环(zh_num,n)
@@ -902,12 +902,10 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('登录其他账号',json_path)
+    res = c.t_match.save_pic_loc('空白位置',json_path)
     c.check_start()
-    # # game_start(windows_title)
-    # # 邮件领取()
-    # # 幽境危战战斗循环(6, 2)
-    # # 每日2(4,1)
+    幽境危战战斗循环(5, 3)
+    # 每日2(7,1)
     # 成就领取()
-    兑换码()
+    # 兑换码()
     c.check_stop()

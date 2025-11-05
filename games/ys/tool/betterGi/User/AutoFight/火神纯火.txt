@@ -1,6 +1,0 @@
-钟离 s(0.1),e(hold)
-玛薇卡 w(0.5),dash,wait(0.2),e
-班尼特 e
-希诺宁 e,attack(0.8),q
-班尼特 q
-玛薇卡 e,q,charge(5)

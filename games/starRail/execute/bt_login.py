@@ -14,9 +14,9 @@ def logins():
     game_start(windows_title)
     for zh in c.zhs:
         登录(zh)
-        # 邮件领取()
+        邮件领取()
         # 巡星之礼领取()
-        兑换码()
+        # 兑换码()
         if c.is_focus():
             c.control.activate()
         log('等待按下0')
@@ -37,5 +37,5 @@ zhs = [
 ]
 
 if __name__ == '__main__':
-    # logins()
-    login_one(6)
+    logins()
+    # login_one(4)

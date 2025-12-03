@@ -149,7 +149,7 @@ def 战斗循环(flag = 1):
     elif flag == 3:
         if c.waits(['队伍1', '队伍1选中']) == '队伍1':
             c.click('队伍1')
-        c.click('支援')
+        c.wait_click('支援')
         c.click('入队')
     c.wait_click('开始挑战')
     while True:
@@ -175,7 +175,7 @@ def 遗器(n,flag = 1):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','侵蚀隧洞',0.7)
+    c.move_click('拟造花萼赤','侵蚀隧洞',0.7)
     c.move_wait('副本标识', f'遗器副本{n}')
     c.click_move_item(f'遗器副本{n}','进入')
     战斗循环(flag)
@@ -185,7 +185,8 @@ def 行迹(name,flag = 1):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','拟造花萼赤',0.7)
+    # c.move_click('拟造花萼金','拟造花萼赤',0.7)
+    c.click('拟造花萼赤',0.7)
     c.move_wait('副本标识', f'行迹{name}')
     c.click_move_item(f'行迹{name}','进入')
     for i in range(6):
@@ -199,7 +200,8 @@ def 每日助战(sign = None):
     c.waits(['Enter'])
     c.send_key('f4')
     c.click(c.waits(['生存索引1','生存索引2']))
-    c.move_click('拟造花萼金','拟造花萼赤',0.7)
+    # c.move_click('拟造花萼金','拟造花萼赤',0.7)
+    c.click('拟造花萼赤',0.7)
     c.click_move_item(sign, '进入')
     c.waits('+')
     for i in range(2):
@@ -312,6 +314,7 @@ def 每日(n,type):
     if type.startswith('x'):
         行迹(type.replace('x',''),flag)
     elif type.startswith('y'):
+        print(type.replace('y',''),flag)
         遗器(type.replace('y',''),flag)
     委托领取()
     每日奖励()
@@ -364,7 +367,7 @@ def 活动():
         if res in esc_names:
             c.send_key('esc')
 
-
+    每日助战('行迹毁灭特殊')
 if __name__ == '__main__':
     c.save_pic_loc(r'空白位置1',0.85)
     log('执行开始')

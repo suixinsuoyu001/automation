@@ -287,9 +287,9 @@ def 兑换码():
     time.sleep(0.5)
     pyautogui.press('esc')
     if waits(['邮件待领取','邮件'],0.95):
-        pyautogui.click([55, 1096])
+        pyautogui.click(get_position([55, 1096]))
     waits(['关闭'])
-    pyautogui.click([227, 753])
+    pyautogui.click(get_position([227, 753]))
     for code in codes:
         click('兑换码_前往兑换')
         click('兑换码_输入兑换码')
@@ -576,7 +576,7 @@ def 须弥回血传送():
     click('地图标识')
     click(waits(['须弥地图标识1','须弥地图标识2']))
     pyautogui.click(get_position([1885, 1183]))
-    click('须弥传送点1')
+    # click('须弥传送点1')
     time.sleep(0.4)
     click_limit('传送',1)
     waits(['菜单'])
@@ -856,7 +856,7 @@ def 每日(zh_num,n):
     if res:
         切换副本队伍()
         # 晶蝶()
-        须弥回血传送()
+        # 须弥回血传送()
         秘境_圣遗物(zh_num,n)
         圣遗物分解()
         切换常用队伍()
@@ -909,5 +909,5 @@ if __name__ == '__main__':
     # 幽境危战战斗循环(5, 3)
     # 每日2(7,1)
     # 成就领取()
-    # 兑换码()
+    兑换码()
     c.check_stop()

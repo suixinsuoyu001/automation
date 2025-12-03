@@ -53,7 +53,7 @@ def on_press(key):
         pass
 
 def ys_talk():
-    # 启动进程（默认开启）11
+    # 启动进程（默认开启）
     start_node()
 
     # 启动键盘监听器

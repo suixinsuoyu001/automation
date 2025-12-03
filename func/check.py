@@ -227,6 +227,7 @@ class check():
         flag = 0
         while True:
             self.control.activate()
+            log(num)
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
                 self.control.send_key(key)

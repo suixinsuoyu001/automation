@@ -366,7 +366,7 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'空白位置',0.85)
+    c.save_pic_loc(r'空白位置1',0.85)
     log('执行开始')
     c.check_start()
     # 无名勋礼()

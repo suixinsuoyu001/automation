@@ -903,7 +903,7 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('空白位置',json_path)
+    res = c.t_match.save_pic_loc('登录其他账号',json_path)
     c.check_start()
     须弥回血传送()
     # 幽境危战战斗循环(5, 3)

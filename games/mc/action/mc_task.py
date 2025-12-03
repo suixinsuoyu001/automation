@@ -360,9 +360,9 @@ def 每日(n,凝素领域 = None,无音清剿 = None):
 
 
 if __name__ == '__main__':
-    c.t_match.save_pic_loc('Tab', json_path, 0.8)
+    c.t_match.save_pic_loc('F', json_path, 0.8)
     c.check_start()
-    c.wait_press('Tab', 'esc')
+    c.wait_press('F', 'f', 0.8)
     #
     #
     # 剧情()

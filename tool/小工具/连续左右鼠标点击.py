@@ -13,9 +13,11 @@ processes = []
 
 def loop_click():
     while True:
-        pyautogui.leftClick()
-        pyautogui.rightClick()
-        time.sleep(0.1)
+        pyautogui.press('f')
+        pyautogui.press('j')
+        pyautogui.press('space')
+        pyautogui.press('e')
+        time.sleep(0.2)
 
 # 定义进程1的函数
 def worker1():

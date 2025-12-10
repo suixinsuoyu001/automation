@@ -11,6 +11,7 @@ def logins():
         # if zh in [zhs[4],zhs[5]]:
         #     continue
         登录(zh)
+        # 兑换码()
         log('等待按下0')
         keyboard.wait('0')
     c.check_stop()
@@ -35,5 +36,5 @@ zhs = [
 
 if __name__ == '__main__':
 
-    # logins()
-    login_one(1)
+    logins()
+    # login_one(7)

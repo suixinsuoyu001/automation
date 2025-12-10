@@ -366,7 +366,7 @@ def 活动():
 
 
 if __name__ == '__main__':
-    c.save_pic_loc(r'空白位置1',0.85)
+    c.save_pic_loc(r'兑换码',0.85)
     log('执行开始')
     c.check_start()
     # 无名勋礼()
@@ -379,5 +379,6 @@ if __name__ == '__main__':
     # 无名勋礼()
     # c.control.activate()
     # 活动()
-    遗器('14')
+    # 遗器('14')
+    兑换码()
     c.check_stop()

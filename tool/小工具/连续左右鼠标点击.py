@@ -17,6 +17,7 @@ def loop_click():
         pyautogui.press('j')
         pyautogui.press('space')
         pyautogui.press('e')
+        pyautogui.press('q')
         time.sleep(0.2)
 
 # 定义进程1的函数

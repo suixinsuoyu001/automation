@@ -5,7 +5,8 @@ from games.ys.action.ys_action import *
 
 
 def logins():
-    game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
+    # game_start(windows_title)
     c.check_start()
     for zh in zhs:
         # if zh in [zhs[4],zhs[5]]:
@@ -17,7 +18,8 @@ def logins():
     c.check_stop()
 
 def login_one(n):
-    game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
+    # game_start(windows_title)
     c.check_start()
     登录(zh[n])
     c.check_stop()
@@ -36,5 +38,5 @@ zhs = [
 
 if __name__ == '__main__':
 
-    logins()
-    # login_one(7)
+    # logins()
+    login_one(5)

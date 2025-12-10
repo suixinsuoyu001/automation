@@ -5,13 +5,15 @@ import keyboard
 
 def login_one(n):
     c.zhs = zhs
-    game_start(windows_title)
+    # game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
     登录(c.zhs[n])
     c.check_stop()
 
 def logins():
     c.zhs = zhs
-    game_start(windows_title)
+    # game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
     for zh in c.zhs:
         登录(zh)
         # 邮件领取()

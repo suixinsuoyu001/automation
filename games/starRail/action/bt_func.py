@@ -433,18 +433,18 @@ class check():
 if __name__ == '__main__':
     # game_start(windows_title)
     c = check(windows_title)
-    # c.save_pic_loc('空白位置',0.8)
+    c.save_pic_loc('输入兑换码',0.8)
 
 
-    c.check_start()
+    # c.check_start()
     # c.move_click('拟造花萼金','侵蚀隧洞')
     # c.move_wait('侵蚀隧洞标识', '遗器副本1')
 
     # c.check_start()
     # c.waits(['test'])
-    while True:
-        c.wait_click('再来一次')
-        time.sleep(3)
+    # while True:
+    #     c.wait_click('再来一次')
+    #     time.sleep(3)
     #
     # # c.send_key('esc')
     # # time.sleep(0.5)
@@ -457,4 +457,4 @@ if __name__ == '__main__':
     # # c.wait_click('分解')
     #
     #
-    c.check_stop()
+    # c.check_stop()

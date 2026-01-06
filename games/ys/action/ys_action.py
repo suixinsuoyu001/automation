@@ -462,7 +462,7 @@ def 秘境_圣遗物(zh_num,num):
     if zh_num == 0:
         fight_txt = '火茜希芙'
     elif zh_num == 1:
-        fight_txt = '那维莱特'
+        fight_txt = '丝爱心塔'
     elif zh_num == 2:
         fight_txt = '散兵'
     elif zh_num == 3:
@@ -906,8 +906,7 @@ if __name__ == '__main__':
     # time.sleep(1)
     res = c.t_match.save_pic_loc('秘宝领取_20原粹树脂',json_path)
     c.check_start()
-    秘境_圣遗物(7, 6)
-    # 须弥回血传送()
+    秘境_圣遗物(1, 5)
     # # 幽境危战战斗循环(5, 3)
     # # 每日2(7,1)
     # # 成就领取()

@@ -56,3 +56,6 @@ if __name__ == '__main__':
     # # 每日(0,1)
     run()
     # run2()
+    # c.check_start()
+    # 每日2(1, 3)
+    # click(waits(['枫丹地图标识1', '枫丹地图标识2']))

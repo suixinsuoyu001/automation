@@ -36,10 +36,11 @@ def run():
     c.check_stop()
 
 def run2():
-    game_start(windows_title)
+    c.g_match.click(f'图标{resolution[0]}')
+    # game_start(windows_title)
     c.check_start()
-    每日2(0,1)
-    每日2(1,1)
+    每日2(0,3)
+    每日2(1,3)
     每日2(2,3)
     每日2(3,3)
     每日2(4,3)

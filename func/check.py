@@ -227,7 +227,7 @@ class check():
         flag = 0
         while True:
             self.control.activate()
-            log(num)
+            # log(num)
             position = self.check_one_pic(name, num, self.processed_screen)
             if position is not None:
                 self.control.send_key(key)
@@ -247,7 +247,7 @@ class check():
             for name in names:
                 position = self.check_one_pic(name,num,self.processed_screen)
                 if position:
-                    log(f'wait: {name} 已找到')
+                    log(f'wait: {name} 已找到',level=2)
                     time.sleep(0.5)
                     return name
 

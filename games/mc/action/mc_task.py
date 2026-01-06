@@ -49,7 +49,8 @@ def loc_jl():
     while 1:
         item_point = [1257, 694]
         match = c.match_one_pic('领取奖励',0.8)
-        if not match:
+        match2 = c.match_one_pic('F', 0.8)
+        if match2:
             break
         point = match[0]
         dis_x = point[0]-item_point[0]
@@ -87,7 +88,7 @@ def 每日资源(凝素领域 = None,无音清剿 = None):
 
 def 传送到安全区域():
     切换地图坐标 = [2132, 1338]
-    黎那汐塔地图坐标 = [1564, 228]
+    黎那汐塔地图坐标 = [1594, 370]
     传送点坐标 = [828, 623]
     c.wait_press('Tab', 'm')
     time.sleep(0.5)
@@ -199,12 +200,15 @@ def 无音清剿战斗(name,num_limit = None):
         if wait_res == 'F':
             c.wait_press('F', 'f', 0.8)
         elif wait_res == '领取奖励':
+            time.sleep(1)
             loc_jl()
             c.wait_press('F', 'f', 0.8)
         res = 奖励领取()
         if res != 3:
             num += 1
         if num == num_limit or res != 1:
+            return num
+        if num == 2 and res == 1:
             return num
 
 
@@ -362,7 +366,9 @@ def 每日(n,凝素领域 = None,无音清剿 = None):
 if __name__ == '__main__':
     c.t_match.save_pic_loc('F', json_path, 0.8)
     c.check_start()
-    c.wait_press('F', 'f', 0.8)
+    # 传送到安全区域()
+    loc_jl()
+    # c.wait_press('F', 'f', 0.8)
     #
     #
     # 剧情()

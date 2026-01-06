@@ -474,7 +474,7 @@ def 秘境_圣遗物(zh_num,num):
     elif zh_num == 6:
         fight_txt = '仆人'
     elif zh_num == 7:
-        fight_txt = '申鹤'
+        fight_txt = '菲伊心爱'
     else:
         fight_txt = None
 
@@ -684,21 +684,22 @@ def 副本战斗(fight_txt):
         pyautogui.press('f')
         time.sleep(1)
         pyautogui.moveTo([0,0])
-        w1 = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识'])
+        w1 = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识','秘宝领取_20原粹树脂'])
         if '秘宝领取_浓缩树脂' in w1:
             w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
             pyautogui.click(get_position(浓缩树脂使用坐标))
             log(n)
-            if w_sz == '浓缩树脂1' and n > 2:
+            if w_sz == '浓缩树脂1' and n >= 2:
                 click('退出标识')
                 return
-        if '秘宝领取_转换标识' in w1:
-            click('秘宝领取_转换')
-            time.sleep(0.5)
+        elif '秘宝领取_转换标识' in w1:
+            if '秘宝领取_20原粹树脂' in w1:
+                click('秘宝领取_转换')
+                time.sleep(0.5)
             pyautogui.click(get_position(原粹树脂使用坐标))
             click('退出标识')
             return
-        if w1 == ['秘宝领取_原粹树脂']:
+        elif '秘宝领取_原粹树脂' in w1:
             pyautogui.press('esc')
             time.sleep(0.5)
             pyautogui.press('esc')
@@ -903,11 +904,12 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('登录其他账号',json_path)
+    res = c.t_match.save_pic_loc('秘宝领取_20原粹树脂',json_path)
     c.check_start()
-    须弥回血传送()
-    # 幽境危战战斗循环(5, 3)
-    # 每日2(7,1)
-    # 成就领取()
-    兑换码()
-    c.check_stop()
+    秘境_圣遗物(7, 6)
+    # 须弥回血传送()
+    # # 幽境危战战斗循环(5, 3)
+    # # 每日2(7,1)
+    # # 成就领取()
+    # 兑换码()
+    # c.check_stop()

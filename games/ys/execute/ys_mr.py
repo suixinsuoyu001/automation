@@ -38,8 +38,8 @@ def run():
 def run2():
     game_start(windows_title)
     c.check_start()
-    每日2(0,1)
-    每日2(1,1)
+    每日2(0,3)
+    每日2(1,3)
     每日2(2,3)
     每日2(3,3)
     每日2(4,3)
@@ -55,3 +55,6 @@ if __name__ == '__main__':
     # # 每日(0,1)
     run()
     # run2()
+    # c.check_start()
+    # 每日2(1, 3)
+    # click(waits(['枫丹地图标识1', '枫丹地图标识2']))

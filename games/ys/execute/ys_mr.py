@@ -25,7 +25,7 @@ def run():
     c.g_match.click(f'图标{resolution[0]}')
     # game_start(windows_title)
     c.check_start()
-    每日(0, 1)
+    每日(0, 7)
     每日(1, 5)
     每日(2, 6)
     每日(3, 5)

@@ -1,8 +1,6 @@
 from games.starRail.action.bt_task import *
 import keyboard
 
-
-
 def login_one(n):
     c.zhs = zhs
     # game_start(windows_title)
@@ -28,16 +26,16 @@ def logins():
 zhs = [
     'suixin001007@163.com', #0	流萤
     'suixin001006@163.com', #1	阿格莱雅
-    'suixin001001@163.com', #2	大黑塔
-    '13280859317',          #3	黄泉
-    'suixin001002@163.com', #4 	遐蝶
-    'suixin001005@163.com', #5 	万敌
-    'suixin001008@163.com', #6	风堇
-    'suixin001009@163.com', #7	希儿
-    'suixin001003@163.com', #8	龙丹
-    'suixin001004@163.com', #9	暂无
+    'suixin001009@163.com', #2	希儿
+    'suixin001001@163.com', #3	大黑塔
+    '13280859317',          #4	黄泉
+    'suixin001002@163.com', #5 	遐蝶
+    'suixin001005@163.com', #6 	万敌
+    'suixin001003@163.com', #7	龙丹
+    'suixin001004@163.com', #8	暂无
+    'suixin001008@163.com', #9	风堇
 ]
 
 if __name__ == '__main__':
-    # logins()
-    login_one(1)
+    logins()
+    # login_one(9)

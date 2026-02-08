@@ -6,7 +6,7 @@ import keyboard
 
 c = check(windows_title)
 
-fp = open('games/starRail/data/codes.txt', 'r')
+fp = open('games/starRail/data/codes.txt', 'r', encoding='utf-8')
 codes = [i.replace('\n', '') for i in fp.readlines()]
 
 phone_position = (29, 57)

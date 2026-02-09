@@ -53,6 +53,17 @@ class match():
                 log(f'click:{name} 已捕获并点击')
                 break
 
+    def move(self,name,num = None):
+        log(f'move:{name} 开始捕获')
+        if num is None:
+            num = self.num
+        while True:
+            matches = self.find_image_on_screen(name,num)
+            if matches:
+                pyautogui.click(matches[0])
+                log(f'move:{name} 已捕获并移动')
+                break
+
     def wait(self,name,num = None):
         if num is None:
             num = self.num

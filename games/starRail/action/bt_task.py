@@ -1,5 +1,7 @@
 from datetime import datetime
 
+import pyautogui
+
 from games.starRail.action.bt_func import check,windows_title
 from func.common import *
 import keyboard
@@ -37,6 +39,7 @@ def 登录(zh):
     c.text_input('输入密码', 'zxc147123')
     c.wait_click('同意')
     c.wait_click_limit('进入游戏')
+    资料验证()
     c.wait_click_limit('开始游戏')
     c.wait_click('点击进入')
     while True:
@@ -60,7 +63,34 @@ def 登录(zh):
         c.send_key('i')
 
 
-
+def 资料验证():
+    w = c.g_match.waits(['1920/资料验证','1920/开始游戏'])
+    if w == '1920/资料验证':
+        c.g_match.click('1920/资料验证')
+        c.g_match.click('1920/同意')
+        c.g_match.click('1920/输入名字')
+        keyboard.write('郭修传', delay=0.01)
+        c.g_match.click('1920/输入身份证')
+        keyboard.write('370214199711095557', delay=0.01)
+        c.g_match.click('1920/常用登录地')
+        c.g_match.move('1920/北京')
+        pyautogui.scroll(-700)
+        c.g_match.move('1920/山东')
+        c.g_match.move('1920/青岛')
+        c.g_match.click('1920/常用设备')
+        c.g_match.click('1920/PC')
+        c.g_match.click('1920/PC')
+        pyautogui.scroll(-1000)
+        c.g_match.click('1920/是否绑定第三方账号')
+        c.g_match.click('1920/否')
+        c.g_match.click('1920/90天')
+        c.g_match.click('1920/否2')
+        c.g_match.click('1920/最近一次')
+        c.g_match.click('1920/崩铁')
+        c.g_match.click('1920/选择日期')
+        time.sleep(0.5)
+        c.g_match.click('1920/4')
+        c.g_match.click('1920/提交')
 
 
 def 批量账号执行(fun1 = None ,fun2 = None, fun3 = None):
@@ -371,7 +401,7 @@ def 活动():
 if __name__ == '__main__':
     c.save_pic_loc(r'兑换码',0.85)
     log('执行开始')
-    c.check_start()
+    # c.check_start()
     # 无名勋礼()
     # 委托领取()
     # 返回主界面()
@@ -383,5 +413,9 @@ if __name__ == '__main__':
     # c.control.activate()
     # 活动()
     # 遗器('14')
-    兑换码()
-    c.check_stop()
+    # 兑换码()
+    # c.check_stop()
+
+
+
+

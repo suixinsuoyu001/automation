@@ -39,5 +39,5 @@ zhs = [
 if __name__ == '__main__':
 
     # logins()
-    login_one(5)
+    login_one(6)
 # 活动剧情没做 0

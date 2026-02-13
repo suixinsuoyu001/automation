@@ -11,6 +11,9 @@ codes = [i.replace('\n', '') for i in fp.readlines()]
 
 phone_position = (29, 57)
 yk_position = (1285, 1209)
+空白位置 = (1272, 1358)
+助战角色替换 = (2274, 758)
+选择助战角色 = (127, 339)
 
 def 登录(zh):
     if type(zh) == int:
@@ -85,7 +88,9 @@ def 邮件领取():
     if c.waits(['邮件1','邮件2'],0.92) == '邮件1':
         c.wait_click('邮件1')
         c.wait_click('全部领取')
-        c.wait_click('空白位置',0.85)
+        time.sleep(1)
+        c.click_point(空白位置)
+        time.sleep(0.5)
     返回主界面()
 
 def 巡星之礼领取():
@@ -136,6 +141,14 @@ def 每月抽卡兑换():
 # 1 循环战斗 2 单次战斗 （默认队伍1战斗）
 def 战斗循环(flag = 1):
     c.wait_click('挑战')
+    def 支援():
+        c.wait_click('支援2')
+        time.sleep(1)
+        c.click_point(get_position(助战角色替换))
+        time.sleep(0.5)
+        c.click_point(get_position(选择助战角色))
+        time.sleep(0.5)
+        c.click('确认5')
     if c.waits(['确认', '开始挑战']) == '确认':
         return 返回主界面()
     if flag == 1:
@@ -144,13 +157,11 @@ def 战斗循环(flag = 1):
     elif flag == 2:
         if c.waits(['队伍7', '队伍7选中']) == '队伍7':
             c.click('队伍7')
-        c.wait_click('支援')
-        c.click('入队')
+        支援()
     elif flag == 3:
         if c.waits(['队伍1', '队伍1选中']) == '队伍1':
             c.click('队伍1')
-        c.wait_click('支援')
-        c.click('入队')
+        支援()
     c.wait_click('开始挑战')
     while True:
         res = c.waits(['C', '再来一次','开拓力补充'],0.9)
@@ -208,8 +219,19 @@ def 每日助战(sign = None):
         c.click('+')
     战斗循环(2)
 
-
 def 委托领取():
+    c.waits(['Enter'])
+    time.sleep(0.5)
+    c.hold_click(phone_position)
+    c.click('委托')
+    time.sleep(0.3)
+    if c.waits(['委托_领取奖励','委托_派遣中']) == '委托_领取奖励':
+        c.click('委托_领取奖励')
+        time.sleep(0.5)
+        c.click_point(get_position(空白位置))
+    返回主界面()
+
+def 旧委托领取():
     now = datetime.now()
     c.waits(['Enter'])
     time.sleep(0.5)
@@ -287,7 +309,13 @@ def 无名勋礼():
     time.sleep(0.5)
     c.send_key('f2')
     time.sleep(0.5)
-    w1 = c.waits_many(['Enter','无名勋礼任务1', '无名勋礼任务2'])
+    w1 = c.waits_many(['开启无名勋礼','Enter','无名勋礼任务1', '无名勋礼任务2'])
+    if '开启无名勋礼' in w1:
+        c.click('开启无名勋礼')
+        time.sleep(1.5)
+        c.click_point(空白位置)
+        w1 = c.waits_many(['开启无名勋礼', 'Enter', '无名勋礼任务1', '无名勋礼任务2'])
+
     if 'Enter' in w1:
         return
     if c.waits(['无名勋礼任务1','无名勋礼任务2'],0.95) == '无名勋礼任务2':
@@ -369,19 +397,17 @@ def 活动():
 
     每日助战('行迹毁灭特殊')
 if __name__ == '__main__':
-    c.save_pic_loc(r'兑换码',0.85)
+    c.save_pic_loc(r'开启无名勋礼',0.85)
     log('执行开始')
     c.check_start()
-    # 无名勋礼()
+    无名勋礼()
     # 委托领取()
-    # 返回主界面()
     # 行迹('虚无2')
     # 邮件领取()
-    # 委托领取()
     # 每日奖励()
     # 无名勋礼()
     # c.control.activate()
     # 活动()
     # 遗器('14')
-    兑换码()
+    # 兑换码()
     c.check_stop()

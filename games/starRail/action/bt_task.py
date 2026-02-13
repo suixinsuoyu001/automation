@@ -174,13 +174,29 @@ def 战斗循环(flag = 1):
     elif flag == 2:
         if c.waits(['队伍7', '队伍7选中']) == '队伍7':
             c.click('队伍7')
-        c.wait_click('支援')
-        c.click('入队')
+        time.sleep(1)
+        c.g_match.click('1920/支援')
+        time.sleep(1)
+        pyautogui.click(1704, 567)
+        time.sleep(1)
+        pyautogui.click(102, 259)
+        time.sleep(1)
+        pyautogui.click(1681, 991)
+        # c.wait_click('支援')
+        # c.click('入队')
     elif flag == 3:
         if c.waits(['队伍1', '队伍1选中']) == '队伍1':
             c.click('队伍1')
-        c.wait_click('支援')
-        c.click('入队')
+        time.sleep(1)
+        c.g_match.click('1920/支援')
+        time.sleep(1)
+        pyautogui.click(1704, 567)
+        time.sleep(1)
+        pyautogui.click(102, 259)
+        time.sleep(1)
+        pyautogui.click(1681, 991)
+        # c.wait_click('支援')
+        # c.click('入队')
     c.wait_click('开始挑战')
     while True:
         res = c.waits(['C', '再来一次','开拓力补充'],0.9)
@@ -339,16 +355,16 @@ def 每日(n,type):
         type = type[:-1]
 
     登录(c.zhs[n])
-    邮件领取()
+    # 邮件领取()
     每日助战(str)
     if type.startswith('x'):
         行迹(type.replace('x',''),flag)
     elif type.startswith('y'):
         print(type.replace('y',''),flag)
         遗器(type.replace('y',''),flag)
-    委托领取()
+    # 委托领取()
     每日奖励()
-    无名勋礼()
+    # 无名勋礼()
 
 def 剧情():
     num = 0.85

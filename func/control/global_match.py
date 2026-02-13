@@ -43,7 +43,7 @@ class match():
         return centers
 
     def click(self,name,num = None):
-        log(f'click:{name} 开始捕获')
+        log(f'click:{name} 开始捕获',level=2)
         if num is None:
             num = self.num
         while True:

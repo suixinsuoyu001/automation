@@ -239,14 +239,17 @@ def get_ego_angle():
 
 
 def 登录(zh):
-    wait_start = waits(['菜单','退出登录'])
+    wait_start = waits(['菜单','退出登录','登录其他账号'])
     if wait_start == '菜单':
         pyautogui.press('esc')
         time.sleep(1.5)
         click('退出2')
         click('退出登录标识')
-    click('退出登录')
-    click('退出')
+        click('退出登录')
+        click('退出')
+    if wait_start == '退出登录':
+        click('退出登录')
+        click('退出')
     click('登录其他账号')
     click('输入账号')
     text = zh.replace('\n','')
@@ -906,10 +909,11 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('秘宝领取_20原粹树脂',json_path)
-    c.check_start()
+    res = c.t_match.save_pic_loc('秘境圣遗物2',json_path)
+    # c.check_start()
     # 秘境_圣遗物(1, 5)
-    幽境危战战斗循环(1, 2)
+    # 幽境危战战斗循环(1, 2)
+    # 秘境_圣遗物(5, 1)
     # # 每日2(7,1)
     # # 成就领取()
     # 兑换码()

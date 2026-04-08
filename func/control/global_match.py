@@ -54,14 +54,14 @@ class match():
                 break
 
     def move(self,name,num = None):
-        log(f'move:{name} 开始捕获')
+        log(f'move:{name} 开始捕获',level=2)
         if num is None:
             num = self.num
         while True:
             matches = self.find_image_on_screen(name,num)
             if matches:
                 pyautogui.click(matches[0])
-                log(f'move:{name} 已捕获并移动')
+                log(f'move:{name} 已捕获并移动',level=2)
                 break
 
     def wait(self,name,num = None):

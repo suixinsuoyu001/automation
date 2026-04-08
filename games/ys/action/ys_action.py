@@ -906,10 +906,10 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('秘宝领取_20原粹树脂',json_path)
-    c.check_start()
+    res = c.t_match.save_pic_loc('秘境圣遗物2',json_path)
+    # c.check_start()
     # 秘境_圣遗物(1, 5)
-    幽境危战战斗循环(1, 2)
+    # 幽境危战战斗循环(1, 2)
     # # 每日2(7,1)
     # # 成就领取()
     # 兑换码()

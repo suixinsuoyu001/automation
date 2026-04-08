@@ -67,9 +67,11 @@ def 登录(zh):
 
 
 def 资料验证():
-    w = c.g_match.waits(['1920/资料验证','1920/开始游戏'])
+    w = c.g_match.waits(['1920/资料验证','1920/开始游戏','1920/点击进入'])
     if w == '1920/资料验证':
         c.g_match.click('1920/资料验证')
+        c.g_match.waits(['1920/同意'])
+        time.sleep(1)
         c.g_match.click('1920/同意')
         c.g_match.click('1920/输入名字')
         keyboard.write('郭修传', delay=0.01)
@@ -77,9 +79,9 @@ def 资料验证():
         keyboard.write('370214199711095557', delay=0.01)
         c.g_match.click('1920/常用登录地')
         c.g_match.move('1920/北京')
-        pyautogui.scroll(-700)
-        c.g_match.move('1920/山东')
-        c.g_match.move('1920/青岛')
+        pyautogui.scroll(-400)
+        c.g_match.move('1920/上海')
+        c.g_match.move('1920/上海')
         c.g_match.click('1920/常用设备')
         c.g_match.click('1920/PC')
         c.g_match.click('1920/PC')
@@ -92,7 +94,7 @@ def 资料验证():
         c.g_match.click('1920/崩铁')
         c.g_match.click('1920/选择日期')
         time.sleep(0.5)
-        c.g_match.click('1920/4')
+        c.g_match.click('1920/1')
         c.g_match.click('1920/提交')
 
 
@@ -342,7 +344,7 @@ def 无名勋礼():
     w1 = c.waits_many(['开启无名勋礼','Enter','无名勋礼任务1', '无名勋礼任务2'])
     if '开启无名勋礼' in w1:
         c.click('开启无名勋礼')
-        time.sleep(1.5)
+        time.sleep(3)
         c.click_point(空白位置)
         w1 = c.waits_many(['开启无名勋礼', 'Enter', '无名勋礼任务1', '无名勋礼任务2'])
 
@@ -352,6 +354,7 @@ def 无名勋礼():
         c.click('无名勋礼任务2')
         if c.waits_limit(['一键领取']):
             c.click('一键领取')
+            time.sleep(3)
     res = c.waits(['无名勋礼奖励1', '无名勋礼奖励2','无名勋礼奖励3','无名勋礼奖励4'],0.95)
     if res in ['无名勋礼奖励2','无名勋礼奖励3']:
         c.click_until(res,'一键领取2')
@@ -430,11 +433,10 @@ if __name__ == '__main__':
     c.save_pic_loc(r'开启无名勋礼',0.85)
     log('执行开始')
     c.check_start()
-    无名勋礼()
+    # 无名勋礼()
     # 委托领取()
     # 行迹('虚无2')
     # 邮件领取()
-    # 每日奖励()
     # 无名勋礼()
     # c.control.activate()
     # 活动()

@@ -14,6 +14,8 @@ def logins():
     c.g_match.click(f'图标{resolution[0]}')
     for zh in c.zhs:
         登录(zh)
+        # 委托领取()
+        # 无名勋礼()
         # 邮件领取()
         # 巡星之礼领取()
         # 兑换码()
@@ -38,4 +40,4 @@ zhs = [
 
 if __name__ == '__main__':
     logins()
-    # login_one(9)
+    # login_one(2)

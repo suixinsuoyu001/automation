@@ -16,7 +16,7 @@ def logins():
         登录(zh)
         # 邮件领取()
         # 巡星之礼领取()
-        # 兑换码()
+        兑换码()
         if c.is_focus():
             c.control.activate()
         log('等待按下0')
@@ -38,4 +38,4 @@ zhs = [
 
 if __name__ == '__main__':
     # logins()
-    login_one(3)
+    login_one(2)

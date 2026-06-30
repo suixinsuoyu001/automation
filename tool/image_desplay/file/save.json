@@ -3,12 +3,6 @@
         "http://127.0.0.1:5000/view_image?dir_path=YD/信号無視&index=23&offsetY=0.0&scale=1.00",
         "http://127.0.0.1:5000/view_image?dir_path=YD/信号無視&index=22&offsetY=0.0&scale=1.00"
     ],
-    "XX_ROM": [
-        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=20&offsetY=200.0&scale=1.10",
-        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=21&offsetY=-250.0&scale=1.10",
-        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=22&offsetY=-250.0&scale=1.30",
-        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=23&offsetY=100.0&scale=1.00"
-    ],
     "绿箭侠": [
         "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=22&offsetY=50.0&scale=1.90",
         "http://127.0.0.1:5000/view_image?dir_path=mrbunnyart/绿箭侠&index=26&offsetY=50.0&scale=1.90",
@@ -196,5 +190,14 @@
         "http://127.0.0.1:5000/view_image?dir_path=韩漫/夏日深處51_75话&index=138&offsetY=934.0&scale=0.50",
         "http://127.0.0.1:5000/view_image?dir_path=韩漫/夏日深處51_75话&index=138&offsetY=2626.0&scale=0.50",
         "http://127.0.0.1:5000/view_image?dir_path=韩漫/夏日深處51_75话&index=138&offsetY=-2400.0&scale=0.80"
+    ],
+    "XX_ROM": [
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=19&offsetY=188.0&scale=0.90",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=20&offsetY=250.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=21&offsetY=250.0&scale=1.10",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=21&offsetY=-237.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=22&offsetY=227.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=22&offsetY=-250.0&scale=1.00",
+        "http://127.0.0.1:5000/view_image?dir_path=YD/XX_ROM&index=23&offsetY=100.0&scale=0.90"
     ]
 }

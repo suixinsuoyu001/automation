@@ -186,6 +186,7 @@ def scroll_click(name1,name2,num = num):
 
 def get_ego_angle():
     c.model_loop_start()
+    start_time = time.time()
     pyautogui.middleClick()
     if 270 > c.ego_angle > 90:
         pyautogui.press('s')
@@ -223,8 +224,10 @@ def get_ego_angle():
         else:
             smooth_mouse_move(-100, 0, duration=0.2, steps=20)
 
-
     while True:
+        if time.time()-start_time > 20:
+            c.model_loop_end()
+            return False
         size_diff = c.size_diff
         log(c.ego_angle,size_diff)
         if size_diff and size_diff > 100:
@@ -235,6 +238,7 @@ def get_ego_angle():
             break
     pyautogui.keyUp('w')
     c.model_loop_end()
+    return True
     # smooth_mouse_move(500000, 0, duration=t, steps=50)
 
 
@@ -498,7 +502,11 @@ def 秘境_圣遗物(zh_num,num):
     pyautogui.rightClick()
     time.sleep(0.8)
     pyautogui.keyUp('w')
-    副本战斗(fight_txt)
+    if not 副本战斗(fight_txt):
+        pyautogui.press('esc')
+        click('确认标识')
+        time.sleep(7)
+        秘境_圣遗物(zh_num, num)
     # if waits(['须弥复活点','菜单']) == '须弥复活点':
     #     秘境_圣遗物(num)
 
@@ -685,7 +693,11 @@ def 副本战斗(fight_txt):
                 break
         c.time_limit = 0.02
         time.sleep(3)
-        get_ego_angle()
+
+        if not get_ego_angle():
+            return False
+        pyautogui.press('f')
+        time.sleep(0.5)
         pyautogui.press('f')
         time.sleep(1)
         pyautogui.moveTo([0,0])
@@ -696,20 +708,20 @@ def 副本战斗(fight_txt):
             log(n)
             if w_sz == '浓缩树脂1' and n >= 2:
                 click('退出标识')
-                return
+                return True
         elif '秘宝领取_转换标识' in w1:
             if '秘宝领取_20原粹树脂' in w1:
                 click('秘宝领取_转换')
                 time.sleep(0.5)
             pyautogui.click(get_position(原粹树脂使用坐标))
             click('退出标识')
-            return
+            return True
         elif '秘宝领取_原粹树脂' in w1:
             pyautogui.press('esc')
             time.sleep(0.5)
             pyautogui.press('esc')
             click('确认标识')
-            return
+            return True
 
         click('挑战')
         waits(['任意位置关闭'])
@@ -718,7 +730,6 @@ def 副本战斗(fight_txt):
         pyautogui.keyDown('w')
         if waits_speed(['启动']):
             pyautogui.keyUp('w')
-
         n += 1
 
 def 移动幽境危战():
@@ -910,7 +921,7 @@ if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
     res = c.t_match.save_pic_loc('登录其他账号',json_path)
-    # c.check_start()
+    c.check_start()
     # 秘境_圣遗物(1, 5)
     # 幽境危战战斗循环(1, 2)
     # 秘境_圣遗物(5, 1)
@@ -918,3 +929,4 @@ if __name__ == '__main__':
     # # 成就领取()
     # 兑换码()
     # c.check_stop()
+    秘境_圣遗物(1, 5)

@@ -59,7 +59,7 @@ if __name__ == "__main__":
 
     hour = date.time().hour
     print(hour)
-    if hour == 13:
+    if hour in [13,14]:
         run_process_with_timeout(BT_login, 60*60*1.5)
 
     if hour == 17:

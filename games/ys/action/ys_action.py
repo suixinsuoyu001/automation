@@ -920,8 +920,8 @@ zh = [
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)
-    res = c.t_match.save_pic_loc('登录其他账号',json_path)
-    c.check_start()
+    res = c.t_match.save_pic_loc('召回',json_path)
+    # c.check_start()
     # 秘境_圣遗物(1, 5)
     # 幽境危战战斗循环(1, 2)
     # 秘境_圣遗物(5, 1)
@@ -929,4 +929,3 @@ if __name__ == '__main__':
     # # 成就领取()
     # 兑换码()
     # c.check_stop()
-    秘境_圣遗物(1, 5)

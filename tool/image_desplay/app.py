@@ -11,7 +11,7 @@ from collections import defaultdict
 app = Flask(__name__)
 
 # 图片根目录
-# IMAGE_ROOT = os.path.join(os.getcwd(), "static", "images")
+# IMAGE_ROOT = os.path.join(os.getcwd(), "static", "images")    
 IMAGE_ROOT = 'E:\images'
 
 

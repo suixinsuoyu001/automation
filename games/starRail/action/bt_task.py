@@ -87,10 +87,11 @@ def 邮件领取():
     c.waits(['邮件1', '邮件2'], 0.92)
     if c.waits(['邮件1','邮件2'],0.92) == '邮件1':
         c.wait_click('邮件1')
-        c.wait_click('全部领取')
-        time.sleep(1)
-        c.click_point(空白位置)
-        time.sleep(0.5)
+        if c.waits_limit(['全部领取'],2):
+            c.wait_click('全部领取')
+            time.sleep(1)
+            c.click_point(空白位置)
+            time.sleep(0.5)
     返回主界面()
 
 def 巡星之礼领取():
@@ -397,10 +398,10 @@ def 活动():
 
     每日助战('行迹毁灭特殊')
 if __name__ == '__main__':
-    c.save_pic_loc(r'登录其他账号',0.85)
+    c.save_pic_loc(r'队伍1选中',0.85)
     log('执行开始')
     c.check_start()
-    无名勋礼()
+    # 无名勋礼()
     # 委托领取()
     # 行迹('虚无2')
     # 邮件领取()

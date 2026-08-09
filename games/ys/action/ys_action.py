@@ -465,6 +465,8 @@ def 秘境_圣遗物(zh_num,num):
         name = '圣遗物_霜凝的机枢'
     elif num == 7:
         name = '圣遗物_月童的库藏'
+    elif num == 8:
+        name = '圣遗物_山风的荆冕'
     else:
         name = None
 

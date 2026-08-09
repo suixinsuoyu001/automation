@@ -430,7 +430,7 @@ def 活动():
 
     每日助战('行迹毁灭特殊')
 if __name__ == '__main__':
-    c.save_pic_loc(r'队伍1',0.85)
+    c.save_pic_loc(r'退出',0.85)
     log('执行开始')
     c.check_start()
     # 无名勋礼()

@@ -348,7 +348,7 @@ def 枫丹合成台():
 
 def 枫丹凯瑟琳():
     waits(['菜单'])
-    time.sleep(1)
+    time.sleep(2)
     pyautogui.keyDown('w')
     time.sleep(1)
     pyautogui.keyDown('a')

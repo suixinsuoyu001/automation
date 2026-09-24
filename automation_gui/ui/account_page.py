@@ -29,7 +29,10 @@ class AccountPage(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setObjectName("AccountPage")
-        self.data = account_store.load_accounts()
+        # 原神：编号 -> {'账号', '启用'}，唯一数据源 games/ys/data/账号.json
+        self.ys_data = account_store.load_ys_accounts()
+        # 崩铁：沿用 automation_gui/accounts.json 的列表
+        self.bt_data = list(account_store.load_accounts().get("bt", []))
         self.current_game = "ys"
         self._build_ui()
         self._refresh_list()
@@ -68,12 +71,21 @@ class AccountPage(QWidget):
         self.update_btn.clicked.connect(self._update)
         self.remove_btn = PushButton(FluentIcon.DELETE, "删除选中", self)
         self.remove_btn.clicked.connect(self._remove)
+        self.toggle_btn = PushButton("启用/停用选中", self)
+        self.toggle_btn.clicked.connect(self._toggle)
         edit.addWidget(self.add_btn)
         edit.addWidget(self.update_btn)
         edit.addWidget(self.remove_btn)
+        edit.addWidget(self.toggle_btn)
         root.addLayout(edit)
 
-        self.hint = BodyLabel("双击列表项可载入到输入框进行编辑", self)
+        self.hint = BodyLabel(
+            "原神账号表在 games/ys/data/账号.json（游戏脚本读的是同一份）；"
+            "用「启用/停用选中」决定任务下拉框里出现哪几个账号。"
+            "双击列表项可载入到输入框编辑。",
+            self,
+        )
+        self.hint.setWordWrap(True)
         self.hint.setTextColor("#808080", "#909090")
         root.addWidget(self.hint)
 
@@ -81,20 +93,43 @@ class AccountPage(QWidget):
         self.current_game = game
         self._refresh_list()
 
+    def _ys_rows(self):
+        """把原神工作副本整理成 [(编号, 账号, 启用), ...]，按编号升序。"""
+        rows = []
+        for key, item in self.ys_data.items():
+            try:
+                index = int(key)
+            except (TypeError, ValueError):
+                continue
+            rows.append((index, item.get("账号", ""), bool(item.get("启用", True))))
+        return sorted(rows, key=lambda row: row[0])
+
     def _refresh_list(self):
         self.list_widget.clear()
-        for idx, acc in enumerate(self.data.get(self.current_game, [])):
+        if self.current_game == "ys":
+            for index, account, enabled in self._ys_rows():
+                mark = "[启用]" if enabled else "[停用]"
+                item = QListWidgetItem(f"{mark} {index}.  {account}")
+                item.setData(Qt.UserRole, index)
+                self.list_widget.addItem(item)
+            return
+        for idx, acc in enumerate(self.bt_data):
             item = QListWidgetItem(f"{idx}.  {acc}")
             item.setData(Qt.UserRole, idx)
             self.list_widget.addItem(item)
 
     def _load_selected(self, item):
-        idx = item.data(Qt.UserRole)
-        accounts = self.data.get(self.current_game, [])
-        if 0 <= idx < len(accounts):
-            self.input.setText(accounts[idx])
+        key = item.data(Qt.UserRole)
+        if self.current_game == "ys":
+            entry = self.ys_data.get(str(key))
+            if entry:
+                self.input.setText(entry.get("账号", ""))
+            return
+        if isinstance(key, int) and 0 <= key < len(self.bt_data):
+            self.input.setText(self.bt_data[key])
 
-    def _selected_index(self):
+    def _selected_key(self):
+        """选中项的键：原神是编号，崩铁是下标。"""
         item = self.list_widget.currentItem()
         if item is None:
             return None
@@ -105,38 +140,71 @@ class AccountPage(QWidget):
         if not text:
             self._warn("请输入账号")
             return
-        self.data.setdefault(self.current_game, []).append(text)
+        if self.current_game == "ys":
+            # 新账号用「当前最大编号 + 1」，编号不复用，避免和队伍表/任务对上不
+            index = max([row[0] for row in self._ys_rows()], default=-1) + 1
+            self.ys_data[str(index)] = {"账号": text, "启用": True}
+        else:
+            self.bt_data.append(text)
         self._save()
         self.input.clear()
 
     def _update(self):
-        idx = self._selected_index()
-        if idx is None:
+        key = self._selected_key()
+        if key is None:
             self._warn("请先选择要更新的账号")
             return
         text = self.input.text().strip()
         if not text:
             self._warn("请输入账号")
             return
-        self.data[self.current_game][idx] = text
+        if self.current_game == "ys":
+            entry = self.ys_data.setdefault(str(key), {"账号": "", "启用": True})
+            entry["账号"] = text
+        else:
+            self.bt_data[key] = text
         self._save()
 
     def _remove(self):
-        idx = self._selected_index()
-        if idx is None:
+        key = self._selected_key()
+        if key is None:
             self._warn("请先选择要删除的账号")
             return
-        del self.data[self.current_game][idx]
+        if self.current_game == "ys":
+            self.ys_data.pop(str(key), None)
+        else:
+            del self.bt_data[key]
         self._save()
         self.input.clear()
 
-    def _save(self):
-        account_store.save_accounts(self.data)
+    def _toggle(self):
+        """启用 / 停用选中的原神账号（停用的不会出现在任务下拉框里）。"""
+        key = self._selected_key()
+        if key is None:
+            self._warn("请先选择要启用/停用的账号")
+            return
+        if self.current_game != "ys":
+            self._warn("崩铁账号没有启用开关")
+            return
+        entry = self.ys_data.get(str(key))
+        if entry is None:
+            return
+        entry["启用"] = not bool(entry.get("启用", True))
+        state = "已启用" if entry["启用"] else "已停用"
+        self._save(content=f"编号 {key} {state}，任务下拉框已同步")
+
+    def _save(self, content="账号列表已更新"):
+        if self.current_game == "ys":
+            account_store.save_ys_accounts(self.ys_data)
+            self.ys_data = account_store.load_ys_accounts()   # 回读，保证与磁盘一致
+        else:
+            account_store.save_accounts({"bt": self.bt_data})
+            self.bt_data = list(account_store.load_accounts().get("bt", []))
         self._refresh_list()
         self.accountsChanged.emit()
         InfoBar.success(
             title="已保存",
-            content="账号列表已更新",
+            content=content,
             orient=Qt.Horizontal,
             isClosable=True,
             position=InfoBarPosition.TOP,

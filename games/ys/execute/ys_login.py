@@ -35,13 +35,13 @@ def login_one(n):
     """登录指定账号。
 
     n 支持两种写法，方便 GUI 直接传账号名，避免「序号和账号列表对不上」：
-      * int 序号 -> 取 zh[n]（脚本里 `login_one(5)` 的老用法）
+      * int 编号 -> 取 games/ys/data/账号.json 里该编号的账号（老用法 login_one(5)）
       * str      -> 直接当作账号本身（如 'xxx@126.com'）
 
-    zh 来自 ys_action.py 的账号表。
+    账号表（编号 -> 账号）在 games/ys/data/账号.json，与 GUI「账号」页共用同一份。
     """
     if isinstance(n, int):
-        account = zh[n]
+        account = 获取账号(n)
     elif isinstance(n, str) and n.strip():
         account = n
     else:
@@ -60,16 +60,9 @@ def login_one(n):
         c.control.stop_ime_watchdog()
         c.check_stop()      # 无论登录成功失败都收掉共享截图线程
 
-zhs = [
-        'kechengzhuang524@126.com',     #0
-        'kemeihao694350@126.com',       #1
-        # 'kenc40sklx6093@126.com',       #2
-        # 'suixin001005@163.com',         #3
-        # 'suixin001002@163.com',         #4
-        # 'kengfeiyan34534@126.com',      #5
-        'k6597975255692@sohu.com',      #6
-        # '13280859317'                   #7
-       ]
+# 批量登录用的账号列表 = games/ys/data/账号.json 里**已启用**的那些
+# （由 ys_action 的 zhs = 启用账号() 提供），所以这里不再写死账号。
+# 想改「登录哪几个」就在 GUI「账号」页里启用/停用，或直接改那份 json。
 
 
 if __name__ == '__main__':

@@ -42,6 +42,10 @@ CARDS_PER_ROW = 2
 # 下拉框最小宽度（一行两个卡片，宽度有限）
 COMBO_MIN_WIDTH = 200
 
+# 卡片里有**多个**参数时（例如「秘境 + 账号」）把下拉框收窄，
+# 否则两个 200px 的下拉框加上标签会把卡片撑出可见区域（小窗口尤其明显）
+COMBO_MIN_WIDTH_MULTI = 130
+
 
 class TaskCard(CardWidget):
     """单个任务卡片：单选 + 名称 + 描述 + 参数。"""
@@ -78,7 +82,8 @@ class TaskCard(CardWidget):
                 if p.type == "choice":
                     # 下拉选择：显示名称，实际取值仍是原始编号
                     combo = ComboBox(self)
-                    combo.setMinimumWidth(COMBO_MIN_WIDTH)
+                    combo.setMinimumWidth(COMBO_MIN_WIDTH if len(task.params) < 2
+                                          else COMBO_MIN_WIDTH_MULTI)
                     self._fill_combo(combo, p)
                     self.param_widgets[p.key] = combo
                     param_layout.addWidget(combo, 1)

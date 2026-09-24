@@ -9,16 +9,8 @@ from games.ys.action.ys_action import *
 # 5 下落套
 # 6 挪德卡莱套
 
-zh = [
-        'kechengzhuang524@126.com',     #0
-        'kemeihao694350@126.com',       #1
-        'kenc40sklx6093@126.com',       #2
-        'suixin001005@163.com',         #3
-        'suixin001002@163.com',         #4
-        'kengfeiyan34534@126.com',      #5
-        'k6597975255692@sohu.com',      #6
-        '13280859317'                   #7
-       ]
+# 账号表统一由 games/ys/data/账号.json 提供
+# （ys_action 里已定义 zh / zhs / 获取账号），所以这里不再写死。
 
 def run():
     # 打开betterGi2()

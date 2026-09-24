@@ -20,6 +20,7 @@ def main():
     from PySide6.QtWidgets import QApplication
     from qfluentwidgets import setTheme, Theme
 
+    from automation_gui import config
     from automation_gui.ui.main_window import MainWindow
 
     QApplication.setHighDpiScaleFactorRoundingPolicy(
@@ -29,7 +30,13 @@ def main():
     setTheme(Theme.LIGHT)
 
     window = MainWindow()
-    window.show()
+    # 默认全屏启动（见 automation_gui/config.py 的 START_MAXIMIZED / START_FULLSCREEN）
+    if getattr(config, "START_FULLSCREEN", False):
+        window.showFullScreen()
+    elif getattr(config, "START_MAXIMIZED", True):
+        window.showMaximized()
+    else:
+        window.show()
     sys.exit(app.exec())
 
 

@@ -20,6 +20,13 @@ AutoFight = read_json('games/ys/data/AutoFight.json')
 # 圣遗物秘境编号 -> 模板图片名 的映射表（可在 GUI「秘境配置」页编辑）
 秘境圣遗物json = 'games/ys/data/秘境圣遗物.json'
 
+# 账号编号 -> 队伍配置（名称 / 各场景输出轴）映射表，见 获取队伍配置()
+# 与 GUI 里「账号下拉框显示名」共用同一份数据（automation_gui/core/team_store.py）
+队伍json = 'games/ys/data/队伍.json'
+
+# 原神账号表（编号 -> {'账号','启用'}），GUI 账号页编辑的就是这份，见 获取账号()
+账号json = 'games/ys/data/账号.json'
+
 windows_title = '原神'
 
 with open('games/ys/data/兑换码.txt', "r", encoding="utf-8") as fp:
@@ -587,27 +594,83 @@ def 获取秘境图片名(num):
         return None
 
 
+def 获取队伍配置(zh_num, 场景 = '秘境'):
+    """按账号编号取该队伍在指定场景下的输出轴名（= AutoFight.json 里的 key）
+
+    映射表在 games/ys/data/队伍.json（手改 / GUI 都行，每次重新读取，改完立即生效）：
+        {"0": {"名称": "火茜希芙", "秘境": "火茜希芙", "幽境危战": "火茜希芙_幽境危战"}, ...}
+
+    原来这里是写死在代码里的 zh_num -> fight_txt 一大串 if/elif；现在统一放进 json，
+    加账号 / 换队伍只要改数据，不用改代码。
+
+    :param 场景: '秘境' 或 '幽境危战'
+    :return: 输出轴名；编号不存在或该场景没配时返回 None（与原来 else 分支一致）
+    """
+    try:
+        item = read_json(队伍json).get(str(zh_num))
+    except Exception as e:
+        log(f'读取队伍.json 失败: {e}')
+        return None
+    if not isinstance(item, dict):
+        return None
+    return item.get(场景)
+
+
+def 读取账号表():
+    """读 games/ys/data/账号.json -> {编号(str): {'账号': str, '启用': bool}}
+
+    兼容「值直接是账号字符串」的老格式。
+    """
+    try:
+        data = read_json(账号json)
+    except Exception as e:
+        log(f'读取账号.json 失败: {e}')
+        return {}
+    table = {}
+    if isinstance(data, dict):
+        for key, item in data.items():
+            if isinstance(item, dict):
+                table[str(key)] = {'账号': str(item.get('账号', '')),
+                                   '启用': bool(item.get('启用', True))}
+            else:
+                table[str(key)] = {'账号': str(item), '启用': True}
+    if not table:
+        log(f'[注意] {账号json} 里没有任何账号，登录/每日任务会拿不到账号')
+    return table
+
+
+def 账号表按编号():
+    """[(编号, {'账号', '启用'}), ...]，按编号升序（跳过编号不是数字的脏数据）"""
+    rows = []
+    for key, item in 读取账号表().items():
+        try:
+            rows.append((int(key), item))
+        except (TypeError, ValueError):
+            continue
+    return sorted(rows, key=lambda kv: kv[0])
+
+
+def 获取账号(编号):
+    """按编号取账号（编号 = 账号.json 的键，也是 GUI「账号」页里显示的编号）"""
+    return 读取账号表().get(str(编号), {}).get('账号')
+
+
+def 启用账号():
+    """按编号顺序返回**已启用**的账号（GUI 账号页里勾选的那些）
+
+    一个都没勾选时退回全部，避免批量任务拿到空列表。
+    """
+    rows = 账号表按编号()
+    enabled = [item['账号'] for _, item in rows if item['启用'] and item['账号']]
+    if enabled:
+        return enabled
+    return [item['账号'] for _, item in rows if item['账号']]
+
+
 def 秘境_圣遗物(zh_num,num):
     name = 获取秘境图片名(num)
-
-    if zh_num == 0:
-        fight_txt = '火茜希芙'
-    elif zh_num == 1:
-        fight_txt = '丝爱心塔'
-    elif zh_num == 2:
-        fight_txt = '散兵'
-    elif zh_num == 3:
-        fight_txt = '火艾'
-    elif zh_num == 4:
-        fight_txt = '火希娜班'
-    elif zh_num == 5:
-        fight_txt = '火希钟班'
-    elif zh_num == 6:
-        fight_txt = '仆人'
-    elif zh_num == 7:
-        fight_txt = '菲伊心爱'
-    else:
-        fight_txt = None
+    # 输出轴：zh_num -> 队伍，映射统一放在 games/ys/data/队伍.json
+    fight_txt = 获取队伍配置(zh_num, '秘境')
 
     # 传送进秘境 -> 战斗 -> 失败就退出重来。
     # 这里用循环而不是递归：原实现是失败时递归调用自己，连续失败会不断加深
@@ -897,24 +960,9 @@ def 幽境危战战斗(fight_txt):
 def 幽境危战战斗循环(zh_num,n):
     boss2 = [310,720]
     boss3 = [255, 960]
-    if zh_num == 0:
-        fight_txt = '火茜希芙_幽境危战'
-    elif zh_num == 1:
-        fight_txt = '丝爱芙托_幽境危战'
-    elif zh_num == 2:
-        fight_txt = '散茜米莱_幽境危战'
-    elif zh_num == 3:
-        fight_txt = '火艾'
-    elif zh_num == 4:
-        fight_txt = '火希娜班_幽境危战'
-    elif zh_num == 5:
-        fight_txt = '火希钟班_幽境危战'
-    elif zh_num == 6:
-        fight_txt = '仆钟希班_幽境危战'
-    elif zh_num == 7:
-        fight_txt = '菲伊砂心_幽境危战'
-    else:
-        fight_txt = None
+    # 输出轴：zh_num -> 队伍，映射统一放在 games/ys/data/队伍.json
+    # （3 号原来就是无后缀的「火艾」，json 里保持原样）
+    fight_txt = 获取队伍配置(zh_num, '幽境危战')
     waits(['菜单'])
     waits(['F'])
     time.sleep(1)
@@ -992,7 +1040,7 @@ def 幽境危战奖励领取():
 
 
 def 每日(zh_num,n):
-    登录(zh[zh_num])
+    登录(获取账号(zh_num))
     邮件领取()
     移动枫丹()
     枫丹合成台()
@@ -1017,7 +1065,7 @@ def 成就领取():
         click('空白位置')
 
 def 每日2(zh_num,n):
-    登录(zh[zh_num])
+    登录(获取账号(zh_num))
     邮件领取()
     移动枫丹()
     枫丹合成台()
@@ -1034,16 +1082,11 @@ def 每日2(zh_num,n):
     每日委托()
     纪行()
 
-zh = [
-        'kechengzhuang524@126.com',     #0
-        'kemeihao694350@126.com',       #1
-        'kenc40sklx6093@126.com',       #2
-        'suixin001005@163.com',         #3
-        'suixin001002@163.com',         #4
-        'kengfeiyan34534@126.com',      #5
-        'k6597975255692@sohu.com',      #6
-        '13280859317'                   #7
-       ]
+# 账号表统一放在 games/ys/data/账号.json（GUI 「账号」页编辑的就是这份）。
+#   zh  = 全部账号，按编号升序（所以 zh[i] 仍等于编号 i）
+#   zhs = **只含启用**的账号（GUI 里勾选的那些），批量登录用这个
+zh = [item['账号'] for _, item in 账号表按编号()]
+zhs = 启用账号()
 if __name__ == '__main__':
     log('开始执行')
     # time.sleep(1)

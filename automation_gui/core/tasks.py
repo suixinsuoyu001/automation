@@ -6,8 +6,6 @@
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional
 
-from automation_gui import config
-
 
 @dataclass
 class TaskParam:
@@ -57,31 +55,34 @@ class TaskDef:
 # ---------------------------------------------------------------------------
 
 def ys_account_choices() -> List:
-    """原神账号选项：[(序号, '账号（队伍名）'), ...]。
+    """原神账号选项：[(编号, '账号（队伍名）'), ...]，**只列账号页里勾选启用的**。
 
-    账号列表实时读取账号页保存的 accounts.json，所以在账号页改完账号后，
+    账号名实时读 games/ys/data/账号.json（游戏脚本读的同一份）、
+    队伍名实时读 games/ys/data/队伍.json，所以这两处改完（或改了启用状态），
     任务卡片上的下拉选项会跟着更新（不必重启程序）。
-    """
-    from automation_gui.core import account_store
 
-    accounts = account_store.load_accounts().get("ys", [])
+    值仍然是**编号** —— 编号是稳定标识，与队伍表一一对应，也是游戏侧取
+    账号 / 输出轴的依据。
+    """
+    from automation_gui.core import account_store, team_store
+
     options = []
-    for index, account in enumerate(accounts):
-        team = config.YS_TEAM_NAMES.get(index)
+    for item in account_store.enabled_ys_accounts():
+        index, account = item["编号"], item["账号"]
+        team = team_store.team_name(index)
         options.append((index, f"{account}（{team}）" if team else str(account)))
     return options
 
 
 def ys_account_name_choices() -> List:
-    """原神账号选项（值就是账号本身）：[(账号, 账号), ...]。
+    """原神账号选项（值就是账号本身，**只列启用的**）：[(账号, 账号), ...]。
 
-    登录任务直接把账号字符串传给 ``login_one``，所以账号页里改了账号，
-    登录用的就是新账号 —— 不会出现「序号指向的账号已经变了」的错位问题。
+    登录任务直接把账号字符串传给 ``login_one``，所以改了账号或启用状态后，
+    登录用的就是新的那一份 —— 不会出现「序号指向的账号已经变了」的错位问题。
     """
     from automation_gui.core import account_store
 
-    accounts = account_store.load_accounts().get("ys", [])
-    return [(str(account), str(account)) for account in accounts]
+    return [(item["账号"], item["账号"]) for item in account_store.enabled_ys_accounts()]
 
 
 def ys_domain_choices() -> List:
@@ -106,8 +107,8 @@ def ys_domain_choices() -> List:
 # ---------------------------------------------------------------------------
 
 YS_TASKS: List[TaskDef] = [
-    # 放在最上面：最常用的任务。不选账号 —— 具体用哪套输出轴由 run3 的
-    # zh_num 默认值决定（见 ys_mr.run3）。
+    # 放在最上面：最常用的任务。
+    # 账号(zh_num) 决定用哪套输出轴 / 队伍，秘境(num) 决定打哪个本 —— 见 ys_mr.run3。
     TaskDef(
         id="ys_domain",
         name="原神圣遗物秘境",
@@ -116,6 +117,7 @@ YS_TASKS: List[TaskDef] = [
         icon="GLOBE",
         group="原神",
         params=[
+            TaskParam("zh_num", "账号", "choice", 0, choices=ys_account_choices),
             TaskParam("num", "秘境", "choice", 1, choices=ys_domain_choices),
         ],
     ),

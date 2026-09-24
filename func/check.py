@@ -69,11 +69,13 @@ class check():
         """
         self.time_limit = time_limit
         flag = 1
+        if not get_hwnd(self.wt):
+            self.g_match.click(f'图标{resolution[0]}')
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
-            time.sleep(0.5)
+            time.sleep(3)
         start_capture(self.wt, time_limit)
         wait_first_frame(self.wt)
         self.control.hwnd = get_hwnd('鸣潮  ')

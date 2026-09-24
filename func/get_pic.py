@@ -1,87 +1,43 @@
-import time,win32gui,win32ui,cv2
-from ctypes import windll
-import numpy as np
-from func.common import get_hwnd,log,setting
+"""截图模块（兼容层）。
 
+真正的实现已迁移到 :mod:`func.screenshot` 的**通用循环截图服务**：
 
-# def get_hwnd(target_title: str) -> str:
-#     result = ""
-#     def callback(hwnd, extra):
-#         nonlocal result  # 让回调函数可以修改外部变量
-#         if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
-#             title = win32gui.GetWindowText(hwnd)
-#             if title and target_title == title:  # 模糊匹配
-#                 result = hwnd
-#
-#     win32gui.EnumWindows(callback, None)
-#     return result if result else None
+* 循环截图只跑一个后台线程（``func.screenshot.service``）；
+* 原神 / 崩铁 / 鸣潮所有功能共享同一份最新画面；
+* ``get_pic(window_title)`` 签名保持不变——服务已启动时直接返回共享帧
+  （零拷贝），未启动时回退为单次实时截图。
 
+这里用 ``import *`` 重新导出，是为了让 ``from func.get_pic import *``
+拿到和以前完全一样的名字（``get_pic`` / ``get_hwnd`` / ``log`` /
+``setting`` / ``cv2`` / ``np`` / ``time`` ...），老代码无需改动。
+"""
 
-
-
-def get_pic(window_title):
-    """截取指定窗口的内容，去掉边框"""
-    # 找到窗口句柄
-    hwnd = get_hwnd(window_title)
-    # print(hwnd)
-    # hwnd = 4195764
-    if not hwnd:
-        log(f"Window with title '{window_title}' not found.",level=2)
-        return None
-    # try:
-    windll.user32.SetProcessDPIAware()
-    sp_left, sp_top, sp_right, sp_bot = win32gui.GetClientRect(hwnd)
-
-    sp_w = sp_right - sp_left
-    sp_h = sp_bot - sp_top
-    real_sp_w = int(sp_w)
-    real_sp_h = int(sp_h)
-    hwndDC = win32gui.GetWindowDC(hwnd)  # 获取窗口设备上下文（DC）
-    mfcDC = win32ui.CreateDCFromHandle(hwndDC)  # 创建MFC DC从hwndDC
-    saveDC = mfcDC.CreateCompatibleDC()  # 创建与mfcDC兼容的DC
-    saveBitMap = win32ui.CreateBitmap()  # 创建一个位图对象
-    # logger(f"int(real_sp_w), int(real_sp_h): {int(real_sp_w)}, {int(real_sp_h)}")
-    saveBitMap.CreateCompatibleBitmap(
-        mfcDC, int(real_sp_w), int(real_sp_h)
-    )  # 创建与mfcDC兼容的位图
-    saveDC.SelectObject(saveBitMap)  # 选择saveDC的位图对象，准备绘图
-    # 尝试使用PrintWindow函数截取窗口图像
-    result = windll.user32.PrintWindow(hwnd, saveDC.GetSafeHdc(), 3)
-    if result != 1:
-        log('PrintWindow函数截取窗口图像失败')
-        return None  # 如果截取失败，则返回None
-    # 从位图中获取图像数据
-    bmp_info = saveBitMap.GetInfo()  # 获取位图信息
-    bmp_str = saveBitMap.GetBitmapBits(True)  # 获取位图数据
-    im = np.frombuffer(bmp_str, dtype="uint8")  # 将位图数据转换为numpy数组
-    im.shape = (bmp_info["bmHeight"], bmp_info["bmWidth"], 4)  # 设置数组形状
-    # im = im[:, :, [2, 1, 0, 3]][:, :, :3]  # 调整颜色通道顺序为RGB 并去掉alpha通道
-    # im = im[:, :, [2, 1, 0]]  # 交换通道 BGR -> RGB
-    im = im[:, :, :3]  # 保留 RGB 格式（不包括 alpha 通道）
-
-    win32gui.DeleteObject(saveBitMap.GetHandle())
-    saveDC.DeleteDC()
-    mfcDC.DeleteDC()
-    win32gui.ReleaseDC(hwnd, hwndDC)
-    if setting.get('resolution') != [2560, 1440]:
-       im = cv2.resize(im, (2560, 1440), interpolation=cv2.INTER_AREA)
-    output_file = "screenshot.png"
-    # cv2.imwrite(output_file, im)
-    # 1450, 657
-    # 1795, 773
-
-    return im  # 返回截取到的图像waA
-    # except:
-    #     log('获取截图失败')
-    #     return None
+from func.common import get_hwnd, log, setting
+from func.screenshot import *          # noqa: F401,F403  (保持原有星号导入表面)
+from func.screenshot import (          # 显式列出，便于 IDE 与静态检查
+    DEFAULT_INTERVAL,
+    ScreenshotService,
+    capture_hwnd,
+    capture_window,
+    get_pic,
+    is_capturing,
+    latest,
+    service,
+    set_capture_interval,
+    start_capture,
+    stop_capture,
+    wait_first_frame,
+)
 
 
 if __name__ == '__main__':
+    import time as _time
 
-    t = time.time()
+    t = _time.time()
     # 使用窗口标题调用
     get_pic("原神")
     # get_pic("鸣潮  ")
     # get_pic("崩坏：星穹铁道")
-    print(time.time() -t)
+    print(_time.time() - t)
+
 

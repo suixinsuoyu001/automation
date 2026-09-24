@@ -36,8 +36,13 @@ def 登录(zh):
         pass
     c.wait_click('登录其他账号')
     c.wait_click('账号密码')
+    # 输入账号密码前屏蔽输入法，防止游戏内切换成中文输入法
+    c.control.disable_ime_all()
     c.text_input('输入账号', zh)
     c.text_input('输入密码', 'zxc147123')
+
+
+
     c.wait_click('同意')
     c.wait_click_limit('进入游戏')
     c.wait_click_limit('开始游戏')

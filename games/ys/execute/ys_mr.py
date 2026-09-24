@@ -48,6 +48,37 @@ def run2():
     每日2(7,3)
     c.check_stop()
 
+def run3(zh_num = 0, num = 1):
+    """只刷圣遗物秘境（GUI 任务「原神圣遗物秘境」走这个入口）。
+
+    zh_num: 账号/队伍编号（决定用哪套输出轴 fight_txt，见 秘境_圣遗物）
+    num:    秘境编号（对应 games/ys/data/秘境圣遗物.json）
+
+    流程：切换副本队伍 -> 进秘境战斗领奖 -> 分解圣遗物 -> 切回常用队伍
+
+    注意：`秘境_圣遗物` 是**动作层**函数，只负责「传送 -> 战斗 -> 领奖」，
+    既不会启动截图循环、也不负责登录。所以这里必须自己 check_start/check_stop，
+    否则 processed_screen 一直是 None，里面的 waits 会一直空等。
+
+    前提：游戏已启动，并且已经登录到 zh_num 对应的账号。
+    """
+    game_start(windows_title)
+    c.check_start()
+    try:
+        切换副本队伍()
+        try:
+            秘境_圣遗物(zh_num, num)
+            圣遗物分解()
+        finally:
+            # 不管打没打完都切回常用队伍，避免账号卡在副本队伍上。
+            # 这里吞掉异常：否则 finally 里抛的错会盖掉真正失败的原因。
+            try:
+                切换常用队伍()
+            except Exception as e:
+                log(f'run3: 切回常用队伍失败: {e}')
+    finally:
+        c.check_stop()      # 无论成功失败都收掉共享截图线程
+
 if __name__ == '__main__':
 
     # # 登录(zh[0])

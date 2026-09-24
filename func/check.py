@@ -14,10 +14,20 @@ class check():
         self.path = path
         self.t_match = t_match(wt, path)
         self.locs = read_json(json_path)
-        self.processed_screen = None
         self.size_diff = None
         self.control = Control()
         self.num = 0.85
+        self._time_limit = 0.02
+        # wait_loop 用的标志位：0=还在等，1=目标已出现
+        self.wait_flag = 0
+        # 后台线程句柄与停止事件（统一在 __init__ 建好，启停都做幂等处理，
+        # 避免重复 start 覆盖属性导致旧线程收不到停止信号而泄漏）
+        self.thread2 = None
+        self.stop_event2 = None
+        self.thread_wait = None
+        self._cancel_wait = None
+        self.thread_func = None
+        self.stop_event_func = None
         self.g_match = match(path, self.num)
         # self.check_game_state()
 
@@ -27,124 +37,201 @@ class check():
     #         time.sleep(1)
     #     self.check_start()
 
-    def get_pic_loop(self):
-        while True:
-            time.sleep(self.time_limit)  # 10ms 检测一次鼠标移动
-            if self.stop_event.is_set():  # 当 e 事件被 set 时，退出循环
-                break
-            pic = get_pic(self.wt)
-            try:
-                pass
-            except:
-                pic = None
-                log('图片获取失败')
-            if pic is not None:
-                self.processed_screen = get_pic(self.wt)
+    @property
+    def processed_screen(self):
+        """最新一帧画面。
+
+        数据来自 :mod:`func.screenshot` 的**全局通用截图服务**，
+        原神 / 崩铁 / 鸣潮所有功能共享同一个截图线程。
+        """
+        return latest(self.wt)
+
+    @property
+    def time_limit(self):
+        """截图间隔（秒）。
+
+        老代码里有 ``c.time_limit = 0.2`` 这种「战斗中降频省 CPU」的写法
+        （见 ``副本战斗``），现在截图由全局服务统一负责，所以这里赋值时
+        会同步改服务间隔，保证原有降频行为不失效。
+        """
+        return self._time_limit
+
+    @time_limit.setter
+    def time_limit(self, value):
+        self._time_limit = value
+        set_capture_interval(value)
 
     def check_start(self,time_limit = 0.02):
+        """启动全局循环截图。
+
+        重复调用（多个 check 实例/多个功能）不会重复起线程，
+        只是把共享服务切到本实例的窗口。
+        """
         self.time_limit = time_limit
-        self.stop_event = threading.Event()
         flag = 1
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
-        self.thread = threading.Thread(target=self.get_pic_loop)
-        self.thread.start()
-        time.sleep(1)
+            time.sleep(0.5)
+        start_capture(self.wt, time_limit)
+        wait_first_frame(self.wt)
         self.control.hwnd = get_hwnd('鸣潮  ')
 
         self.control.activate()
         log("获取图片进程已开始")
 
     def check_stop(self):
-        self.stop_event.set()  # 触发停止事件
-        self.thread.join()  # 等待线程结束
+        stop_capture()
         log("获取图片进程已停止")
 
 
-    def get_model_res_loop(self):
+    def get_model_res_loop(self, stop_event):
+        """后台循环：YOLO 找石化古树（size_diff） + 模板匹配算角色朝向（ego_angle）。
+
+        stop_event 用参数传入，而不是每轮读 ``self.stop_event2``：这样即使
+        外面又重新 start 了一轮（属性被覆盖），本线程依然能收到属于自己的
+        停止信号，不会变成永远停不下来的孤儿线程。
+        """
         # x1, y1 = get_position([200, 130])
         # x2, y2 = get_position([250, 190])
         x1, y1 = [200, 130]
         x2, y2 = [250, 190]
-        while True:
+        while not stop_event.is_set():
             time.sleep(self.time_limit2)  # 10ms 检测一次鼠标移动
-            if self.processed_screen is None:
+            screen = self.processed_screen      # 取一次即可，属性访问不必重复
+            if screen is None:
                 continue
             image = f"{self.path}朝向模板.png"
-            cropped = self.processed_screen[y1:y2, x1:x2]
+            cropped = screen[y1:y2, x1:x2]
             self.ego_angle = match_ego_angle(image, cropped)
 
-            match_res = model_match_pic(self.processed_screen)
+            match_res = model_match_pic(screen)
             position_x = 2560 // 2
             if match_res:
                 size = (match_res[0][0]+match_res[0][2])/2
                 self.size_diff = size-position_x
             else:
                 self.size_diff = None
-            if self.stop_event2.is_set():  # 当 e 事件被 set 时，退出循环
-                break
 
     def model_loop_start(self,time_limit = 0.1):
+        # 幂等：上一轮如果没停干净先收掉，避免覆盖 thread2 造成线程泄漏
+        self.model_loop_end()
         self.time_limit2 = time_limit
-        self.stop_event2 = threading.Event()
+        stop_event = threading.Event()
+        self.stop_event2 = stop_event
         flag = 1
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
-        self.thread2 = threading.Thread(target=self.get_model_res_loop)
+            time.sleep(0.5)
+        self.thread2 = threading.Thread(
+            target=self.get_model_res_loop, args=(stop_event,),
+            name='ModelLoop', daemon=True,
+        )
         self.thread2.start()
         time.sleep(1)
         log("获取石化古树检出循环已开始")
 
-    def model_loop_end(self):
-        self.stop_event2.set()  # 触发停止事件
-        self.thread2.join()  # 等待线程结束
+    def model_loop_end(self,timeout = 2):
+        """停止石化古树检出循环（可重复调用）。"""
+        stop_event = self.stop_event2
+        thread = self.thread2
+        if stop_event is None and thread is None:
+            return
+        self.stop_event2 = None
+        self.thread2 = None
+        if stop_event is not None:
+            stop_event.set()        # 触发停止事件
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout)    # 等待线程结束
         log("获取石化古树检出循环已停止")
 
-    def func_loop(self, func):
-        while True:
+    def func_loop(self, func, stop_event):
+        while not stop_event.is_set():
             func()
             time.sleep(self.time_limit_func)
-            if self.stop_event_func.is_set():  # 当 e 事件被 set 时，退出循环
-                break
 
     def func_loop_start(self,func,time_limit = 0.01):
+        # 幂等：上一轮没停干净先收掉，避免覆盖 thread_func 造成线程泄漏
+        self.func_loop_end()
         self.time_limit_func = time_limit
-        self.stop_event_func = threading.Event()
+        stop_event = threading.Event()
+        self.stop_event_func = stop_event
         flag = 1
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
-        self.thread_func = threading.Thread(target=self.func_loop, args=(func,))
+            time.sleep(0.5)
+        self.thread_func = threading.Thread(
+            target=self.func_loop, args=(func, stop_event),
+            name='FuncLoop', daemon=True,
+        )
         self.thread_func.start()
         time.sleep(1)
         log(f"{func}循环已开始")
 
-    def func_loop_end(self):
-        self.stop_event_func.set()  # 触发停止事件
-        self.thread_func.join()  # 等待线程结束
-        log(f"循环已停止")
+    def func_loop_end(self,timeout = 2):
+        """停止 func_loop（可重复调用）。"""
+        stop_event = self.stop_event_func
+        thread = self.thread_func
+        if stop_event is None and thread is None:
+            return
+        self.stop_event_func = None
+        self.thread_func = None
+        if stop_event is not None:
+            stop_event.set()        # 触发停止事件
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout)    # 等待线程结束
+        log("循环已停止")
 
-    def wait_loop(self, name):
+    def wait_loop(self, name, cancel_event):
+        """后台等待 name 出现；出现后把 wait_flag 置 1 供主循环读取。
+
+        被外部取消（新一轮战斗开始）时不置位，否则会把新一轮的
+        战斗输出循环立刻打断。
+        """
         self.wait_flag = 0
         self.waits([name])
+        if cancel_event.is_set():
+            log(f'wait_loop {name} 已取消')
+            return
         self.wait_flag = 1
 
     def wait_loop_start(self,name):
-        self.stop_event_wait = threading.Event()
+        # 幂等：先停掉上一轮，避免「上一轮没检测到目标」时线程越堆越多
+        self.wait_loop_end()
+        cancel_event = threading.Event()
+        self._cancel_wait = cancel_event
         flag = 1
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
-        self.thread_wait = threading.Thread(target=self.wait_loop, args=(name,))
+            time.sleep(0.5)
+        self.thread_wait = threading.Thread(
+            target=self.wait_loop, args=(name, cancel_event),
+            name='WaitLoop', daemon=True,
+        )
         self.thread_wait.start()
         time.sleep(1)
         log(f"wait_loop_start {name}循环已开始")
+
+    def wait_loop_end(self,timeout = 2):
+        """停止 wait_loop（可重复调用）。"""
+        cancel_event = self._cancel_wait
+        thread = self.thread_wait
+        if cancel_event is None and thread is None:
+            return
+        if cancel_event is not None:
+            cancel_event.set()      # 先通知，再等它退出
+        if thread is not None and thread.is_alive() and thread is not threading.current_thread():
+            thread.join(timeout)
+        self._cancel_wait = None
+        self.thread_wait = None
+        log("wait_loop 循环已停止")
 
 
     def match_one_pic(self,name,num = 0.9):
@@ -243,9 +330,24 @@ class check():
         if self.processed_screen is None:
             log('check_start未运行')
             return
+        last_screen = None
         while True:
+            # 被 wait_loop_end 取消时立即退出
+            cancel_event = self._cancel_wait
+            if cancel_event is not None and cancel_event.is_set():
+                return
+            screen = self.processed_screen
+            if screen is None:
+                time.sleep(0.05)
+                continue
+            if screen is last_screen:
+                # 截图服务还没产出新帧，重扫同一张画面结果不会变，
+                # 让出 CPU（原实现这里会 100% 占满一个核）
+                time.sleep(0.005)
+                continue
+            last_screen = screen
             for name in names:
-                position = self.check_one_pic(name,num,self.processed_screen)
+                position = self.check_one_pic(name,num,screen)
                 if position:
                     log(f'wait: {name} 已找到',level=2)
                     time.sleep(0.5)

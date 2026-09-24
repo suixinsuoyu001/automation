@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 # 图片根目录
 # IMAGE_ROOT = os.path.join(os.getcwd(), "static", "images")    
-IMAGE_ROOT = 'E:\images'
+IMAGE_ROOT = r'E:\images'
 
 
 def get_first_images_by_directory(root):

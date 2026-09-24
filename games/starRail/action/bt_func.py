@@ -3,7 +3,7 @@ import pyautogui
 import win32con
 from PIL import Image
 from func.common import *
-from func.get_pic import get_pic
+from func.get_pic import get_pic, latest, start_capture, stop_capture, wait_first_frame
 from func.match.template_match import t_match
 from func.control.back_control import Control
 from func.control.global_match import match
@@ -34,13 +34,14 @@ class check():
         self.hwnd = get_hwnd(windows_title)
         self.control = Control(self.hwnd)
         image_path = current_dir.replace('action','image\\')
-        json_path = current_dir.replace('action','data\img_loc.json')
+        json_path = current_dir.replace('action', 'data\\img_loc.json')
         self.path = image_path
         self.json_path = json_path
         self.t_match = t_match(self.wt, self.path)
         self.locs = read_json(json_path)
-        self.processed_screen = None
         self.focus = False
+        self.thread = None
+        self.stop_event = None
         self.zhs = zhs
         self.g_match = match(image_path,self.num)
 
@@ -50,43 +51,56 @@ class check():
             return True
         return False
 
+    @property
+    def processed_screen(self):
+        """最新一帧画面，来自 :mod:`func.screenshot` 的全局通用截图服务。"""
+        return latest(self.wt)
+
+    def _loop_interval(self):
+        # time_limit 默认是 0，给个下限避免维护线程空转烧 CPU
+        return self.time_limit if self.time_limit and self.time_limit > 0 else 0.05
+
     def get_pic_loop(self):
-        while True:
-            time.sleep(self.time_limit)
-            if self.stop_event.is_set():  # 当 e 事件被 set 时，退出循环
-                break
-            try:
-                pic = get_pic(self.wt)
-            except:
-                pic = None
-                log('图片获取失败')
-            if pic is not None:
-                self.processed_screen = get_pic(self.wt)
-                self.focus = self.is_focus()
-            else:
-                while not get_hwnd(self.wt):
+        """后台维护线程：跟踪焦点窗口 + 窗口重启后重建句柄/控制器。
+
+        画面本身由通用截图服务统一提供（``self.processed_screen``），
+        这里不再重复截图，省掉原来每轮两次 PrintWindow 的开销。
+        """
+        while not self.stop_event.is_set():
+            if latest(self.wt) is None:
+                # 窗口还没起来 / 被关掉了，等它回来再重建句柄
+                while not self.stop_event.is_set() and not get_hwnd(self.wt):
                     log(f'等待{self.wt}启动')
-                    time.sleep(5)
+                    time.sleep(1)
                 self.hwnd = get_hwnd(self.wt)
                 self.control = Control(self.hwnd)
+            self.focus = self.is_focus()
+            self.stop_event.wait(self._loop_interval())
+
     def check_start(self):
-        self.stop_event = threading.Event()
         flag = 1
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
+            time.sleep(0.5)
         self.hwnd = get_hwnd(self.wt)
         self.t_match = t_match(self.wt, self.path)
         self.control = Control(self.hwnd)
-        self.thread = threading.Thread(target=self.get_pic_loop)
+        self.stop_event = threading.Event()
+        start_capture(self.wt, self._loop_interval())
+        wait_first_frame(self.wt)
+        self.thread = threading.Thread(target=self.get_pic_loop, name='BtFocusLoop', daemon=True)
         self.thread.start()
-        time.sleep(1)
+        self.focus = self.is_focus()
         log("获取图片进程已开始")
 
     def check_stop(self):
-        self.stop_event.set()  # 触发停止事件
-        self.thread.join()  # 等待线程结束
+        if self.stop_event is not None:
+            self.stop_event.set()  # 触发停止事件
+        if self.thread is not None and self.thread.is_alive():
+            self.thread.join(2)  # 等待线程结束
+        stop_capture()
         log("获取图片进程已停止")
 
     def show_pic(self):

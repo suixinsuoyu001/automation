@@ -69,6 +69,8 @@ class check():
         """
         self.time_limit = time_limit
         flag = 1
+        if not get_hwnd(self.wt):
+            self.g_match.click(f'图标{resolution[0]}')
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')

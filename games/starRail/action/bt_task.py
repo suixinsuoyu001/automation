@@ -221,7 +221,7 @@ def 每日助战(sign = None):
     c.click('拟造花萼赤',0.7)
     c.click_move_item(sign, '进入')
     c.waits('+')
-    for i in range(2):
+    for i in range(6):
         c.click('+')
     战斗循环(2)
 

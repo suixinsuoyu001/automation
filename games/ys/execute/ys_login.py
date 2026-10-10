@@ -67,5 +67,5 @@ def login_one(n):
 
 if __name__ == '__main__':
 
-    # logins()
-    login_one(6)
+    logins()
+    # login_one(6)

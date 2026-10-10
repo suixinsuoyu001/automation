@@ -394,10 +394,11 @@ def 登录(zh):
     click('同意')
     click('进入游戏')
     click('点击进入')
-    if waits(['菜单','空月祝福']) == '空月祝福':
-        click('空月祝福')
-        if waits(['空月祝福', '空白位置']) == '空月祝福':
-            click('空月祝福')
+    wait1 = waits(['菜单','空月祝福','空月祝福2'])
+    if wait1 in ['空月祝福','空月祝福2']:
+        click(wait1)
+        if waits(['空月祝福','空月祝福2', '空白位置']) == '空月祝福':
+            click(wait1)
         waits(['空白位置'],0.8)
         t = time.time()
         while True:

@@ -193,7 +193,7 @@ def 登录自检(account=None, n=0):
 
     ok = False
     try:
-        c.g_match.click(f'图标{resolution[0]}')
+        c.focus_or_start_game()
         c.check_start()
         c.control.hwnd = get_hwnd(windows_title)
         _状态('check_start 后')

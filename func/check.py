@@ -9,13 +9,25 @@ from games.ys.action.ys_funtion import *
 from func.control.global_match import match
 
 class check():
-    def __init__(self,wt,path,json_path):
+    # 还在等窗口时，每隔这么多秒再试一次「点桌面图标启动」（秒）。
+    # 上一次可能因为「刚点过 / 游戏进程还在 / 图标被挡住」没点成；
+    # 真正点过的会被 func.common 里的冷却挡掉，所以不会连点。
+    start_retry = 45
+
+    def __init__(self,wt,path,json_path,icon = None,exe = None):
         self.wt = wt
         self.path = path
+        # 桌面上的「游戏图标」模板名：游戏没启动时靠它把游戏点起来。
+        # 默认按「图标 + 屏幕宽」命名（原神 / 崩铁都是这个约定），
+        # 鸣潮的图标叫「鸣潮图标」，所以在 games/mc/action/mc_task.py 里显式传入。
+        self.icon = icon or f'图标{resolution[0]}'
+        # 游戏**本体**进程名片段：进程在就说明游戏正在启动（窗口还没画出来），
+        # 这时绝不能再点桌面图标 —— 原神/崩铁会弹「Multiple games are detected」。
+        self.exe = tuple(exe or ())
         self.t_match = t_match(wt, path)
         self.locs = read_json(json_path)
         self.size_diff = None
-        self.control = Control()
+        self.control = Control(get_hwnd(wt))
         self.num = 0.85
         self._time_limit = 0.02
         # wait_loop 用的标志位：0=还在等，1=目标已出现
@@ -66,22 +78,71 @@ class check():
 
         重复调用（多个 check 实例/多个功能）不会重复起线程，
         只是把共享服务切到本实例的窗口。
+
+        游戏还没启动时**先点桌面图标把它拉起来**再等窗口出现，
+        但「点图标」只会点一次（见 func.common.start_game_if_missing）：
+        原神/崩铁是同一个单实例启动器，短时间内连点两次会直接弹
+        「Multiple games are detected. Please exit the existing client.」
+        窗口实在等不到就一直等（保持老行为），不会抛异常中断任务。
         """
         self.time_limit = time_limit
         flag = 1
         if not get_hwnd(self.wt):
-            self.g_match.click(f'图标{resolution[0]}')
+            self.start_game()
+        # 还在等窗口时定期再试一次：上一次可能因为「刚点过 / 游戏进程还在 /
+        # 图标被挡住」没点成，真正点过的会被冷却挡掉，不会连点。
+        next_try = time.time() + self.start_retry
         while not get_hwnd(self.wt):
             if flag:
                 log(f'等待{self.wt}启动')
                 flag = 0
+            if time.time() >= next_try:
+                next_try = time.time() + self.start_retry
+                self.start_game()
             time.sleep(0.5)
         start_capture(self.wt, time_limit)
         wait_first_frame(self.wt)
-        self.control.hwnd = get_hwnd('鸣潮  ')
+        # 句柄必须是**本实例这个游戏**的窗口：原实现这里写死成『鸣潮  』，
+        # 跑原神/崩铁时会把 control 的消息发到别的游戏窗口（关闭时就是 None）。
+        self.control.hwnd = get_hwnd(self.wt)
 
         self.control.activate()
         log("获取图片进程已开始")
+
+    def start_game(self, timeout = 60):
+        """游戏窗口不存在时，点桌面上的游戏图标把它启动起来。
+
+        真正「能不能点、点几次」的判断都在 func.common.start_game_if_missing()：
+        原神和崩铁是同一个**单实例**启动器，短时间内被拉起两次会弹
+        「Multiple games are detected. Please exit the existing client.」，
+        所以「点图标」这件事必须统一由那一个函数管住。
+
+        它不等窗口，只做几次**即时**判断（窗口 / 游戏进程 / 米哈游启动器进程 /
+        默认 0.3 秒的短观察期），所以冷启动时这里只花 ~0.35 秒就会去点图标。
+
+        :return: 是否真的点到了图标
+        """
+        return start_game_if_missing(self.wt, self.g_match, self.icon, self.exe, timeout)
+
+    def focus_or_start_game(self, timeout = 60):
+        """任务入口统一调用：保证游戏窗口**存在且在前台**。
+
+        * 窗口已经在 —— 还原 + 置前（登录流程要键盘/鼠标输入，窗口必须在前台；
+          而且此时**绝不能**再点桌面图标，那会把单实例启动器又拉起一个）
+        * 窗口不在   —— 走 start_game() 点一次桌面图标把游戏启动起来
+
+        :return: 窗口是否已经（或已经点图标去）准备好
+        """
+        if get_hwnd(self.wt):
+            try:
+                # func.common.game_start：还原被最小化的窗口 + 切前台
+                game_start(self.wt)
+            except Exception as e:
+                # 切前台失败不该把任务打挂（老代码 entry 里直接调 game_start，
+                # 这里多一层兜底），继续往下走；实在没切过来会由后续流程体现
+                log(f'{self.wt} 切前台失败（{e}），继续执行')
+            return True
+        return self.start_game(timeout)
 
     def check_stop(self):
         stop_capture()

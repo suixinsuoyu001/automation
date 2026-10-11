@@ -1,11 +1,12 @@
-from games.mc.action.mc_task import g_match,c,每日
+from games.mc.action.mc_task import c,每日
 from games.mc.action.ok import open_ok_ww,close_ok_ww
 import multiprocessing, time, pyautogui, os, signal
 from pynput import keyboard
 
 
 def run(flag = 1):
-    g_match.click('鸣潮图标')
+    # 窗口已经在 -> 只置前；不在 -> 点一次「鸣潮图标」启动（绝不会连点两次）
+    c.focus_or_start_game()
     c.check_start()
     pid = None
     if flag == 1:

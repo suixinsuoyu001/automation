@@ -14,7 +14,10 @@ zhs = [
 ]
 
 def mr():
-    c.g_match.click(f'图标{resolution[0]}')
+    # 窗口已经在 -> 只置前；不在 -> 点一次桌面图标启动
+    # （绝不能自己 g_match.click(图标)：会和别处的点击叠成连点，
+    #   崩铁/原神是同一个单实例启动器，会弹「Multiple games are detected」）
+    c.focus_or_start_game()
     每日(0, 'x毁灭1')			# 流萤 y11
     每日(1, 'x毁灭1')			# 阿格莱雅 y13
     # 每日(2, 'y14')		    # 希儿

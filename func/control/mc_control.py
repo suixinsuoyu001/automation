@@ -28,10 +28,17 @@ key_code = {
 }
 
 
+# 区分「没传 hwnd」和「明确传了 None」：游戏还没启动时句柄就是 None，
+# 不能当成没传去回退成鸣潮窗口，否则按键/点击会发到别的游戏窗口上。
+_UNSET = object()
+
+
 class Control():
 
-    def __init__(self):
-        self.hwnd = get_hwnd('鸣潮  ')
+    def __init__(self, hwnd = _UNSET):
+        # 不传 hwnd 时保持老行为（按鸣潮窗口取）；
+        # func.check 会把自己那个游戏的窗口句柄传进来（原神/崩铁/鸣潮都能用）。
+        self.hwnd = get_hwnd('鸣潮  ') if hwnd is _UNSET else hwnd
         # self.hwnd = 2820420
     def get_key_code(self,key):
         if type(key) == str and len(key) == 1:

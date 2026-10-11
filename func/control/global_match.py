@@ -42,16 +42,29 @@ class match():
 
         return centers
 
-    def click(self,name,num = None):
+    def click(self,name,num = None, timeout = None):
+        """点击屏幕上匹配到的第一个模板图。
+
+        timeout=None（默认）时一直找，找到才返回 —— 老行为不变；
+        给了秒数则超时返回 False，交给调用方决定后面怎么办，
+        避免「图标永远不出现」时任务一直死等（例如点桌面游戏图标时
+        图标被别的窗口挡住、或者根本没显示在当前显示器上）。
+
+        :return: 是否点到了（超时返回 False）
+        """
         log(f'click:{name} 开始捕获')
         if num is None:
             num = self.num
+        deadline = time.time() + timeout if timeout else None
         while True:
             matches = self.find_image_on_screen(name,num)
             if matches:
                 pyautogui.click(matches[0])
                 log(f'click:{name} 已捕获并点击')
-                break
+                return True
+            if deadline is not None and time.time() >= deadline:
+                log(f'click:{name} {timeout}s 内未找到，已放弃')
+                return False
 
     def wait(self,name,num = None):
         if num is None:

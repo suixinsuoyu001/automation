@@ -44,6 +44,12 @@ class check():
         self.stop_event = None
         self.zhs = zhs
         self.g_match = match(image_path,self.num)
+        # 桌面图标模板名（游戏没启动时点它启动）+ 游戏**本体**进程名片段，
+        # 见 func.common.start_game_if_missing：崩铁和原神共用一个单实例启动器，
+        # 「已经在跑 / 正在启动」时不能再点图标，否则会弹
+        # 「Multiple games are detected. Please exit the existing client.」
+        self.icon = f'图标{resolution[0]}'
+        self.exe = ('starrail.exe',)
 
     def is_focus(self):
         focus = get_focus_window()
@@ -94,6 +100,28 @@ class check():
         self.thread.start()
         self.focus = self.is_focus()
         log("获取图片进程已开始")
+
+    def start_game(self, timeout = 60):
+        """窗口不在时点桌面图标把游戏启动起来。
+
+        冷却 / 进程 / 宽限判断都在 func.common.start_game_if_missing() 里，
+        所以不会「任务入口点一次 + 这里再点一次」把单实例启动器拉起两个，
+        直接弹「Multiple games are detected. Please exit the existing client.」。
+
+        :return: 是否真的点到了图标
+        """
+        return start_game_if_missing(self.wt, self.g_match, self.icon, self.exe, timeout)
+
+    def focus_or_start_game(self, timeout = 60):
+        """任务入口统一调用：窗口在 -> 还原 + 置前；不在 -> 点一次桌面图标启动。"""
+        if get_hwnd(self.wt):
+            try:
+                game_start(self.wt)
+            except Exception as e:
+                # 切前台失败不该把任务打挂，继续往下走
+                log(f'{self.wt} 切前台失败（{e}），继续执行')
+            return True
+        return self.start_game(timeout)
 
     def check_stop(self):
         if self.stop_event is not None:

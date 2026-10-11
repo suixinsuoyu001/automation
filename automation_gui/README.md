@@ -136,6 +136,70 @@ screenshot.stop_capture()             # 停止
 * 循环线程每帧都产生**全新 ndarray** 再整体替换引用，从不原地修改，
   因此 `latest()` 可以零拷贝返回，调用方不会读到撕裂画面。
 
+### `check_start` 与「游戏还没打开」的处理（`func/check.py`）
+
+原神 / 崩铁 / 鸣潮 都用 `func/check.py` 的 `check` 类，`check_start()` 里原来有两处
+写死了鸣潮，导致「刚双击完游戏图标、游戏还没打开就点开始任务」直接报错或按键发错窗口：
+
+* **桌面图标模板按游戏区分**：`check(wt, path, json_path, icon=None)` 新增 `icon` 参数，
+  默认 `图标{屏幕宽}`（`setting.json` 的 `resolution[0]` 决定文件名，原神 / 崩铁都是
+  这个约定），鸣潮的图标叫「鸣潮图标」，所以在 `games/mc/action/mc_task.py` 里显式传入。
+* **点图标不再抛异常**：`start_game()` 用 `global_match.click(icon, timeout=60)` 限时找图标，
+  模板文件不存在（以前这里是 `FileNotFoundError`，直接把任务打挂）或超时找不到，
+  都只记一条日志、返回 `False`，然后照常执行「等待窗口出现」的老流程。
+* **`control` 绑的是本游戏的窗口**：`check_start()` 里原本是写死的 `get_hwnd('鸣潮  ')`，
+  跑原神 / 崩铁时按键和点击会发到鸣潮窗口（鸣潮没开就是 `None`，等于什么都不点）。
+  现在统一用 `get_hwnd(self.wt)`；`Control(hwnd)` 也支持由调用方传入句柄，
+  `Control()` 不传时保持老行为。
+
+### 只允许点一次桌面图标：`Multiple games are detected` (3,0,0)（`func/common.py`）
+
+原神批量登录会弹
+
+```
+Multiple games are detected.
+Please exit the existing client.
+Error Code:(3,0,0)
+```
+
+原因是**同一秒内点了两次桌面图标**：任务入口（`ys_login.logins` 等）自己写了
+`c.g_match.click(f'图标{resolution[0]}')`，紧接着 `check_start()` 里的 `start_game()`
+发现窗口还没出现，又点了一次 —— 原神和崩铁共用的是一个**单实例**启动器，
+被拉起两次就弹这个对话框，之后游戏再也起不来，任务只能卡死在「等待窗口」。
+
+现在所有「把游戏启动起来」的动作都统一走 `func.common.start_game_if_missing()`，
+由它保证只点一次：
+
+* **窗口已经在** → 任务入口改调 `check.focus_or_start_game()`：只做「还原 + 置前」
+  （登录流程要键盘输入，窗口必须在最前），**绝不点图标**。
+* **刚点过一次图标** → `GAME_START_COOLDOWN`（150 秒）内不再点。
+* **游戏进程已经在跑** → 说明正在启动（窗口还没画出来），不点，继续等窗口。
+  进程名由各游戏注册：`check(..., exe=[...])`，原神 `yuanshen.exe` /
+  `genshinimpact.exe`，崩铁 `starrail.exe`（`bt_func.check` 里写死），
+  鸣潮 `client-win64-shipping.exe`。
+* **米哈游启动器进程已经在跑** → 说明启动器正在起来（窗口还没出来）：追加等
+  `GAME_START_LAUNCHER_GRACE`（最多 2.5 秒）看窗口会不会自己出现；超时
+  （比如启动器只是缩在托盘里）就照常点图标 —— **不无限等、不卡死**。
+  进程名 `launcher.exe` 太通用，所以按 exe 路径里的 `miHoYo Launcher` 目录来认。
+* **上面都没命中** → 只留 `GAME_START_GRACE`（0.3 秒）盯窗口：每 40ms 查一次
+  `get_hwnd`（EnumWindows 很便宜），窗口冒出来就不点，否则点图标。
+
+冷启动时这一整套判断 + 点图标实测只花 **~0.33 秒**（本机：`get_hwnd` 0.6ms、
+进程扫描 26ms、启动器检查 1.2ms，加 0.3 秒观察期）。**不是盲等**：原来那 5 秒
+只是为了「万一用户刚好双击了图标」而干等，现在换成确定性的即时信号 + 极短观察期。
+
+* 还在等窗口时，`check_start()` 每 45 秒会再试一次 `start_game()`，
+  上一次因为「刚点过 / 进程还在 / 图标被挡住」没点成的情况能自愈（不会连点）。
+
+`games/starRail/action/bt_func.py` 的 `check`（崩铁自己的那份实现）也加了同名的
+`start_game()` / `focus_or_start_game()`，行为一致。
+
+回归测试（全程不真的点桌面，句柄与 pyautogui 都用替身，约 25 秒）：
+
+```powershell
+venv\Scripts\python.exe tool/check_start_test.py
+```
+
 ### 任务执行器为什么不能用 daemon（`core/task_runner.py`）
 
 `ys_talk` / `bt_talk` / `bt_auto` / `bt_mnyz` / `mc_jq` / `mc_hd` 这些脚本

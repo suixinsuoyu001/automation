@@ -229,6 +229,157 @@ def game_start(windows_title):
             if focus and windows_title in focus:
                 break
 
+
+# ---------------------------------------------------------------------------
+# 「把游戏启动起来」的安全实现（原神 / 崩铁 / 鸣潮共用）
+#
+# 背景：原神和崩铁共用一个**单实例**启动器。如果短时间内被拉起两次
+# （典型场景：任务入口先点了一次桌面图标，紧接着 check_start 又点了一次），
+# 启动器会直接弹
+#     Multiple games are detected. Please exit the existing client.
+#     Error Code:(3,0,0)
+# 对话框一出来游戏就再也起不来，任务只能卡死在「等待窗口」上。
+#
+# 所以「点桌面图标启动游戏」统一走 start_game_if_missing()，由它保证：
+#   * 窗口已经在     -> 调用方先判断，根本不会点（点图标 = 又拉起一个启动器）
+#   * 刚点过一次图标 -> GAME_START_COOLDOWN 秒内不再点（游戏正在启动）
+#   * 游戏进程已经在 -> 说明正在启动（窗口还没画出来），不点，继续等窗口
+#   * 启动器进程在跑 -> 说明正在启动（只是窗口还没出来），先等窗口出来再决定
+#   * 上面都没命中   -> 只留 GAME_START_GRACE（0.3 秒）确认一下，然后点图标
+#
+# 为什么不做「干等 5 秒」：查窗口（EnumWindows）和查进程（psutil 走一圈
+# 只 ~28ms）都是确定性的即时信号，比盲等可靠也快得多；实测冷启动时
+# 「判断 + 点击图标」现在总共只花 ~0.35 秒。
+# ---------------------------------------------------------------------------
+
+GAME_START_COOLDOWN = 150    # 两次「点桌面图标」之间的最小间隔（秒）
+GAME_START_GRACE = 0.3       # 点图标前盯窗口的时间（秒）：只要窗口自己冒出来就不点
+GAME_START_POLL = 0.04       # 观察期内查窗口的间隔（秒，EnumWindows 很便宜）
+GAME_START_LAUNCHER_GRACE = 2.5   # 发现「启动器正在跑但窗口还没出来」时的追加等待（秒）
+
+# 米哈游启动器（原神/崩铁共用同一个单实例启动器）：
+# 进程名 launcher.exe 太通用，所以按**完整路径**里的安装目录来认，
+# 例如 D:\miHoYo Launcher\launcher.exe -> 命中 'mihoyo launcher'。
+MHY_LAUNCHER_PATH = 'mihoyo launcher'
+
+# 窗口标题 -> 上一次成功点桌面图标的时间。按标题存，所以各模块各自 new
+# 出来的 check 实例共享同一份状态，不会「你点一次我再点一次」。
+_game_started_at = {}
+
+
+def game_process_running(exe_names):
+    """游戏**本体**进程是否已经在运行（窗口可能还没画出来）。
+
+    exe_names 里写进程名片段即可（小写比较），例如 ``('yuanshen.exe',)``；
+    传空 / None 表示不做这项判断（只靠窗口 + 宽限判断）。
+
+    实测 300+ 进程的机器上走一圈约 28ms，比「盲等几秒」划算得多。
+    """
+    names = [n.lower() for n in (exe_names or ()) if n]
+    if not names:
+        return False
+    try:
+        for process in psutil.process_iter(['name']):
+            name = (process.info.get('name') or '').lower()
+            if name and any(n in name for n in names):
+                return True
+    except Exception as e:
+        # 查询进程失败不能影响任务：当作「没检测到」处理
+        log(f'game_process_running: 查询进程失败，忽略本次判断（{e}）')
+    return False
+
+
+def launcher_running(path_hint = MHY_LAUNCHER_PATH):
+    """米哈游启动器是否正在运行（窗口可能还没出来）。
+
+    只看名字 ``launcher.exe`` 太容易误判（别的软件也用这个名字），所以要求
+    **exe 路径**里有 ``miHoYo Launcher`` 目录。读不到路径（权限不足）就当没
+    命中 —— 漏判只会退回到「短观察期后照常点图标」，不会把任务卡死。
+    """
+    try:
+        for process in psutil.process_iter(['name']):
+            if (process.info.get('name') or '').lower() != 'launcher.exe':
+                continue
+            try:
+                exe = (process.exe() or '').lower()
+            except Exception:
+                continue
+            if path_hint in exe:
+                return True
+    except Exception as e:
+        log(f'launcher_running: 查询进程失败，忽略本次判断（{e}）')
+    return False
+
+
+def start_game_if_missing(windows_title, g_match, icon = None, exe = None, timeout = 60):
+    """游戏窗口不在时，点桌面上的游戏图标把游戏启动起来。
+
+    **绝不会连点两次**（原因见上面的大段注释），也只记日志、**不抛异常** ——
+    图标模板不存在、桌面上找不到图标（被其它窗口挡住 / 不在当前显示器）时
+    返回 False，调用方照常继续等窗口。
+
+    判断顺序（前三条都是即时的，最后才是 0.3 秒的短观察期）::
+
+        窗口已在 / 刚点过 / 游戏进程在跑 / 启动器进程在跑  -> 不点
+        否则 -> 盯 GAME_START_GRACE 秒（窗口冒出来就不点）-> 再确认一次进程 -> 点
+
+    :param g_match: func.control.global_match.match 实例（全屏找图 + 点击）
+    :param icon:    桌面图标模板名，默认「图标 + 屏幕宽」（原神/崩铁的约定）
+    :param exe:     游戏本体进程名片段，例如 ('yuanshen.exe',)
+    :return: 本次是否真的点了桌面图标
+    """
+    icon = icon or f'图标{resolution[0]}'
+    now = time.time()
+    last = _game_started_at.get(windows_title)
+    if last and now - last < GAME_START_COOLDOWN:
+        log(f'{windows_title} {int(now - last)}s 前刚点过桌面图标「{icon}」，'
+            f'不再重复点击（重复启动会弹「Multiple games are detected」）')
+        return False
+    if get_hwnd(windows_title):
+        log(f'{windows_title} 窗口已经在，不点桌面图标')
+        return False
+    if game_process_running(exe):
+        log(f'{windows_title} 进程已经在运行（窗口还没出来），不点桌面图标，继续等窗口')
+        return False
+
+    # 短观察期：用户可能刚好双击过图标（启动器还在起来），这期间一旦窗口
+    # 出现就放弃点击 —— 不盲等，只花 GAME_START_GRACE（默认 0.3 秒）。
+    deadline = now + GAME_START_GRACE
+    extended = False
+    while True:
+        if get_hwnd(windows_title):
+            log(f'{windows_title} 窗口已出现，不点桌面图标')
+            return False
+        if time.time() >= deadline:
+            # 启动器进程在跑但窗口还没出来：它在启动（正常几百毫秒后就有窗口），
+            # 也可能是被用户缩到托盘里了。再给 GAME_START_LAUNCHER_GRACE 秒，
+            # 超时就照常点图标，绝不无限等。
+            if not extended and launcher_running():
+                log('检测到米哈游启动器正在运行（窗口还没出来），'
+                    f'再等 {GAME_START_LAUNCHER_GRACE:g} 秒看窗口会不会自己出现')
+                deadline = time.time() + GAME_START_LAUNCHER_GRACE
+                extended = True
+                continue
+            break
+        time.sleep(GAME_START_POLL)
+    # 观察期结束再确认一次：用户双击后游戏本体进程可能刚好起来了
+    if game_process_running(exe):
+        log(f'{windows_title} 进程已经开始运行，不点桌面图标，继续等窗口')
+        return False
+
+    try:
+        clicked = g_match.click(icon, timeout = timeout)
+    except FileNotFoundError as e:
+        log(f'找不到桌面图标模板「{icon}」（{e}），跳过自动启动，改为等待窗口')
+        return False
+    if clicked:
+        _game_started_at[windows_title] = time.time()
+        log(f'已点击桌面图标「{icon}」，等待 {windows_title} 窗口出现')
+    return clicked
+
+
+
+
 def close_exe(name):
     name += ".exe"
     for process in psutil.process_iter(['pid', 'name']):

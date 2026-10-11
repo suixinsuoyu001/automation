@@ -33,7 +33,10 @@ with open('games/ys/data/兑换码.txt', "r", encoding="utf-8") as fp:
     codes = [line.strip() for line in fp]
 fp.close()
 
-c = check(windows_title,image_path,json_path)
+# exe：游戏**本体**的进程名（写片段即可）。游戏已经在跑（或正在启动）时
+# 绝不能再点桌面图标 —— 原神和崩铁是同一个单实例启动器，重复拉起会弹
+# 「Multiple games are detected. Please exit the existing client.」
+c = check(windows_title,image_path,json_path,exe = ['yuanshen.exe','genshinimpact.exe'])
 m = match(image_path,0.9)
 
 num = 0.85

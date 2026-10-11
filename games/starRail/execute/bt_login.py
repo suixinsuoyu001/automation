@@ -3,15 +3,15 @@ import keyboard
 
 def login_one(n):
     c.zhs = zhs
-    # game_start(windows_title)
-    c.g_match.click(f'图标{resolution[0]}')
+    # 窗口已经在 -> 只置前；不在 -> 点一次桌面图标启动
+    c.focus_or_start_game()
     登录(c.zhs[n])
     c.check_stop()
 
 def logins():
     c.zhs = zhs
-    # game_start(windows_title)
-    c.g_match.click(f'图标{resolution[0]}')
+    # 窗口已经在 -> 只置前；不在 -> 点一次桌面图标启动
+    c.focus_or_start_game()
     # 屏蔽游戏窗口的中文输入法，防止登录时切换成中文输入
     c.control.disable_ime_all()
     # 启动输入法看门狗：仅在游戏窗口处于前台时强制英文输入，

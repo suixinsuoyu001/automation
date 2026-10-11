@@ -5,8 +5,11 @@ from games.ys.action.ys_action import *
 
 
 def logins():
-    c.g_match.click(f'图标{resolution[0]}')
-    # game_start(windows_title)
+    # 统一入口：窗口已经在 -> 只还原 + 置前；不在 -> 点**一次**桌面图标启动。
+    # 千万不要再自己写 c.g_match.click(图标)：它会和 check_start() 里的那次
+    # 点击叠成「连点两次图标」，把原神的单实例启动器拉起两个，直接弹
+    # 「Multiple games are detected. Please exit the existing client.」
+    c.focus_or_start_game()
     c.check_start()
     # 屏蔽原神窗口的中文输入法，防止登录时切换成中文输入
     c.control.hwnd = get_hwnd(windows_title)
@@ -47,7 +50,8 @@ def login_one(n):
     else:
         log(f'login_one: 无效的账号参数 {n!r}')
         return
-    # game_start(windows_title)
+    # 和 logins() 一样：先把游戏弄到前台（没启动就点一次图标启动），再等截图服务
+    c.focus_or_start_game()
     c.check_start()
     # 屏蔽原神窗口的中文输入法，防止登录时切换成中文输入
     c.control.hwnd = get_hwnd(windows_title)

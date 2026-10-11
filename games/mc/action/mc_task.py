@@ -13,7 +13,12 @@ from games.mc.data.mc_data import *
 g_match = match(image_path,0.85)
 
 
-c = check(windows_title,image_path,json_path)
+# 桌面图标模板叫「鸣潮图标」（不是原神/崩铁那套「图标2560」），
+# 所以显式告诉 check：游戏没启动时该点哪张图。
+# exe：游戏本体进程名，鸣潮已经在跑（或正在启动）时就不再点桌面图标，
+# 免得把启动器又拉起来一个。
+c = check(windows_title,image_path,json_path,icon = '鸣潮图标',
+          exe = ['client-win64-shipping.exe'])
 
 
 def pic_click(names,matches):

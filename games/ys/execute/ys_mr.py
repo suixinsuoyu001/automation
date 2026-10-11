@@ -14,8 +14,10 @@ from games.ys.action.ys_action import *
 
 def run():
     # 打开betterGi2()
-    c.g_match.click(f'图标{resolution[0]}')
-    # game_start(windows_title)
+    # 先把游戏弄到前台/启动起来：窗口已经在就只置前，不在才点**一次**桌面图标。
+    # 不要自己 g_match.click(图标)：那会和 check_start() 里的点击叠成连点，
+    # 把原神的单实例启动器拉起两个，弹「Multiple games are detected」。
+    c.focus_or_start_game()
     c.check_start()
     每日(0, 9)
     每日(1, 9)

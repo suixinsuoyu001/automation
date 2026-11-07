@@ -74,6 +74,27 @@ def run3(zh_num = 0, num = 1):
     finally:
         c.check_stop()      # 无论成功失败都收掉共享截图线程
 
+def run_flex(zh_num = None):
+    """灵活副本战斗（GUI 任务「原神灵活副本战斗」走这个入口）。
+
+    和 run3 的区别：**不传送、不切队伍、不看秘境编号** —— 打的就是角色当前
+    站的这个秘境（秘境配置里没有的本、临时活动本都能用）。
+
+    zh_num: 账号/队伍编号（决定用哪套输出轴，见 ys_action.获取队伍配置）；
+            None / '' 时按游戏内 UID 自动识别（ys_action.uid转zh_num）
+
+    前提：游戏已启动、已登录到对应账号、角色站在秘境里（手动走进去或传送都行）。
+
+    和 run3 一样，动作层的 灵活副本战斗 不会启动截图循环，所以这里自己
+    check_start/check_stop，否则里面的 waits 会一直等不到新画面。
+    """
+    game_start(windows_title)
+    c.check_start()
+    try:
+        灵活副本战斗(zh_num)
+    finally:
+        c.check_stop()      # 无论成功失败都收掉共享截图线程
+
 if __name__ == '__main__':
 
     # # 登录(zh[0])

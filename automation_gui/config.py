@@ -47,18 +47,37 @@ DEFAULT_YS_ACCOUNTS = [
 ]
 
 # 默认账号列表（崩坏：星穹铁道）
+# 顺序与 games/starRail/execute/bt_login.py 的 zhs 一一对应（改这里记得同步那边），
+# 这样 GUI 显示的序号 = 脚本里的序号。
 DEFAULT_BT_ACCOUNTS = [
     "suixin001007@163.com",  # 0 流萤
     "suixin001006@163.com",  # 1 阿格莱雅
-    "suixin001009@163.com",  # 2 希儿
-    "suixin001001@163.com",  # 3 大黑塔
-    "13280859317",           # 4 黄泉
-    "suixin001002@163.com",  # 5 遐蝶
-    "suixin001005@163.com",  # 6 万敌
-    "suixin001003@163.com",  # 7 龙丹
-    "suixin001004@163.com",  # 8 暂无
-    "suixin001008@163.com",  # 9 风堇
+    "suixin001001@163.com",  # 2 大黑塔
+    "13280859317",           # 3 黄泉
+    "suixin001002@163.com",  # 4 遐蝶
+    "suixin001005@163.com",  # 5 万敌
+    "suixin001008@163.com",  # 6 风堇
+    "suixin001009@163.com",  # 7 希儿
+    "suixin001003@163.com",  # 8 龙丹
+    "suixin001004@163.com",  # 9 暂无
 ]
+
+# 崩铁账号备注（账号 -> 会员/角色备注名），只给 GUI 显示用。
+# 任务卡片上的「账号」下拉框会显示成「账号（备注）」，
+# 实际传给任务函数的仍然是账号本身（见 automation_gui/core/tasks.py 的
+# bt_account_name_choices）。账号页里新加的账号如果这里没有，就只显示账号。
+BT_ACCOUNT_REMARKS = {
+    "suixin001007@163.com": "流萤",
+    "suixin001006@163.com": "阿格莱雅",
+    "suixin001001@163.com": "大黑塔",
+    "13280859317": "黄泉",
+    "suixin001002@163.com": "遐蝶",
+    "suixin001005@163.com": "万敌",
+    "suixin001008@163.com": "风堇",
+    "suixin001009@163.com": "希儿",
+    "suixin001003@163.com": "龙丹",
+    "suixin001004@163.com": "暂无",
+}
 
 # 原神圣遗物秘境：默认「编号 -> 模板图片名」映射。
 # 首次运行会写入 games/ys/data/秘境圣遗物.json，之后以该 json 为准，

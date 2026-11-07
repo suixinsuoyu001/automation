@@ -214,13 +214,15 @@ class check():
         else:
             log("匹配失败")
 
-    def post(self,func, a1=None, a2=None):
+    def post(self,func, *args):
         """点击 / 按键的统一封装：临时屏蔽用户输入并置前，做完再还原。
 
         原来这段**没有 try/finally**：中间任何一步抛异常（句柄失效、
         SetCursorPos 失败……），``BlockInput(True)`` 就再也不会被解除 ——
         整个系统的键盘鼠标都被屏蔽（表现就是「点什么都没反应、切换窗口很卡」），
         只能杀进程才能恢复。所以这里必须用 finally 兜底。
+
+        ``*args`` 原样转发给 func（text_input 需要额外传 before_input 回调）。
         """
         self.control.block_user_input()
         x = y = None
@@ -229,12 +231,7 @@ class check():
             time.sleep(0.01)
             x, y = self.control.get_mouse_position()
             time.sleep(0.01)
-            if a2:
-                func(a1, a2)
-            elif a1:
-                func(a1)
-            else:
-                func()
+            func(*args)
             time.sleep(0.02)
             self.control.inactivate()
             time.sleep(0.03)
@@ -406,7 +403,13 @@ class check():
             if position:
                 return name
 
-    def text_input(self,name,text,num = None):
+    def text_input(self,name,text,num = None,before_input = None):
+        """找到输入框 -> 点进去 -> 逐字输入 text。
+
+        :param before_input: 点中输入框之后、真正打字之前的回调（可选）。
+            用来在输入框已经获得焦点的那一刻把中文输入法挡回英文，
+            见 ``Control.click_input`` 与 bt_task.登录()。
+        """
         num = self.num if num is None else num
         log(f'text_input:{name} 开始捕获录入',level=2)
         if self.processed_screen is None:
@@ -417,7 +420,7 @@ class check():
             position = self.check_one_pic(name,num,self.processed_screen)
             if position:
                 log(f'text_input: {name} 已找到开始点击输入',level=2)
-                self.post(self.control.click_input, get_position(position[0]),text)
+                self.post(self.control.click_input, get_position(position[0]),text,before_input)
                 return name
 
     def hold_click(self,point):

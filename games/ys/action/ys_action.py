@@ -1,5 +1,7 @@
 import time
 
+import pyperclip
+
 from func.common import *
 from func.check import *
 from func.control.global_match import *
@@ -47,6 +49,17 @@ num = 0.85
 # 战后走向「石化古树」的对准超时（秒）。
 # 原实现这段没有超时，古树一直识别不到就会无限循环，只能人工点「停止任务」。
 对准古树超时 = 30
+
+# 副本战斗（秘境）的两段限时（秒）：
+#   战斗限时  从开局（等「挑战达成」的后台线程启动）算起，单场战斗最多打这么久。
+#             打不过/团灭/角色卡地形时「挑战达成」永远不会出现，原实现会在
+#             输出轴循环里无限按键，只能人工点「停止任务」。
+#   领奖限时  战斗结束后（get_ego_angle 对准石化古树成功后）等领取面板、
+#             判断树脂类型的**总**时间，面板一直不出现（掉线/卡读条/判定失败）
+#             就放弃这次领取。
+# 任一超时都让 `副本战斗` 返回 False，由 `秘境_圣遗物` 退出秘境后重新传送重试。
+战斗限时 = 180       # 3 分钟
+领奖限时 = 20
 
 
 class 截图服务未启动(RuntimeError):
@@ -216,6 +229,38 @@ def waits_many(names,num = num):
         if position:
             res.append(name)
     return res
+
+def _剩余秒数(deadline, 最小 = 0.2):
+    """到 deadline 还剩多少秒（至少返回 最小，避免 0/负数传给限时等待）。"""
+    return max(最小, deadline - time.time())
+
+
+def waits_many_limit(names, t, num = num):
+    """在 t 秒内等 names 中任意一项出现，返回**同时可见**的项列表；超时返回 []。
+
+    和 waits_many 的唯一区别是**有超时**：领奖面板这类「等不到就该放弃」的
+    场景不能无限等（见 副本战斗 的领奖限时），否则掉线/卡读条时会一直挂着。
+    """
+    log(f'waits_many_limit:{names} 开始捕获（限时 {t:g}s）',level=2)
+    _ensure_capture_started()
+    deadline = time.time() + t
+    last_screen = None
+    while time.time() < deadline:
+        focus = get_focus_window()
+        if not (focus and '原神' in focus):
+            time.sleep(0.05)
+            continue
+        screen = _next_screen(last_screen)
+        if screen is None:
+            continue
+        last_screen = screen
+        if any(c.check_one_pic(name, num, screen) for name in names):
+            # 命中后再复扫一帧，把同时可见的项都收集起来（和 waits_many 一致）
+            screen = c.processed_screen
+            return [name for name in names if c.check_one_pic(name, num, screen)]
+    log(f'waits_many_limit:{names} 未捕获，超时取消',level=2)
+    return []
+
 
 def waits_speed(names,num = num):
     log(f'waits:{names} 开始捕获',level=2)
@@ -699,7 +744,9 @@ def 秘境_圣遗物(zh_num,num):
             return
         log('秘境_圣遗物: 本次挑战失败，退出秘境后重新传送')
         pyautogui.press('esc')
-        click('确认标识')
+        # 用限时点击代替 click()：战斗超时/领奖超时后界面可能根本没有「确认」
+        # 弹窗，click() 会一直死等，等于把刚加的超时又抵消掉
+        click_limit('确认标识', 5)
         time.sleep(7)
 
 def 晶蝶传送(name):
@@ -852,6 +899,58 @@ def p(s,t = 1.0):
         time.sleep(t)
         pyautogui.keyUp(s[0])
 
+def 获取uid():
+    waits(['菜单'])
+    pyautogui.press('esc')
+    click('复制')
+    uid = pyperclip.paste()
+    time.sleep(0.5)
+    pyautogui.press('esc')
+    time.sleep(0.5)
+    pyautogui.press('esc')
+    return uid
+
+def uid转zh_num(uid):
+    zh_num = None
+    if uid == '107211449':
+        zh_num = '0'
+    elif uid == '199231974':
+        zh_num = 6
+    return zh_num
+
+def 灵活副本战斗(zh_num = None):
+    """站在**当前所在秘境**里直接开打 + 领奖 + 分解圣遗物（不传送、不切队伍）。
+
+    GUI 任务「原神灵活副本战斗」走这里（入口 ys_mr.run_flex）。和 秘境_圣遗物 的
+    区别：不看秘境编号、不开地图传送 —— 打的就是角色此刻站的这个本，所以
+    秘境配置（秘境圣遗物.json）里没有的新本也能用。
+
+    :param zh_num: 账号/队伍编号（决定用哪套输出轴，见 获取队伍配置）；
+                   None / '' 时按游戏内 UID 自动识别（uid转zh_num）
+    :return: True 打完了；False 没打成（找不到输出轴 / 战斗或领奖超时）
+    """
+    if zh_num is None or zh_num == '':
+        uid = 获取uid()
+        zh_num = uid转zh_num(uid)
+        log(f'灵活副本战斗: 按 UID {uid} 识别到账号编号 {zh_num}')
+    fight_txt = 获取队伍配置(zh_num, '秘境')
+    if not fight_txt:
+        # 以前这里会把 None 直接丢给 副本战斗 -> AutoFight[None] 报 KeyError，
+        # 现在改成一条明确的提示：卡片上手动选账号，或去 队伍.json 补配置。
+        log(f'灵活副本战斗: 编号 {zh_num} 在 games/ys/data/队伍.json 里没有「秘境」输出轴，'
+            f'请在任务卡片「账号」里手动选一个账号')
+        return False
+    log(f'灵活副本战斗: 使用输出轴 {fight_txt}')
+    if not 副本战斗(fight_txt):
+        log('灵活副本战斗: 本次挑战失败，退出秘境（不会自动重传，因为是「灵活」模式）')
+        pyautogui.press('esc')
+        # 用限时点击代替 click()：战斗超时/领奖超时后界面可能根本没有「确认」
+        # 弹窗，click() 会一直死等，等于把超时又抵消掉
+        click_limit('确认标识', 5)
+        圣遗物分解()
+        return False
+    圣遗物分解()
+    return True
 
 
 def 副本战斗(fight_txt):
@@ -872,10 +971,19 @@ def 副本战斗(fight_txt):
                 pyautogui.keyUp('w')
         c.wait_loop_start('挑战达成')
         pyautogui.press('f')
+        # 战斗内限时：从开局算起最多打 战斗限时。打不过（团灭）/角色卡地形时
+        # 「挑战达成」永远不会出现，原实现会在输出轴里无限按键。
+        # 超时直接返回 False，交给 秘境_圣遗物 退出秘境后重新传送。
+        战斗开始 = time.time()
         while True:
             for s in AutoFight[fight_txt].split(' '):
                 if c.wait_flag:
                     break
+                if time.time() - 战斗开始 > 战斗限时:
+                    log(f'副本战斗: 战斗超过 {战斗限时}s 仍未达成，放弃本场（退出秘境后重试）')
+                    c.wait_loop_end()       # 收掉还在等「挑战达成」的后台线程
+                    c.time_limit = 0.02     # 恢复常规帧间隔，别让退出/重传阶段一直高频截图
+                    return False
                 if '(' in s:
                     key = s.split('(')[0]
                     t = s.split('(')[1].replace(')','')
@@ -890,14 +998,26 @@ def 副本战斗(fight_txt):
 
         if not get_ego_angle():
             return False
+        # 战斗外（领奖）限时：从这里开始算，等领取面板 + 判断树脂共用 领奖限时。
+        # 面板一直不出现（掉线/卡读条/判定失败）就不再无限等，放弃本次领取。
+        领奖截止 = time.time() + 领奖限时
         pyautogui.press('f')
         time.sleep(0.5)
         pyautogui.press('f')
         time.sleep(1)
         pyautogui.moveTo([0,0])
-        w1 = waits_many(['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识','秘宝领取_20原粹树脂'])
+        w1 = waits_many_limit(
+            ['秘宝领取_原粹树脂','秘宝领取_浓缩树脂','秘宝领取_转换标识','秘宝领取_20原粹树脂'],
+            _剩余秒数(领奖截止, 1))
+        if not w1:
+            log(f'副本战斗: 领奖面板 {领奖限时}s 内未出现，放弃本次领取')
+            return False
         if '秘宝领取_浓缩树脂' in w1:
-            w_sz = waits(['浓缩树脂1', '浓缩树脂标识'])
+            w_sz_list = waits_many_limit(['浓缩树脂1', '浓缩树脂标识'], _剩余秒数(领奖截止))
+            w_sz = w_sz_list[0] if w_sz_list else None
+            if w_sz is None:
+                log(f'副本战斗: 领奖超过 {领奖限时}s 仍未识别到浓缩树脂界面，放弃本次领取')
+                return False
             pyautogui.click(get_position(浓缩树脂使用坐标))
             log(n)
             if w_sz == '浓缩树脂1' and n >= 2:
@@ -1093,14 +1213,15 @@ zh = [item['账号'] for _, item in 账号表按编号()]
 zhs = 启用账号()
 if __name__ == '__main__':
     log('开始执行')
-    # time.sleep(1)
-    res = c.t_match.save_pic_loc('登录其他账号',json_path)
+    # # time.sleep(1)
+    # res = c.t_match.save_pic_loc('登录其他账号',json_path)
     c.check_start()
+    # # 秘境_圣遗物(1, 5)
+    # # 幽境危战战斗循环(1, 2)
+    # # 秘境_圣遗物(5, 1)
+    # # # 每日2(7,1)
+    # # # 成就领取()
+    # # 兑换码()
+    # # c.check_stop()
     # 秘境_圣遗物(1, 5)
-    # 幽境危战战斗循环(1, 2)
-    # 秘境_圣遗物(5, 1)
-    # # 每日2(7,1)
-    # # 成就领取()
-    # 兑换码()
-    # c.check_stop()
-    秘境_圣遗物(1, 5)
+    灵活副本战斗()

@@ -897,7 +897,15 @@ class Control():
         # 抬起 Shift
         ctypes.windll.user32.PostMessageW(hwnd, win32con.WM_KEYUP, VK_LSHIFT, lparam_up)
 
-    def click_input(self,point,text):
+    def click_input(self,point,text,before_input=None):
+        """点击坐标后把 text 以 WM_CHAR 逐字发给窗口（不经过输入法）。
+
+        :param before_input: 点击输入框之后、开始打字之前的回调（可选）。
+            崩铁/原神的登录界面是 webview，点一下输入框它就会把中文输入法
+            重新挂回来；调用方借这个回调在「已经点中输入框」的时刻再挡一次
+            输入法（force_english_input + set_input_english），
+            见 games/starRail/action/bt_task.py 的 登录()。
+        """
         x, y = point  # 点击的坐标（相对于窗口客户区）
         ctypes.windll.user32.SetCursorPos(x, y)
         l_param = (y << 16) | x  # 计算坐标参数
@@ -905,6 +913,9 @@ class Control():
         time.sleep(0.05)
         ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_LBUTTONUP, 0, l_param)
         time.sleep(0.02)
+        if callable(before_input):
+            # 此时输入框已经拿到焦点，窗口/输入焦点都在游戏上
+            before_input()
         for char in text:
             ctypes.windll.user32.PostMessageW(self.hwnd, win32con.WM_CHAR, ord(char), 0)
             time.sleep(0.01)

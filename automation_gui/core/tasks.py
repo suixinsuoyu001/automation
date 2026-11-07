@@ -85,6 +85,45 @@ def ys_account_name_choices() -> List:
     return [(item["账号"], item["账号"]) for item in account_store.enabled_ys_accounts()]
 
 
+def ys_account_auto_choices() -> List:
+    """「自动识别」排第一的账号选项：[('', '自动（按 UID 识别）')] + ys_account_choices()。
+
+    「灵活副本战斗」用：不打传送流程、只靠游戏内 UID 反查账号编号（ys_action.uid转zh_num），
+    所以默认不需要选账号；UID 没配映射时再在卡片上手动选（值是编号，和 队伍.json 对齐）。
+    """
+    return [("", "自动（按 UID 识别）")] + ys_account_choices()
+
+
+def bt_account_name_choices() -> List:
+    """崩铁账号选项：[(账号, '账号（备注）'), ...]。
+
+    下拉框显示「账号（备注）」（备注见 config.BT_ACCOUNT_REMARKS，例如
+    ``suixin001007@163.com（流萤）``），全角括号把账号和备注隔开，
+    和原神下拉框的「账号（队伍名）」是同一个样式；但**值仍然是账号本身** ——
+    登录任务直接把账号字符串传给 ``bt_login.login_one``，所以即使以后
+    accounts.json 和 ``bt_login.zhs`` 的顺序被改得不一致，也不会出现
+    「选中的账号和实际登录的账号对不上」的问题。
+
+    读的是账号页编辑的 automation_gui/accounts.json，每次调用都重新读，
+    所以账号页改完，任务卡片的下拉框会跟着更新（不必重启程序）。
+    账号页里新加的账号如果在 BT_ACCOUNT_REMARKS 里没有备注，就只显示账号。
+    """
+    from automation_gui import config
+    from automation_gui.core import account_store
+
+    remarks = config.BT_ACCOUNT_REMARKS
+    options = []
+    for account in account_store.load_accounts().get("bt", []):
+        if not account:
+            continue
+        account = str(account)
+        remark = remarks.get(account, "")
+        # 有备注才加括号，没备注就直接显示账号（不留空括号/尾随空格）
+        label = f"{account}（{remark}）" if remark else account
+        options.append((account, label))
+    return options
+
+
 def ys_domain_choices() -> List:
     """圣遗物秘境选项：[(编号, '模板图片名'), ...]。
 
@@ -154,6 +193,19 @@ YS_TASKS: List[TaskDef] = [
         group="原神",
         params=[
             TaskParam("n", "账号", "choice", "", choices=ys_account_name_choices),
+        ],
+    ),
+    # 灵活副本战斗：不传送、不切队伍，直接打角色**当前站的**秘境
+    # （秘境配置里没有的新本也能用）。账号默认按 UID 自动识别，识别不到就手动选。
+    TaskDef(
+        id="ys_domain_flex",
+        name="原神灵活副本战斗",
+        description="站在当前秘境里直接开打 + 领奖 + 分解圣遗物（不传送；账号可自动识别）",
+        entry="games.ys.execute.ys_mr:run_flex",
+        icon="GLOBE",
+        group="原神",
+        params=[
+            TaskParam("zh_num", "账号", "choice", "", choices=ys_account_auto_choices),
         ],
     ),
     # 自检任务：跑一遍和「原神单账号登录」完全相同的完整流程，
@@ -246,12 +298,14 @@ BT_TASKS: List[TaskDef] = [
     TaskDef(
         id="bt_login_one",
         name="崩铁单账号登录",
-        description="登录指定序号的账号（对应 bt_login.login_one）",
+        description="登录指定账号（对应 bt_login.login_one）",
         entry="games.starRail.execute.bt_login:login_one",
         icon="PEOPLE",
         group="崩铁",
         params=[
-            TaskParam("n", "账号序号", "int", 0, minimum=0, maximum=99),
+            # 值直接是账号名（见 bt_account_name_choices），不再用序号，
+            # 免得 accounts.json 和 bt_login.zhs 顺序不一致时登错账号
+            TaskParam("n", "账号", "choice", "", choices=bt_account_name_choices),
         ],
     ),
     TaskDef(

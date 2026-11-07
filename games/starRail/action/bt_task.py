@@ -21,6 +21,25 @@ yk_position = (1285, 1209)
 # （没有 sleep 也没有超时），截图一坏就会疯狂点击、卡住任务，见 剧情()。
 消息循环超时 = 15
 
+def 输入法切英文():
+    """点击输入框后立刻把输入法挡回英文（和原神 ys_action.登录 的做法一致）。
+
+    崩铁登录界面和原神一样是 webview：点一下输入框，游戏自己就会把中文
+    输入法重新挂上。所以除了在打字前 ``disable_ime_all()``，还要在
+    **点中输入框之后**再挡一次：
+
+      * ``force_english_input()``：解除窗口树与输入法的关联（IMM32）；
+      * ``set_input_english()``：把该窗口线程的输入语言临时切成英文
+        （对付微软拼音这类 IMM32 管不到的 TSF 输入法）。
+
+    调用方（``Control.click_input`` 的 before_input 回调）保证此时游戏在前台，
+    输入框已经拿到焦点。
+    """
+    c.control.hwnd = get_hwnd(windows_title)
+    c.control.force_english_input()
+    c.control.set_input_english()
+
+
 def 登录(zh):
     if type(zh) == int:
         zh = c.zhs[zh]
@@ -43,15 +62,21 @@ def 登录(zh):
     c.wait_click('登录其他账号')
     c.wait_click('账号密码')
     # 输入账号密码前屏蔽输入法，防止游戏内切换成中文输入法
+    c.control.hwnd = get_hwnd(windows_title)
     c.control.disable_ime_all()
-    c.text_input('输入账号', zh)
-    c.text_input('输入密码', 'zxc147123')
-
-
+    # 点中输入框时游戏会把输入法重新挂回来 -> 在 before_input 里再挡一次，
+    # 这样账号/密码不会经过中文输入法（同原神 登录() 的 force_english_input）
+    c.text_input('输入账号', zh, before_input=输入法切英文)
+    c.text_input('输入密码', 'zxc147123', before_input=输入法切英文)
+    # 账号密码已打完，立刻把输入法/输入语言还给游戏与系统：
+    # 游戏内聊天照常能打中文，游戏外其它程序也不受影响
+    c.control.enable_ime_all()
+    c.control.restore_input()
 
     c.wait_click('同意')
     c.wait_click_limit('进入游戏')
-    资料验证()
+    if resolution[0] != 2560:
+        资料验证()
     c.wait_click_limit('开始游戏')
     c.wait_click('点击进入')
     while True:

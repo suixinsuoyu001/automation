@@ -46,6 +46,11 @@ COMBO_MIN_WIDTH = 200
 # 否则两个 200px 的下拉框加上标签会把卡片撑出可见区域（小窗口尤其明显）
 COMBO_MIN_WIDTH_MULTI = 130
 
+# 下拉框按最长选项自动撑开时的上限（防止极端长文本把卡片撑爆）
+# 只对**单参数**卡片生效：像「秘境 + 账号」这种多参数卡片宽度本来就紧张，
+# 继续沿用上面的固定最小宽度，避免把卡片撑出可见区域。
+COMBO_AUTO_MAX_WIDTH = 480
+
 
 class TaskCard(CardWidget):
     """单个任务卡片：单选 + 名称 + 描述 + 参数。"""
@@ -84,7 +89,7 @@ class TaskCard(CardWidget):
                     combo = ComboBox(self)
                     combo.setMinimumWidth(COMBO_MIN_WIDTH if len(task.params) < 2
                                           else COMBO_MIN_WIDTH_MULTI)
-                    self._fill_combo(combo, p)
+                    self._fill_combo(combo, p, max_width=self._combo_max_width())
                     self.param_widgets[p.key] = combo
                     param_layout.addWidget(combo, 1)
                 else:
@@ -101,16 +106,37 @@ class TaskCard(CardWidget):
         text_layout.addStretch(1)
         layout.addLayout(text_layout, 1)
 
+    def _combo_max_width(self):
+        """下拉框自动撑开的宽度上限：多参数卡片不撑开（返回 0）。"""
+        return COMBO_AUTO_MAX_WIDTH if len(self.task.params) < 2 else 0
+
     @staticmethod
-    def _fill_combo(combo, param, keep=None):
-        """把参数选项填进下拉框，并尽量保持当前选中项。"""
+    def _fill_combo(combo, param, keep=None, max_width=COMBO_AUTO_MAX_WIDTH):
+        """把参数选项填进下拉框，并尽量保持当前选中项。
+
+        :param max_width: 按最长选项自动撑开的最小宽度上限；0 表示不撑开
+            （多参数卡片宽度紧张，见 COMBO_AUTO_MAX_WIDTH 的注释）。
+        """
         combo.blockSignals(True)
         combo.clear()
-        for value, text in param.option_list():
+        options = param.option_list()
+        for value, text in options:
             combo.addItem(text, userData=value)
         target = param.default if keep is None else keep
         index = combo.findData(target)
         combo.setCurrentIndex(index if index >= 0 else 0)
+        # 按最长选项把下拉框撑开，避免「账号（备注）」这类长文本被截断
+        # （卡片本身是拉伸布局，这里只是给一个下限）
+        if max_width:
+            try:
+                metrics = combo.fontMetrics()
+                longest = max((metrics.horizontalAdvance(text) for _value, text in options),
+                              default=0)
+                if longest:
+                    combo.setMinimumWidth(min(max(combo.minimumWidth(), longest + 48),
+                                              max_width))
+            except Exception:
+                pass    # 取字体宽度失败就保持原来的最小宽度，不影响功能
         combo.blockSignals(False)
 
     def param_values(self):
@@ -130,7 +156,8 @@ class TaskCard(CardWidget):
                 continue
             combo = self.param_widgets.get(p.key)
             if combo is not None:
-                self._fill_combo(combo, p, keep=combo.currentData())
+                self._fill_combo(combo, p, keep=combo.currentData(),
+                                 max_width=self._combo_max_width())
 
 
 class TaskSwitchRow(CardWidget):

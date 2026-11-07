@@ -17,6 +17,10 @@ yk_position = (1285, 1209)
 助战角色替换 = (2274, 758)
 选择助战角色 = (127, 339)
 
+# 剧情里「消息标识 -> 关闭消息」这一步的最长重试时间（秒）。原来是死循环
+# （没有 sleep 也没有超时），截图一坏就会疯狂点击、卡住任务，见 剧情()。
+消息循环超时 = 15
+
 def 登录(zh):
     if type(zh) == int:
         zh = c.zhs[zh]
@@ -395,6 +399,9 @@ def 剧情():
         esc_names = ['空白位置1', '阅读','获得物品']
         res = c.waits_speed(other_list + click_list + esc_names,num)
         if res is None:
+            # 这一帧什么都没识别到。原实现直接 continue：一轮要扫十几个模板，
+            # 会把一个核烧满，而截图服务 50ms 才出一帧，扫得更快没有意义。
+            time.sleep(0.05)
             continue
         log(res+' 识别')
         if res in ['L','M','LB','RB']:
@@ -411,9 +418,20 @@ def 剧情():
         if res in esc_names:
             c.send_key('esc')
         if res == '消息标识':
-            c.click(res)
+            # 原实现是 c.click(res) + 「while not 关闭消息: 点(2300,950)」：
+            # 既没有 sleep 也没有超时。截图一旦坏掉（画面不再更新，例如窗口
+            # 被最小化 / 游戏没响应），「关闭消息」就永远等不到 -> 这里变成
+            # 死循环：疯狂点击、每点一次都屏蔽用户输入并抢鼠标（表现就是
+            # 任务卡死不再推进、切窗口/切页很卡，游戏窗口也被刷得越来越卡）。
+            c.click_speed(res)
+            deadline = time.time() + 消息循环超时
             while not c.waits_speed(['关闭消息']):
+                if time.time() > deadline:
+                    log(f'消息标识：{消息循环超时:g}s 内没等到「关闭消息」，'
+                        f'停止点击，交回主循环重试')
+                    break
                 c.click_point([2300,950])
+                time.sleep(0.3)
         time.sleep(0.2)
 
 def 活动():
@@ -425,6 +443,8 @@ def 活动():
         click_list = [f'活动/{i}' for i in click_list]
         res = c.waits_speed(other_list + click_list + esc_names,num)
         if res is None:
+            # 同 剧情()：没识别到就小睡，别空转烧一个核
+            time.sleep(0.05)
             continue
         log(res+' 识别')
         if res == '活动/s0':

@@ -3,7 +3,10 @@ import pyautogui
 import win32con
 from PIL import Image
 from func.common import *
-from func.get_pic import get_pic, latest, start_capture, stop_capture, wait_first_frame
+from func.get_pic import (
+    get_pic, is_stale, latest, log_throttled, start_capture, stop_capture,
+    wait_first_frame,
+)
 from func.match.template_match import t_match
 from func.control.back_control import Control
 from func.control.global_match import match
@@ -93,9 +96,17 @@ class check():
         self.hwnd = get_hwnd(self.wt)
         self.t_match = t_match(self.wt, self.path)
         self.control = Control(self.hwnd)
-        self.stop_event = threading.Event()
         start_capture(self.wt, self._loop_interval())
         wait_first_frame(self.wt)
+        # 幂等：已经在跟踪焦点就不要再起一个线程。
+        # 原来这里每次都新建线程并覆盖 self.thread，旧线程收不到停止信号会
+        # 一直留着；而 waits/click 等在 processed_screen 为 None 时都会调
+        # check_start，多调几次就堆出一串后台线程（越跑越卡）。
+        if self.thread is not None and self.thread.is_alive():
+            self.focus = self.is_focus()
+            log("获取图片进程已开始")
+            return
+        self.stop_event = threading.Event()
         self.thread = threading.Thread(target=self.get_pic_loop, name='BtFocusLoop', daemon=True)
         self.thread.start()
         self.focus = self.is_focus()
@@ -155,6 +166,15 @@ class check():
     def check_one_pic(self,name,num,screen):
         if screen is None:
             return
+        if is_stale():
+            # 截图连续失败（窗口被最小化/遮挡、游戏一时没响应）时，画面已经
+            # 不再更新了：再拿这一帧判断只会按**过期的界面**乱点，所以直接
+            # 放弃本次判断，等截图恢复。见 func.screenshot.is_stale()
+            log_throttled(
+                'bt_screen_stale',
+                '画面已停止更新（截图连续失败），暂停识别等截图恢复…',
+            )
+            return
         if self.locs.get(name) is None:
             return self.match_one_pic(name, num)
         for point in self.locs[name]:
@@ -195,24 +215,35 @@ class check():
             log("匹配失败")
 
     def post(self,func, a1=None, a2=None):
+        """点击 / 按键的统一封装：临时屏蔽用户输入并置前，做完再还原。
+
+        原来这段**没有 try/finally**：中间任何一步抛异常（句柄失效、
+        SetCursorPos 失败……），``BlockInput(True)`` 就再也不会被解除 ——
+        整个系统的键盘鼠标都被屏蔽（表现就是「点什么都没反应、切换窗口很卡」），
+        只能杀进程才能恢复。所以这里必须用 finally 兜底。
+        """
         self.control.block_user_input()
-        self.control.activate()
-        time.sleep(0.01)
-        x, y = self.control.get_mouse_position()
-        time.sleep(0.01)
-        if a2:
-            func(a1, a2)
-        elif a1:
-            func(a1)
-        else:
-            func()
-        time.sleep(0.02)
-        self.control.inactivate()
-        time.sleep(0.03)
-        self.control.set_mouse_position(x, y)
-        self.control.unblock_user_input()
-        if self.focus:
+        x = y = None
+        try:
             self.control.activate()
+            time.sleep(0.01)
+            x, y = self.control.get_mouse_position()
+            time.sleep(0.01)
+            if a2:
+                func(a1, a2)
+            elif a1:
+                func(a1)
+            else:
+                func()
+            time.sleep(0.02)
+            self.control.inactivate()
+            time.sleep(0.03)
+        finally:
+            if x is not None and y is not None:
+                self.control.set_mouse_position(x, y)
+            self.control.unblock_user_input()
+            if self.focus:
+                self.control.activate()
 
 
     def click(self,name,num = None):
@@ -390,28 +421,40 @@ class check():
                 return name
 
     def hold_click(self,point):
+        """长按点击（先屏蔽用户输入，做完**务必**解除）。
+
+        原来没有 try/finally，而且重试用的是递归：中途抛异常、或者一直重试
+        下去，``BlockInput(True)`` 就一直生效 —— 整个系统的键盘鼠标全被屏蔽
+        （表现是「点什么都没反应、切窗口很卡」）。这里用 finally 兜底，
+        并把递归改成同层循环，行为不变但不会叠加屏蔽。
+        """
         self.control.block_user_input()
+        try:
+            self._hold_click_until(point)
+        finally:
+            self.control.unblock_user_input()
+
+    def _hold_click_until(self,point):
+        """长按点击的实际逻辑（调用方必须已经 block_user_input）。"""
         if not self.focus:
             self.control.activate()
         log(f'hold_click: 点击坐标{point}',level=2)
-
-        x, y = self.control.get_mouse_position()
-        time.sleep(0.02)
-        self.control.send_key_down('alt')
-        time.sleep(0.01)
-        ctypes.windll.user32.SetCursorPos(point[0],point[1])
-        if self.control.get_mouse_position() == point:
-            self.control.click(point)
-            self.control.send_key_up('alt')
+        while True:
+            x, y = self.control.get_mouse_position()
             time.sleep(0.02)
-            if not self.focus:
-                self.control.inactivate()
-            time.sleep(0.02)
-            self.control.set_mouse_position(x, y)
-        else:
+            self.control.send_key_down('alt')
+            time.sleep(0.01)
+            ctypes.windll.user32.SetCursorPos(point[0],point[1])
+            if self.control.get_mouse_position() == point:
+                self.control.click(point)
+                self.control.send_key_up('alt')
+                time.sleep(0.02)
+                if not self.focus:
+                    self.control.inactivate()
+                time.sleep(0.02)
+                self.control.set_mouse_position(x, y)
+                return
             time.sleep(0.5)
-            self.hold_click(point)
-        self.control.unblock_user_input()
 
 
 

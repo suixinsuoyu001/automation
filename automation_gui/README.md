@@ -125,8 +125,13 @@ from func import screenshot
 
 screenshot.start_capture('原神')     # 启动（重复调用同一窗口不会重启线程）
 frame = screenshot.latest('原神')     # 零拷贝取最新一帧
+screenshot.is_stale()                 # 画面是否已陈旧（连续失败，别拿它做判断）
+screenshot.restart_capture()          # 杀掉截图线程并重新拉起（卡死的旧线程直接放弃）
 screenshot.stop_capture()             # 停止
 ```
+
+* `capture_restart_count()` / `last_frame_age()` 给排查用：前者是本次会话彻底重启了
+  几次截图线程，后者是「最近一帧距今多少秒」（180 秒没有任何新帧就会被判成进程级故障）。
 
 * `func.get_pic.get_pic(window_title)` 签名不变，服务已启动时直接返回共享帧，
   未启动时自动回退为单次实时截图 —— 老代码**零改动**即可受益。
@@ -135,6 +140,97 @@ screenshot.stop_capture()             # 停止
   维护工作，不再重复截图。
 * 循环线程每帧都产生**全新 ndarray** 再整体替换引用，从不原地修改，
   因此 `latest()` 可以零拷贝返回，调用方不会读到撕裂画面。
+
+### 截图失败时的自我保护（`func/screenshot.py`）
+
+**真机结论：崩铁「全屏」时 PrintWindow 一定抓不到画面，而且只有屏幕 DC 能救命。**
+全屏游戏窗口是 popup 且盖满屏幕，一旦它成为**前台窗口**，DWM 就切到 direct-flip
+（不再合成这个窗口）：`PrintWindow` 的 `0/1/2/3` 四种 flag **全部返回 0**、只得到
+全黑位图，`DwmFlush` 也没用；更关键的是**从窗口 DC（`GetWindowDC`）BitBlt 同样是
+纯黑** —— flip 的内容压根不在窗口 DC 里。唯一能拿到真画面的是**屏幕 DC**
+（`GetDC(0)` 拷客户区所在的那块屏幕，实测均值 65、唯一色 36 万，模板匹配
+0.66~0.75）。现象就是「跑着跑着突然一直报 `PrintWindow函数截取窗口图像失败`、
+任务失效」，而重新开关任务（人动一下鼠标、GUI 抢回前台）又好了。所以现在的处理是：
+
+* **抓屏幕回退**：PrintWindow 全失败、且**屏幕上采样点确实都是本窗口**（
+  `_window_visible_ratio`，5×5 采样 ≥80%）时，从**屏幕 DC** 拷客户区那一块
+  （进程已 `SetProcessDPIAware`，坐标与 2560×1440 的模板坐标一致）。闸门**不能**
+  用 `GetForegroundWindow`：切窗口时前台会短暂变成系统内部窗口（`ForegroundStaging`、
+  任务切换的 `MultitaskingViewFrame`，实测 4 秒跳 249 次），会把明明能抓的画面
+  误判掉。窗口真的被盖住/切走时坚决不用（否则会把上层窗口的像素当游戏画面乱点，
+  见 `BITBLT_FALLBACK`），并且日志会说清楚**是谁挡住了**（类名 + 标题）。
+* **全屏游戏被切走会自动抢回前台**：全屏窗口被切到别的窗口后面时，PrintWindow
+  必失败、抓屏幕又必须拒绝 —— 等于完全抓不到，唯一出路是把它弄回屏幕。此时截图
+  服务会（`RECOVER_INTERVAL` 15s 起、连续失败指数退避到 5 分钟）把游戏窗口
+  `SW_RESTORE` + 抢回前台，画面自己就回来了，不用重开任务。
+  抢前台的实现有坑：**后台进程调用 `SetForegroundWindow` 会被系统静默忽略**
+  （不报错、什么也不发生），所以先发一次 ALT 空按让系统认为「最后输入来自本进程」，
+  再 `SetForegroundWindow`，还不行就挂到前台窗口线程 / 目标线程上重试，最后用
+  `GetForegroundWindow` 判断到底成没成。置前动作跑在独立线程里，万一
+  `AttachThreadInput` 卡住也不会把截图线程拖死。
+* **用户正在用电脑时不自愈，等他空闲**：抢焦点会打断正在打字的人，所以自愈要求
+  「**真人** `RECOVER_MIN_USER_IDLE`（60s）内没碰过键鼠」（`real_user_idle`，
+  会扣掉我们自己注入的空输入，否则永远以为自己刚有操作）。日志会说明「先不动它，
+  等你停下 60s 后自动弄回来」。想彻底不抢焦点：把崩铁改成**窗口化**模式 —— 窗口
+  模式下 DWM 正常合成，PrintWindow 在游戏不在前台时也能抓到画面。
+* **日志限频**：原实现每帧都 `log(...)`，失败时就是 20~100Hz 刷屏。现在用
+  `log_throttled(key, msg, 5s)`，并把失败原因 + **窗口状态**（最小化 / 不可见 /
+  cloaked / 没响应 / 会话被锁 / 距上次真实输入多少秒）写在同一条日志里。
+* **纯色图判失败**：窗口最小化 / 画面被系统丢掉时 PrintWindow 会「成功」返回
+  全黑图，模板匹配永远匹配不到 —— 现在直接当失败处理（`_is_blank`）。
+* **自动还原**：窗口最小化/不可见且真人空闲 60s 以上时自动
+  `ShowWindow(SW_RESTORE)` + 置前，任务不用重开就能继续。
+* **失败降频**：连续失败时重试间隔拉到 `FAIL_RETRY_INTERVAL`（1 秒），重新按标题
+  找窗口限频到 `RESOLVE_INTERVAL`（3 秒）；抓到一帧立刻恢复原频率。
+* **画面陈旧标记**：连续失败 `STALE_AFTER_FAILURES`（3）次后 `screenshot.is_stale()`
+  为真，`func.check` / `bt_func` 的 `check_one_pic` 会**跳过识别**（只等截图恢复），
+  不再拿过期的那一帧乱点（这是「功能失效 / 乱点 / 切窗口变卡」的直接原因）。
+* **别让系统关屏/休眠/锁屏**：自动化点击走 `PostMessage`，系统**不算用户输入**，
+  长时间跑剧情时显示器会照样关、会话会照样锁，而锁屏后 DWM 停止合成用户桌面 →
+  PrintWindow 全挂。所以截图线程会 `SetThreadExecutionState(ES_DISPLAY_REQUIRED)`
+  并且每 `WAKE_INTERVAL`（20s）注入一次空输入（`keep_awake`）。注意：**实测
+  「注入空输入」并不总能顶掉 Windows 的空闲计时器**，所以真正起作用的是
+  SetThreadExecutionState；如果诊断显示屏保才是罪魁，把 `SUPPRESS_SCREENSAVER`
+  改成 True（截图期间临时禁用屏保，停止时还原）。
+* **GDI 清理**：删位图前先 `SelectObject` 换出来，避免长时间运行泄漏位图。
+* **`get_hwnd` 跳过本进程的窗口**：`GetWindowText` 对**本进程**的窗口是同步等
+  `WM_GETTEXT` 的，本进程里只要有个窗口没在抽消息，截图线程就会**永久卡死**
+  且没有任何报错（表现就是「功能失效」）。游戏窗口永远在别的进程，所以直接跳过。
+* **杀掉截图线程并重新拉起（看门狗）**：线程一旦卡在 `PrintWindow` / `GetDC` 这类
+  **系统调用**里，Python 侧没有任何办法打断它（GIL 早就释放了，只能等调用返回），
+  表现就是画面永远不再更新、怎么等都不会自己好。所以另起一个 `ScreenshotWatchdog`
+  线程盯着，命中任一条就 `restart_capture()`：
+
+  * 连续失败 `HARD_RESTART_AFTER_FAILURES`（10 次 ≈ 10 秒 —— 失败期间每秒才重试一帧）；
+  * 超过 `LOOP_HANG_TIMEOUT`（20s）没有心跳 —— 也就是卡在系统调用里；
+  * 截图线程直接退出（异常 / 被系统回收）。
+
+  重启 = 放弃旧线程（daemon，进程退出时一并回收）、`GdiFlush`、清掉限频 / 陈旧 /
+  退避计数、重新按标题找窗口、起新线程（线程名 `ScreenshotLoop#N`，N 是代次），
+  日志会明确写一句「已杀掉截图线程（第 N 次），正在重新拉起：<原因>」。
+  两次重启之间有指数退避（`HARD_RESTART_INTERVAL` 15s 起，最长 5 分钟），避免故障
+  一直存在时反复换线程反而更卡。旧线程醒来退出时按代次判断「我已经被换掉了」，
+  不会去撤新线程的保活 / 屏保状态。
+* **换线程也救不回来时只报警，不擅自杀任务进程**：任务子进程里还有一个看护线程，
+  只要「画面连续 `CAPTURE_DEAD_SECONDS`（180s）一帧都没有、且截图服务自己判陈旧」，
+  就往日志队列里上报 `capture_dead`；界面默认只写一条错误日志 + 弹提示（把游戏
+  窗口切回前台 / 改成窗口化模式后会自动恢复），**不杀任务、不抢焦点** —— 因为抢
+  焦点会打断正在用电脑的人。想让程序自动把整棵任务进程树收掉再按原参数重开（含
+  任务脚本自己起的点击子进程，最多 2 次），把
+  `automation_gui/ui/main_window.py` 里的 `AUTO_RESTART_ON_CAPTURE_DEAD` 改成 `True`。
+
+出问题时先跑现场诊断（只读，会把窗口状态 / 空闲时间 / 屏保 / 电源设置都打出来）：
+
+```bash
+venv\Scripts\python.exe tool/capture_diagnose.py            # 默认崩坏：星穹铁道
+venv\Scripts\python.exe tool/capture_diagnose.py 原神
+```
+
+回归测试（在独立进程里建一个窗口当截图目标，61 项断言，约 50 秒）：
+
+```bash
+venv\Scripts\python.exe tool/screenshot_capture_test.py
+```
 
 ### `check_start` 与「游戏还没打开」的处理（`func/check.py`）
 

@@ -54,9 +54,21 @@ def get_focus_window():
 
 def get_hwnd(target_title: str) -> str:
     result = ""
+    self_pid = os.getpid()
+
     def callback(hwnd, extra):
         nonlocal result  # 让回调函数可以修改外部变量
         if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
+            # ⚠ 跳过本进程自己的窗口：GetWindowText 对**本进程**的窗口是同步发
+            # WM_GETTEXT 的，本进程里只要有个窗口没在抽消息（主线程在 sleep /
+            # 卡住），这里就会**永久阻塞**。截图线程一卡，画面就再也不更新了，
+            # 而且不会有任何报错（表现就是「功能失效」）。要找的游戏窗口永远
+            # 在别的进程，直接跳过最安全。
+            try:
+                if win32process.GetWindowThreadProcessId(hwnd)[1] == self_pid:
+                    return
+            except Exception:
+                pass
             title = win32gui.GetWindowText(hwnd)
             # if title and target_title in title:  # 模糊匹配
             if title and target_title == title:  # 绝对匹配
@@ -81,9 +93,17 @@ def enum_all_windows():
 
 def get_item_hwnd(right, bot):
     result = ""
+    self_pid = os.getpid()
+
     def callback(hwnd, extra):
         nonlocal result  # 让回调函数可以修改外部变量
         if win32gui.IsWindowVisible(hwnd):  # 只查找可见窗口
+            # 同 get_hwnd：本进程的窗口会让 GetWindowText 同步等 WM_GETTEXT
+            try:
+                if win32process.GetWindowThreadProcessId(hwnd)[1] == self_pid:
+                    return
+            except Exception:
+                pass
             title = win32gui.GetWindowText(hwnd)
             sp_left, sp_top, sp_right, sp_bot = win32gui.GetClientRect(hwnd)
             if sp_right == right and sp_bot == bot:

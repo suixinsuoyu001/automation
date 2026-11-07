@@ -490,6 +490,11 @@ class check():
     def check_one_pic(self,name,num,screen):
         if screen is None:
             return
+        if is_stale():
+            # 截图连续失败时画面已经不更新，再拿这一帧判断只会按过期界面乱点
+            # （见 func.screenshot.is_stale），所以放弃本次判断，等截图恢复。
+            log_throttled('screen_stale', '画面已停止更新（截图连续失败），暂停识别等截图恢复…')
+            return
         if self.locs.get(name) is None:
             return self.match_one_pic(name, num)
         for point in self.locs[name]:
